@@ -1,6 +1,6 @@
 # Spec-Loop Skill 仓库
 
-这是我自己的跨设备、跨 harness 工作流恢复仓库：承载 spec-loop（规格驱动）工程方法论与评审 agent。`archive/` 是作为参考留存、**不参与提交**的 deepseek-harness 原始材料。
+这是我自己的跨设备、跨 harness 工作流恢复仓库：承载 spec-loop（规格驱动）工程方法论与评审 agent。
 
 ## 这是什么
 
@@ -19,8 +19,7 @@ Spec-loop engineering 的核心：任何跨 2+ 文件或 2+ 步骤的任务，�
 │   ├── manage-decision-records/
 │   ├── trim-cot-leakage/
 │   └── simplification-audit/
-├── Google_code_style.md # 全局代码风格（Google Python + 注释中文）
-└── archive/             # 参考资料（dsh-* 等；由 .gitignore 排除，不提交）
+└── Google_code_style.md # 全局代码风格（Google Python + 注释中文）
 ```
 
 ## 恢复到新设备 / 新 harness
@@ -45,7 +44,3 @@ requirements → `write-spec`（冻结 spec，含 `[Sn]`+Claims+`Dependencies`+�
 - `write-spec` 应用 prose-quality（完整命题）与 manage-decision-records（supersession 检查）。
 - `structured-code-review` 层1 调 prose-quality + trim-cot-leakage；`trim-cot-leakage` 删前引用 prose-quality；`simplification-audit` 委托 manage-decision-records 做保留判断。
 - 协作声明落盘：`AGENTS.md`（调用指南）+ 各 `SKILL.md` 的 `## Collaboration` 节 + `agents/reviewer.md` + 本文件（协作总图）。
-
-## archive/ 说明
-
-`archive/` 是本地参考资料，被 `.gitignore` 排除、不进入版本控制：含 deepseek-harness 的 `dsh-*` 技能、Agent Notes 文档（`README-agent-notes.zh.md`）、`dsh_skill_AGENTS.md`。用于回溯这些 skill 的原始出处及我提炼它们时的对照，不参与本仓库维护。
