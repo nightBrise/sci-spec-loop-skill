@@ -118,7 +118,7 @@ Assertions fail on the intended regression and verify external state — logs, e
 
 ### Decision Record matches shipped reality
 
-When a change implements a proposed Decision Record, move and rewrite it as present-tense shipped state in the same diff, then verify paths, names, and mechanisms against the implementation.
+When a change implements a proposed standalone Decision Record, verify the record was migrated to `accepted` (a present-tense `## Decision` plus `## Consequences`) per manage-decision-records' transition rules, then verify paths, names, and mechanisms against the implementation. The main agent executes the migration on main after the implementing change merges; a review must never ask an implementer to edit `docs/specs/*`. Conversely, flag design choices visible in the diff that no Decision Record or Decision Log entry covers — an implementation that silently introduces an unrecorded decision needs one.
 
 ### Snapshot and visible-output changes
 
@@ -187,5 +187,6 @@ This skill is the review layer that orchestrates other skills:
 
 - **prose-quality:** invoked by blocking requirement #1 (prose semantic review)
 - **trim-cot-leakage:** invoked by blocking requirement #1 (leakage detection)
-- **write-spec:** referenced by the "Decision Record matches shipped reality" check
+- **write-spec:** produces the frozen spec and Decision Log that this review verifies against
+- **manage-decision-records:** owns the migration and supersession semantics the "Decision Record matches shipped reality" check verifies
 - **reviewer agent:** this skill's methodology is what the reviewer agent (or the main agent's review flow) applies as the code quality layer (after spec compliance review passes)

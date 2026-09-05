@@ -36,7 +36,7 @@ Before producing a new spec:
 
 1. `glob docs/specs/*.md` — check if a spec for this feature already exists
    - Exclude `*-design.md` (design doc from the requirements phase — treat as INPUT, not an existing spec)
-   - Exclude `*.decisions.md` (Decision Log companion files)
+   - Exclude `*.decisions.md` (per-feature Decision Logs)
 2. Check `docs/specs/README.md` (or the project's spec index) — check if a spec path was recorded
 
 If a matching spec file (not design doc, not decision log) is found: read the
@@ -116,15 +116,6 @@ write the file.
 ## Out of Scope
 
 - <Explicitly excluded behavior.>
-
-## Decisions
-
-### D1: <Decision title>
-**Chosen:** <what was selected>
-**Rationale:** <why, in 1-2 sentences>
-**Rejected:**
-- <alternative 1> — <reason for rejection>
-- <alternative 2> — <reason for rejection>
 ```
 
 ### Section rules (`[Sn]`)
@@ -174,24 +165,31 @@ write the file.
 
 ### Decision rules (`Dn`)
 
-The `## Decisions` section records significant design choices made during
-brainstorm — the WHY that code and claims cannot carry.
+Brainstorm design choices are recorded directly in the Decision Log as
+`Phase: write-spec` entries — the WHY that code and Claims cannot carry. The
+spec itself carries no decisions.
 
 - Record a decision only when a genuine alternative was considered and rejected.
   If there was no real choice (only one viable approach), do not fabricate alternatives.
-- Each decision has: chosen option, rationale (1-2 sentences), rejected alternatives
+- Each entry has: chosen option, rationale (1-2 sentences), rejected alternatives
   with reasons.
-- Number decisions sequentially: D1, D2, D3, ...
-- Link each decision to its relevant `[Sn]` section if applicable.
-- Skip this section entirely if no meaningful alternatives were discussed during
-  brainstorm. An empty Decisions section is worse than none.
-- Write the `## Decisions` section with prose-quality's complete-proposition rule, and run manage-decision-records' supersession check against existing records before recording a decision that overlaps one.
+- Number entries sequentially in the Decision Log: D1, D2, D3, ... — a single
+  continuous stream from brainstorm through acceptance.
+- Link each entry to its relevant `[Sn]` section if applicable.
+- If no meaningful alternatives were discussed during brainstorm, write no
+  entries; the Decision Log holds only its header.
+- Write entries with prose-quality's complete-proposition rule, and run
+  manage-decision-records' supersession check against existing records before
+  recording a decision that overlaps one. If an existing standalone Decision
+  Record covers the topic, reference it instead of re-deciding.
 
-### Decision Log file (companion)
+### Decision Log file
 
-In addition to the `## Decisions` section in the spec, create a companion
-Decision Log file that persists beyond the spec freeze. This file captures
-decisions made throughout the entire lifecycle — not just during brainstorm.
+The Decision Log is the feature's single decision home. Create it alongside the
+spec, holding the brainstorm entries written under the decision rules above. The
+log persists beyond the spec freeze and captures decisions from the entire
+lifecycle — brainstorm through review and user interaction. The spec itself
+carries no decisions.
 
 **Path:** `docs/specs/<feature-slug>.decisions.md` (same directory as spec)
 
@@ -214,10 +212,10 @@ decisions made throughout the entire lifecycle — not just during brainstorm.
 ...
 ```
 
-The `## Decisions` section in the spec and the `.decisions.md` file share the
-same D1, D2, ... numbering for brainstorm-phase decisions. Post-brainstorm
-decisions (implementation, review, user interaction) are appended to
-`.decisions.md` only — the spec is frozen.
+Numbering runs as a single continuous stream in `.decisions.md`: D1, D2, ...
+Brainstorm entries are written during write-spec (`Phase: write-spec`);
+post-brainstorm decisions (implementation, review, user interaction) are
+appended with later numbers — the spec is frozen and carries no decisions.
 
 **Lifecycle decisions beyond the requirements phase:**
 
@@ -246,15 +244,15 @@ After writing, verify:
   outcome? If not, rewrite.
 4. No requirement from the gathered requirements is unaddressed — list any gap
   and add a section or claim
-5. Every decision in `## Decisions` has a Chosen option, Rationale, and at
+5. Every brainstorm Decision Log entry has a Chosen option, Rationale, and at
   least one Rejected alternative with a reason
 
 ## Save and confirm
 
 1. Write the spec to `<spec-dir>/<feature-slug>.md`
-2. Write the Decision Log to `<spec-dir>/<feature-slug>.decisions.md`
-   (copy D1, D2, ... from the spec's `## Decisions` section; if no decisions
-   were made, create the file with the header only and no entries)
+2. Write the Decision Log to `<spec-dir>/<feature-slug>.decisions.md`,
+   holding the brainstorm entries written above (if no decisions were made,
+   create the file with the header only and no entries)
 3. Commit both files:
    ```bash
    git add <spec-dir>/<feature-slug>.md <spec-dir>/<feature-slug>.decisions.md
@@ -310,10 +308,12 @@ it continues to accumulate decisions throughout implementation and review.
   implementation, review, or any interactive session
 - Each entry must include: Phase, Chosen, Rationale, and at least one Rejected
   alternative with a reason
-- Decisions stay in `.decisions.md`; only cross-spec architectural decisions earn a
-  standalone record in `docs/specs/decisions/` (per manage-decision-records). Do not
-  promote decisions into a separate `## Architecture decisions` document — the
-  per-feature Decision Log is the single home.
+- Decisions stay in `.decisions.md`; only durable cross-feature or cross-spec
+  proposals and decisions earn a standalone record in `docs/specs/decisions/`
+  (per manage-decision-records). Do not promote a feature-bound decision into a
+  standalone record for prominence, and do not create a separate
+  `## Architecture decisions` document — the per-feature Decision Log is the
+  single home for feature-bound decisions.
 
 ## Abandoning a spec
 
@@ -331,6 +331,6 @@ If requirements change substantially during implementation:
 This skill is the producer layer: it converts requirements into the frozen contract and Decision Log that drive the whole loop.
 
 - **prose-quality:** write-spec applies the complete-proposition rule to spec sections and Decision Log prose.
-- **manage-decision-records:** write-spec applies the supersession check and retention judgment to the `## Decisions` section and Decision Log entries.
+- **manage-decision-records:** write-spec applies the supersession check to Decision Log entries it writes; an overlapping standalone Decision Record is referenced, not re-decided.
 - **structured-code-review:** the reviewer consumes this skill's Claims for spec-compliance verification.
 - **main agent:** invokes write-spec when a task spans 2+ files / 2+ steps.

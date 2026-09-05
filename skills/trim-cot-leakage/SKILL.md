@@ -103,7 +103,7 @@ Different surfaces allow different leakage classes. This table overrides the bla
 | Code comments/docstrings | No | No | Strictest — only HEAD-resolvable facts |
 | README/docs | No | No | Current-state only |
 | Spec Claims (`[Sn]`) | No | No | Frozen contract |
-| Spec Decisions | No | User dialogue as WHY | Records rationale including conversation |
+| Legacy Spec Decisions (frozen specs only) | No | User dialogue as WHY | Historical snapshot; new specs carry no decisions |
 | Decision Log (`.decisions.md`) | No | Phase field + user dialogue | Sanctioned evidence surface |
 | Plan Steps | No | No | Implementation instructions only |
 | Delivery summary "What Was Built" | No | No | Final state, self-contained |
@@ -209,4 +209,4 @@ This skill is the detection/repair layer. It references prose-quality as its sta
 - **prose-quality** owns the complete-proposition rule — trim-cot-leakage enumerates propositions before every deletion to ensure no factual clause is lost
 - **prose-quality** defines the surface coverage requirements — trim-cot-leakage's surface tolerance table supplements them with leakage-specific rules
 - **structured-code-review** invokes trim-cot-leakage as part of its "prose quality" blocking requirement
-- **write-spec** — the spec's `## Decisions` section and the Decision Log are sanctioned surfaces per the tolerance table
+- **write-spec** — the Decision Log is a sanctioned surface per the tolerance table; frozen legacy specs keep their historical `## Decisions` sections as snapshots
