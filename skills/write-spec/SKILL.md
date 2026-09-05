@@ -296,8 +296,9 @@ it continues to accumulate decisions throughout implementation and review.
   and note the deviation in the task's report. Do not edit the spec.
 - If requirements change substantially: abandon the old spec, invoke
   write-spec again to produce a new one
-- Small clarifications that do not change acceptance criteria: add a comment
-  line below the claim (e.g., `<!-- clarified: X means Y -->`)
+- An ambiguity found during implementation that needs a clarification: record
+  it in the Decision Log as a new entry (`Phase: implementation`) — never as a
+  comment in the spec
 
 ## Decision Log rules
 

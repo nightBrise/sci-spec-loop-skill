@@ -33,15 +33,19 @@ Accept `mode: automatic | interactive`; default to `automatic`.
 
 `mode` controls questions, not write authority. Review and audit tasks report findings without editing; explicitly requested write, fix, or trim tasks apply changes.
 
-### Exclusions (always, regardless of scope)
+### Always excluded (never inspected or edited, regardless of scope)
 
-- External dependencies (`../FALCON/`, third-party vendored code) — do not follow symlinks into them
+- External dependencies and third-party vendored code (`../FALCON/`, `node_modules/`, `.venv/`) — do not follow symlinks into them
 - Generated files (`__pycache__/`, `.mypy_cache/`, build artifacts)
 - Test fixtures and recorded snapshots
-- Decision Log (`.decisions.md`) — allowed to reference session context
-- Process journals — allowed to narrate process (5-item limit)
+- Frozen specs (`docs/specs/<slug>.md`) — scanned and reported on only; never edit them. Corrections go to the feature's Decision Log or a new spec (per write-spec)
 
 Treat generated catalogs, snapshots, and fixtures as derivative. Edit the owning source or scenario first, then regenerate the artifact.
+
+### Exemptions (from one rule each, never from coverage)
+
+- Decision Log (`.decisions.md`) — exempt from the no-session-context rule: entries may reference session context and narrate the decision process. The Decision-artifact coverage rule and the corpus audit still apply.
+- Process journals — exempt from the no-narration rule: may narrate process, up to the item limit in trim-cot-leakage's surface tolerance table.
 
 ## Preserve the complete proposition
 
@@ -84,7 +88,10 @@ This is not a one-way shortening pass. Add or restore prose when code, types, an
 
 ## Structure before prose
 
-Apply to every human-facing document in scope. Do not apply to Decision Records (they follow their own format from write-spec).
+Apply to every human-facing document in scope. Do not apply to documents whose
+format is owned by another skill: Decision Log entries (per write-spec),
+standalone Decision Records (per manage-decision-records), frozen specs (per
+write-spec), and research outlines (per write-research-outline).
 
 1. Locate the document in the repository and navigation trees. State its subject and identify its direct children.
 2. Set the permitted level of detail. Keep full detail about the document's subject, summarize direct children by purpose and responsibility, move deeper explanations to their owning descendants with links.

@@ -85,7 +85,7 @@ untranslated working-language fragments (端, 设计稿, `---- 私有 ----` sepa
 Unaided citation passes fail in both directions — deleting durable references and keeping dead ones. Apply these keep rules as written:
 
 1. **Issue references** — `#1470`, `TODO(name):`, "issue #N owns the follow-up" resolve at HEAD; keep them on any surface, including READMEs. Do not relocate them to Decision Logs.
-2. **Merged-PR and issue citations inside Decision Logs and process journals** — these are the sanctioned evidence surfaces in the spec-loop workflow. Prose-quality exempts them from standard prose review.
+2. **Merged-PR and issue citations inside Decision Logs and process journals** — these are the sanctioned evidence surfaces in the spec-loop workflow. Prose-quality exempts them from the session-context and narration bans, not from coverage rules.
 3. **Suppression justifications** — `ruff: noqa … -- reason`, `type: ignore … # reason`, coverage-ignore reasons, empty-catch explanations are required prose; fix a false reason, never delete it.
 4. **Counterfactual-present regression pins** — "without X, Y happens".
 5. **Measured bounds** — "(measured: 512 nests ≈ 0.15s)" calibrating a constant; the provenance word "measured" is load-bearing.
