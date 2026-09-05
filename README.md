@@ -40,7 +40,7 @@ cp Google_code_style.md ~/.kimi-code/Google_code_style.md
 
 ## 工作流速览
 
-研究课题：研究问题 → `write-research-outline`（活大纲 + 叶子分类）→ spec 叶子冻结 / investigation 叶子走调查循环。
+研究课题：研究问题 → `write-research-outline`（活大纲 + 叶子分类）→ spec 叶子冻结 / investigation 叶子走调查循环；叶子结局内联记在大纲，耐久 guardrail 提升为 standalone DR。
 
 功能开发：requirements → `write-spec`（冻结纯契约 spec：`[Sn]`+Claims+`Dependencies`）→ 派发循环（每 `[Sn]` 实现/commit/review）→ 对照 spec 验收。全部设计决策（brainstorm 起）直接进 `<slug>.decisions.md`（含 `## Progress` 进度表）；跨 feature/跨 spec 的耐久决策进 standalone DR（`docs/specs/decisions/`）。prose 与推理泄漏审查由 `prose-quality` + `trim-cot-leakage` 承担；简化用 `simplification-audit`；GitHub Flow 约定见 `AGENTS.md`。
 
@@ -48,5 +48,5 @@ cp Google_code_style.md ~/.kimi-code/Google_code_style.md
 
 - `write-spec` 应用 prose-quality（完整命题）与 manage-decision-records（supersession 检查）。
 - `structured-code-review` 层1 调 prose-quality + trim-cot-leakage；`trim-cot-leakage` 删前引用 prose-quality；`simplification-audit` 委托 manage-decision-records 做保留判断。
-- `write-research-outline` 是研究层入口：spec 叶子交 `write-spec`，investigation 叶子的负结果/死胡同交 `manage-decision-records`。
+- `write-research-outline` 是研究层入口：spec 叶子交 `write-spec`；叶子结局内联记在大纲，耐久 guardrail 提升为 standalone DR 交 `manage-decision-records`。
 - 协作声明落盘：`AGENTS.md`（调用指南）+ 各 `SKILL.md` 的 `## Collaboration` 节 + `agents/reviewer.md` + 本文件（协作总图）。

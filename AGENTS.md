@@ -57,7 +57,7 @@
 
 | Skill | 负责 | 触发时机 |
 |---|---|---|
-| `write-research-outline` | 把研究问题写成活大纲 + 叶子分类（spec / investigation） | 任务是开放研究问题，"要造什么"尚未确定 |
+| `write-research-outline` | 把研究问题写成活大纲 + 叶子分类（spec / investigation）+ 叶子结局内联记录（耐久 guardrail 提升 standalone） | 任务是开放研究问题，"要造什么"尚未确定 |
 | `write-spec` | 把需求写成可派发 spec（`[Sn]`+Claims+Decision Log）；**本方法论重心** | 任务跨 2+ 文件/2+ 步，需先冻结契约 |
 | `prose-quality` | 编辑标准——完整命题规则 + 各位置必备文案覆盖率 | 写/审/修/剪任何文案：注释、文档、prompt、诊断、UI 字符串 |
 | `trim-cot-leakage` | 推理过程泄漏检测与修复（8 类分类） | 审查可能泄漏会话痕迹的文案：死引用、变更叙述、评审编排、兜底残留 |
@@ -68,7 +68,7 @@
 ### 协作（一规则一归属，只引用不重复）
 
 - `write-spec` 应用 prose-quality（命题）与 manage-decision-records（写日志条目时做 supersession 检查）；`structured-code-review` 层1 调 prose-quality + trim-cot-leakage；`trim-cot-leakage` 删前引用 prose-quality；`simplification-audit` 委托 manage-decision-records 做保留判断，耐久提案按 MDR 的 proposed 格式写 standalone。
-- `write-research-outline` 是研究层入口：spec 叶子交给 `write-spec` 冻结，investigation 叶子的负结果/死胡同交给 `manage-decision-records`，prose 交给 `prose-quality`/`trim-cot-leakage`。
+- `write-research-outline` 是研究层入口：spec 叶子交给 `write-spec` 冻结；investigation 叶子的结局内联记在大纲（`docs/research/`，研究记录非决策）；满足 guardrail 判据的结论由主 agent 提升为 standalone DR（`Status: rejected`，落 `docs/specs/decisions/`）；大纲 prose 归 `prose-quality`/`trim-cot-leakage`。
 - 协作声明落盘在：`AGENTS.md`（本调用指南）+ 各 `SKILL.md` 的 `## Collaboration` 节 + `agents/reviewer.md`（评审路径）+ `README.md`（总图）。
 - **评审路径**：reviewer agent 加载 `structured-code-review`，用 prose-quality/trim-cot-leakage 做 prose 一遍，不在别处重复这些规则。
 - **spec 路径**：需求 → `write-spec`（冻结契约）→ 派发循环 → `structured-code-review` 验收；决策按 `manage-decision-records` 规则累积在 `<slug>.decisions.md`。

@@ -31,6 +31,12 @@ there. A decision that constrains or outlives a single feature becomes a
 standalone Decision Record. A decision has exactly one home; other files
 reference it and never copy its rationale.
 
+Research outcomes are two kinds: a leaf conclusion recorded inside a living
+outline (`docs/research/<topic>.md`) is a research record, not a decision
+artifact — this skill does not audit outlines. A conclusion promoted as a
+durable guardrail (a dead end a future agent might re-propose) becomes a
+standalone Decision Record with `Status: rejected` in `docs/specs/decisions/`.
+
 The Decision Log is the primary working document. The append-only constraint
 governs its `## Dn` entries; the `## Progress` board in the same file is a
 status table that the main agent updates in place. A frozen spec that contains a
@@ -190,5 +196,6 @@ deletion windows; other skills only reference, never duplicate.
 
 - **write-spec:** consults it for the supersession check when writing a spec's brainstorm Decision Log entries.
 - **simplification-audit:** writes durable proposals as standalone `proposed` records in this skill's format and delegates retention judgment to it.
+- **write-research-outline:** promotes durable research guardrails as standalone `rejected` records; in-outline leaf records stay outside this skill's scope.
 - **reviewer / main agent:** reference it as decisions evolve during implementation and review; the main agent executes state transitions (including proposed → accepted migration) on main.
 - Its scope covers decision artifacts only; the per-feature `## Progress` board (a status table, not a decision) is excluded from its audit rules.

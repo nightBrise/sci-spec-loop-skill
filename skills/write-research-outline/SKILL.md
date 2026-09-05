@@ -33,7 +33,11 @@ Write one living document per research topic at `docs/research/<topic>.md`. Stru
   - Type: `spec` | `investigation`
   - Dependencies: which leaves must resolve first
   - Status: `open` | `in-progress` | `dead-end` | `resolved`
-  - Output: the spec path, report path, or conclusion it produced
+  - Output: the frozen spec path for a spec leaf; for an investigation leaf, a
+    conclusion — one line stating the outcome plus the evidence reference.
+    Deep-dive reports are optional linked files
+    (`docs/research/<topic>-<leaf-slug>.md`); the leaf conclusion stays the
+    summary.
 
 The outline is the research-level progress board: its leaf status is the single
 source of truth for where the research stands.
@@ -52,9 +56,13 @@ source of truth for where the research stands.
 
 - **spec leaf** → write-spec produces the frozen spec and Decision Log.
 - **investigation leaf** → investigation loop: propose a hypothesis → run the
-  experiment/prototype → record the result → update the leaf status. The loop
-  reuses prose-quality / trim-cot-leakage for its prose and manage-decision-records
-  for negative results, dead ends, and pivots.
+  experiment/prototype → record the conclusion in the leaf (one line plus the
+  evidence reference) → update the leaf `Status` (`dead-end` / `resolved` /
+  `pivot`). Leaf outcomes are research records, not Decision Records.
+- **durable guardrail** → when a dead end or rejection would still tempt a
+  future agent, the main agent promotes the conclusion to a standalone Decision
+  Record (`Status: rejected` — guardrail semantics) per manage-decision-records.
+  Promotion is the exception, not the rule, for every negative result.
 
 ## Review and evidence
 
@@ -68,7 +76,6 @@ source of truth for where the research stands.
 This skill is the research-layer entry point above the spec loop.
 
 - **write-spec:** receives converged spec leaves and freezes them.
-- **manage-decision-records:** receives negative results, dead ends, and pivots as decisions (rejected / guardrail semantics).
+- **manage-decision-records:** governs promoted standalone guardrails (`Status: rejected`) from concluded leaves; in-outline leaf records are research records outside its scope.
 - **prose-quality / trim-cot-leakage:** the outline and investigation reports obey the complete-proposition rule; no leakage.
-- **simplification-audit:** converges or cuts redundant outline directions.
 - **main agent:** invokes this skill when the task is a research question, before any spec is written.

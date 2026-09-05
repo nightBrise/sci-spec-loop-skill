@@ -135,3 +135,5 @@ This skill is the standard layer that other skills reference:
 - **trim-cot-leakage:** references the complete-proposition rule before deleting leaked prose
 - **structured-code-review:** uses this skill's location coverage as a blocking requirement (#1: prose quality)
 - **write-spec:** applies this skill's proposition rules to spec and Decision Log documents
+- **write-research-outline:** the outline and investigation-report prose obeys this skill's coverage and proposition rules
+- **simplification-audit:** candidate proposals' prose obeys this skill's coverage and proposition rules

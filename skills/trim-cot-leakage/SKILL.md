@@ -108,6 +108,7 @@ Different surfaces allow different leakage classes. This table overrides the bla
 | Plan Steps | No | No | Implementation instructions only |
 | Delivery summary "What Was Built" | No | No | Final state, self-contained |
 | Delivery summary "Design Decisions" | "we chose X because Y" | No | Decision framing allowed |
+| Research outline leaf / investigation report | No | Leaf status tags (`dead-end`, `pivot`) + evidence refs | Leaf conclusions and one-line reasons are sanctioned |
 | Process journal | Yes (≤5 items) | `[dead end]`/`[pivot]`/`[lesson]` tags | Sanctioned narrative surface |
 | Prompts/UI strings | No | No | Wording is behavior |
 
@@ -210,3 +211,4 @@ This skill is the detection/repair layer. It references prose-quality as its sta
 - **prose-quality** defines the surface coverage requirements — trim-cot-leakage's surface tolerance table supplements them with leakage-specific rules
 - **structured-code-review** invokes trim-cot-leakage as part of its "prose quality" blocking requirement
 - **write-spec** — the Decision Log is a sanctioned surface per the tolerance table; frozen legacy specs keep their historical `## Decisions` sections as snapshots
+- **write-research-outline** — the living outline and investigation reports are leakage-checked surfaces per the tolerance table
