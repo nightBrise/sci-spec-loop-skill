@@ -1,5 +1,7 @@
 # Python Coding Standards (Based on Google Python Style Guide)
 
+Adapted and condensed from the Google Python Style Guide, not reproduced verbatim, and carrying rules the upstream guide does not: the Chinese-language requirement below governs comments, docstrings, and TODO descriptions. This file constrains Python code only; the index mapping each language to its style file lives in the project's always-loaded rules (`AGENTS.md`).
+
 > **Team Rule on Language**: All docstrings, inline comments, block comments, and TODO descriptions **must be written in Chinese** to ensure clarity for the team. This document is kept in English for rule consistency.
 
 ## 1. Language Rules

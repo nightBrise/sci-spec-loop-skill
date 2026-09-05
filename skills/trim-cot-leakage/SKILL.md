@@ -78,7 +78,9 @@ control-flow narration ("first we X, then we Y"), test walkthroughs, proofs of o
 
 untranslated working-language fragments (端, 设计稿, `---- 私有 ----` separators) in prose whose language is otherwise English, or the reverse in a zh counterpart.
 
-**Fix:** translate or delete. External references that resolve outside the repo (Figma frame names, RFC sections) stay as-is. If a project rule mandates a writing language for a surface (e.g. Chinese comments per Google_code_style), that rule overrides this class; only fragments mixing in another language are slips.
+**Fix:** translate or delete. External references that resolve outside the repo (Figma frame names, RFC sections) stay as-is. If a project rule mandates a writing language for a surface (e.g. Chinese comments per `references/style/python.md`, Chinese report bodies per write-research-report's Report language), that rule sets the surface's language and overrides this class; ordinary prose fragments in a language other than the mandated one are still slips and still get translated or deleted.
+
+**Technical tokens keep their form.** A token that is an identifier rather than prose is never a slip in any surface language: values of a controlled vocabulary defined by the rule owning that surface, structured anchors (`[Sn]`, `Cn`, `Dn`), file paths, `file:line` references, code identifiers, spec slugs, and status-field values. Translating one breaks the cross-file anchor or the path that resolves at HEAD, so it stays as written inside prose of either language. Where the rule owning a surface enumerates that surface's own mandated tokens, its list extends the categories above rather than replacing them, and the surface's list prevails where the two conflict.
 
 ## What is not leakage
 
@@ -103,13 +105,14 @@ Different surfaces allow different leakage classes. This table overrides the bla
 | Code comments/docstrings | No | No | Strictest — only HEAD-resolvable facts |
 | README/docs | No | No | Current-state only |
 | Spec Claims (`[Sn]`) | No | No | Frozen contract |
-| Legacy Spec Decisions (frozen specs only) | No | User dialogue as WHY | Historical snapshot; new specs carry no decisions |
+| Legacy Spec Decisions (frozen specs only) | No | User dialogue as WHY | Historical snapshot; specs written under write-spec carry no `## Decisions` section |
 | Decision Log (`.decisions.md`) | No | Phase field + user dialogue | Sanctioned evidence surface |
 | Standalone DR (`docs/specs/decisions/`) | No | Merged-PR/issue citations + user dialogue | `## Problem`/`## Alternatives Considered` state the pre-decision state; `## Decision`/`## Consequences` are present tense (per prose-quality) |
 | Plan Steps | No | No | For workflows that produce plan documents |
-| Delivery summary "What Was Built" | No | No | Final state, self-contained |
-| Delivery summary "Design Decisions" | "we chose X because Y" | No | Decision framing allowed |
-| Research outline leaf / investigation report | No | Leaf status tags (`dead-end`, `pivot`) + evidence refs | Leaf conclusions and one-line reasons are sanctioned |
+| Delivery summary "What Was Built" | No | No | For workflows that produce delivery summaries; final state, self-contained |
+| Delivery summary "Design Decisions" | "we chose X because Y" | No | For workflows that produce delivery summaries; decision framing allowed |
+| Research outline leaf | No | Leaf status tags (`dead-end`, `pivot`) + evidence refs | Leaf conclusions and one-line reasons are sanctioned |
+| Research report (stage, overall, deep-dive) | No | Leaf status tags (`dead-end`, `pivot`) + evidence refs | A point-in-time deliverable that must stand alone for a reader outside the session; leaf conclusions and their one-line reasons are sanctioned. write-research-report owns the body language (Report language) and the figures with their captions (Figures), so the English technical tokens and section anchors inside a report are sanctioned per Class 8 |
 | Process journal | Yes (≤5 items) | `[dead end]`/`[pivot]`/`[lesson]` tags | Sanctioned narrative surface |
 | Prompts/UI strings | No | No | Wording is behavior |
 
@@ -173,7 +176,7 @@ rg -n --hidden '(^|[^a-zA-Z])端([^a-zA-Z]|$)' --glob '*.md' ...
 
 ### Known false-positive families
 
-Known from past purges and re-expected; expect them again:
+Judged and kept as false positives in past purges; expect them again:
 
 - **Instrumental "used to"** — "the key used to sign requests" is instrumental, not temporal.
 - **Runtime old/new** — "the old connection drains before the new one accepts" names live objects during handover, not repo states.
@@ -182,11 +185,12 @@ Known from past purges and re-expected; expect them again:
 - **`§N` with a committed owner** — external standards (RFC 9110 §10.1.5) and committed docs that own their §-numbering stay citable by section.
 - **"Today" in generated timestamps and CLI output samples** — recorded output keeps its voice.
 - **本版本 in zh prose** — a legitimate rendering of "this release" in versioned-artifact contexts; the banned indexical is 本版 as a bare stamp mirroring "this cut".
+- **English technical tokens on a surface whose language is mandated zh** — `dead-end`, `[S3]`, `docs/research/<topic>.md`, and a `<report>.md:41` reference inside a Chinese report body are identifiers under Class 8's technical-token rule, not authoring-language slips.
 - **`[Sn]`/`Dn` anchors in active spec/plan/Decision Log** — these are the spec-loop anchoring system, resolvable at HEAD, not leakage.
 
 ## Workflow
 
-1. **Scope and exclusions** per prose-quality: require an explicit scope; apply its always-excluded list (external dependencies, generated files, test fixtures and snapshots, frozen specs — scanned and reported on only). This skill's own directory (it quotes leaked wording as calibration) and recorded fixture/snapshot directories are additionally excluded. Frozen spec `[Sn]` anchors are protected (class 1 resolvable-anchor rule).
+1. **Scope and exclusions** per prose-quality: require an explicit scope; apply its always-excluded list (external dependencies, generated files, test fixtures and snapshots, frozen specs and research reports — scanned and reported on only). This skill's own directory (it quotes leaked wording as calibration) and recorded fixture/snapshot directories are additionally excluded. Frozen spec `[Sn]` anchors are protected (class 1 resolvable-anchor rule).
 
 2. **Audit read-only first:** run the recall batteries with `--hidden` (see invocation rules), then judge every hit semantically. The batteries are probes, not the definition — they under-match by nature (see Recall batteries), so also read the densest prose in scope (module docstrings, READMEs, Decision Records) without a pattern in hand.
 
@@ -195,6 +199,8 @@ Known from past purges and re-expected; expect them again:
    - Model-visible strings → wording is behavior, flag for snapshot-backed change instead of silently rewording
    - Bilingual pairs → update the counterpart (if a surface has a derived/paired counterpart, update it)
    - Decision Log → session-context entries are tolerated per surface table; dead citations are fixed
+   - Research reports → report findings only; never edit a written report and never overwrite a figure file it cites. A figure error that changes no finding is corrected by a new figure file carried by the next report covering the same topic or leaf — once the topic has closed, by a supplementary stage report written at the owner's request or by a stage report from a later unattended run (write-research-report's `## Figures` owns the channel's rules)
+     - A figure error that changes a finding is substantive: the living outline (leaf status or conclusion) is updated first, and the corrected figure ships with the next report covering that leaf
 
 4. **Overcorrection check before deleting:** enumerate the passage's propositions (per prose-quality's complete-proposition rule), then check the 4 overcorrection traps:
    - Does deleting flip an obligation into an endorsement?
@@ -212,4 +218,7 @@ This skill is the detection/repair layer. It references prose-quality as its sta
 - **prose-quality** defines the surface coverage requirements — trim-cot-leakage's surface tolerance table supplements them with leakage-specific rules
 - **structured-code-review** invokes trim-cot-leakage as part of its "prose quality" blocking requirement
 - **write-spec** — the Decision Log is a sanctioned surface per the tolerance table; frozen legacy specs keep their historical `## Decisions` sections as snapshots
-- **write-research-outline** — the living outline and investigation reports are leakage-checked surfaces per the tolerance table
+- **manage-decision-records** — the Decision Log and standalone Decision Records it governs are leakage-checked surfaces per the tolerance table
+- **write-research-outline** — the living outline is a leakage-checked surface per the tolerance table
+- **write-research-report** — the stage, overall, and deep-dive reports are leakage-checked surfaces per the tolerance table: self-contained for a reader outside the session, never edited after writing. It owns the report body language Class 8 defers to and the figures whose captions freeze with each report
+- **simplification-audit** — the candidate proposals it writes are standalone Decision Records, a leakage-checked surface per the tolerance table

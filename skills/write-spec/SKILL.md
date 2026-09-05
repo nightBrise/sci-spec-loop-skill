@@ -3,10 +3,12 @@ name: write-spec
 description: >
   Converts gathered requirements into a frozen spec document with numbered claims
   and verifiable acceptance criteria. The spec becomes the single source of truth
-  for all downstream planning, implementation, and review. Every feature spanning
-  2+ files or 2+ steps MUST have a spec before implementation begins.
+  for all downstream planning, implementation, and review. A spec MUST precede
+  implementation when a task touches an external contract, spans 2+ modules that
+  cannot roll back as one unit, runs unattended, or needs a trade-off decided
+  between defensible designs; mechanical multi-file edits are exempt.
 type: prompt
-whenToUse: When the user asks to plan or implement a feature spanning 2+ files or 2+ steps, or when requirements need to be frozen into a verifiable contract before implementation begins
+whenToUse: When a task introduces or changes an external contract, spans 2+ modules that cannot roll back as one unit, will run unattended, or requires choosing between defensible designs — or when requirements need to be frozen into a verifiable contract before implementation begins
 ---
 
 # Write Spec
@@ -14,6 +16,20 @@ whenToUse: When the user asks to plan or implement a feature spanning 2+ files o
 Convert gathered requirements into a structured, frozen spec that downstream
 planning and implementation consume. The spec is the arbitration document — once
 confirmed, it binds all planning, implementation, and review.
+
+A spec is required when a task meets any one of four criteria:
+
+- **It introduces or changes an external contract** — an API, a data format, a
+  configuration schema, a protocol, or a CLI surface.
+- **It spans 2+ modules and cannot be rolled back as a single unit.**
+- **It will run unattended** — with nobody in the loop to correct course, the
+  frozen contract is the only backstop.
+- **It needs a trade-off decided first** — two or more defensible designs exist.
+
+Mechanical multi-file edits are exempt: renames, reformatting, dependency
+upgrades, and adding tests for behavior that already exists. They touch many
+files but produce no contract that needs arbitration, so file count alone never
+triggers a spec.
 
 ## Role in the workflow
 
@@ -77,9 +93,6 @@ issue). Extract:
 If key details are missing (ambiguous behavior, unclear boundaries, conflicting
 requirements), ask the user before writing. Do not guess acceptance criteria.
 
-If the task is trivial (single file, single behavior), skip this skill and
-implement directly.
-
 ## Write the spec
 
 Create the directory if it does not exist (`mkdir -p docs/specs`), then
@@ -121,7 +134,17 @@ write the file.
 
 ### Section rules (`[Sn]`)
 
-- **1 spec = 1 deliverable change**; `[Sn]` are its internal dispatchable units. Split into a new spec only when units share no contract coupling, ship and roll back independently, and serve different outcomes; when in doubt, keep one spec.
+- **1 spec = 1 deliverable change**: the smallest unit that merges on its own,
+  rolls back on its own, maps to one PR, and whose acceptance a set of Claims can
+  express completely. `[Sn]` are its internal dispatchable units, and one spec
+  normally holds several of them.
+- Split into a new spec only when all three criteria hold at once: the candidate
+  specs share no contract coupling, they ship and roll back independently, and
+  they serve different outcomes. When any one of the three fails, keep one spec.
+- The size limit stays implicit: a spec grows no larger than one PR can carry and
+  still be reviewed end to end, with `main` deployable after the merge. If some
+  `[Sn]` must merge in separate batches to keep `main` deployable, that is the
+  signal to split. The number of `[Sn]` is never the criterion — cohesion is.
 - One section per independently dispatchable unit — each `[Sn]` is handed to a single implementer.
 - `Dependencies (optional)`: list the `[Sn]` that must be done first; the section stays pending until its dependencies are done.
 - Every section SHOULD contain Claims. A section without claims is a warning —
@@ -222,6 +245,7 @@ appended with later numbers — the spec is frozen.
 |-------|-------------|---------|
 | write-spec | this skill | requirements-phase alternatives |
 | implementation | main agent | user makes a design choice during Q&A |
+| implementation | main agent | implementer reports adjacent scope that no frozen Claim covers |
 | review | main agent | reviewer flags an issue, user decides how to handle |
 | any session | main agent | user states a design preference in conversation |
 
@@ -295,22 +319,59 @@ it continues to accumulate decisions throughout implementation and review.
 ## Frozen spec rules
 
 - The spec MUST NOT be modified during implementation
-- If a claim proves infeasible: record the problem, continue implementation,
-  and note the deviation in the task's report. Do not edit the spec.
+- If a claim proves infeasible: record the problem, continue implementing the
+  rest of the `[Sn]` that owns the claim, and note the deviation in the task's
+  report. Do not edit the spec. The acceptance gate rules on the deviation; the
+  reviewer does not. The reviewer reports that Claim as unmet and cites the
+  recorded deviation as its explanation. That report is a finding, not a
+  rejection, and does not count toward the consecutive-rejection limit.
 - If requirements change substantially: abandon the old spec, invoke
   write-spec again to produce a new one
 - An ambiguity found during implementation that needs a clarification: record
   it in the Decision Log as a new entry (`Phase: implementation`) — never as a
   comment in the spec
 
+**Work discovered during implementation** falls into exactly one of three
+classes. Classify it before acting:
+
+- **An existing Claim absorbs it.** Some `[Sn]` already obliges the work at a
+  finer grain, so it is not new scope. Do it, and record the design choice as one
+  Decision Log entry (`Phase: implementation`).
+- **It contradicts a Claim, or it changes `## Global Constraints`.** The contract
+  is wrong rather than incomplete, and the frozen `[Sn]` no longer hold. Go to
+  `## Abandoning a spec`. Proportionality separates this class from an infeasible
+  Claim. A contradiction means the contract's premises failed: Claims that
+  cannot all be true at once leave no `[Sn]` trustworthy, so the whole spec
+  goes. One Claim that proves infeasible leaves the rest of the contract
+  coherent and deliverable, so the response is a deviation that the acceptance
+  gate rules on while the remaining Claims ship.
+- **It neither contradicts a Claim nor is covered by one.** This is adjacent new
+  scope that the freeze did not foresee, while every frozen `[Sn]` still holds and
+  stays verifiable. The implementer reports it upward and the main agent records a
+  deferred-scope entry (format in `## Decision Log rules`). The frozen spec ships
+  as-is: no new section, no edited word, no abandon.
+
+Deferred scope never stops a run. An unattended run records the entry and keeps
+going; deferred scope is not a stop condition, and the deferred list is reported
+at the acceptance gate together with the evidence. This is the boundary against
+the second class: a contract that is wrong stops the run, a contract that is
+merely incomplete does not.
+
+After the spec's PR merges, the main agent collects every deferred entry for that
+spec and decides: fold them into one follow-up spec, split them across several,
+or drop them all — much deferred scope turns out not to be worth doing.
+
 ## Decision Log rules
 
 - The Decision Log (`.decisions.md`) is NOT frozen — it accumulates decisions
   throughout implementation and review
 - The main agent appends new entries when the user makes design choices during
-  implementation, review, or any interactive session
+  implementation, review, or any interactive session, and when implementation
+  reports deferred scope
 - Each entry must include: Phase, Chosen, Rationale, and at least one Rejected
-  alternative with a reason
+  alternative with a reason. In a deferred-scope entry the `Not absorbed because`
+  line discharges the Rejected-alternative requirement — the rejected alternative
+  is absorbing the work into the frozen spec.
 - Decisions stay in `.decisions.md`; only durable cross-feature or cross-spec
   proposals and decisions earn a standalone record in `docs/specs/decisions/`
   (per manage-decision-records). Do not promote a feature-bound decision into a
@@ -318,9 +379,35 @@ it continues to accumulate decisions throughout implementation and review.
   `## Architecture decisions` document — the per-feature Decision Log is the
   single home for feature-bound decisions.
 
+**Deferred-scope entries are a first-class entry type**, written when
+implementation finds adjacent scope that no frozen Claim covers and no frozen
+Claim contradicts:
+
+```markdown
+## D<n>: Defer <adjacent work> to a follow-up spec
+**Phase:** implementation
+**Chosen:** defer to follow-up spec
+**Rationale:** <why the work belongs outside this frozen spec>
+**Not absorbed because:** <the Claims nearest the work, and why they do not cover it>
+```
+
+The `Not absorbed because` line is the guardrail against abuse: if you cannot
+state why no existing Claim covers the work, then the work is an implementation
+detail rather than deferred scope — do it and record a design-choice entry
+instead.
+
 ## Abandoning a spec
 
-If requirements change substantially during implementation:
+Abandon only when the contract's premises have failed: Claims that contradict
+each other, work discovered during implementation that contradicts a frozen
+Claim, or requirements that changed substantially — so the frozen `[Sn]` no
+longer hold. A single Claim that proves infeasible is not premise failure: it is
+a deviation, ruled on at the acceptance gate under `## Frozen spec rules`. A
+contract that is correct but incomplete does not come here either — adjacent
+scope that no Claim contradicts is deferred scope, recorded in the Decision Log
+while the frozen spec ships as-is (see `## Frozen spec rules`).
+
+When either condition holds:
 
 1. Record the reason in the Decision Log as the final entry:
    `**Phase:** abandon — <reason for abandoning>`
@@ -333,7 +420,11 @@ If requirements change substantially during implementation:
 
 This skill is the producer layer: it converts requirements into the frozen contract and Decision Log that drive the whole loop.
 
+- **write-research-outline:** hands this skill the spec leaves that converged in a living research outline; this skill freezes them.
+- **write-research-report:** its reports recommend direction only — a recommendation becomes work when it lands as a spec leaf in the outline and freezes through this skill.
 - **prose-quality:** write-spec applies the complete-proposition rule to spec sections and Decision Log prose.
+- **trim-cot-leakage:** audits this skill's outputs for reasoning-transcript leakage; the Decision Log is a sanctioned surface per its tolerance table.
 - **manage-decision-records:** write-spec applies the supersession check to Decision Log entries it writes; an overlapping standalone Decision Record is referenced, not re-decided.
+- **simplification-audit:** writes its feature-bound candidates as Decision Log entries in the format this skill owns.
 - **structured-code-review:** the reviewer consumes this skill's Claims for spec-compliance verification.
-- **main agent:** invokes write-spec when a task spans 2+ files / 2+ steps.
+- **main agent:** invokes write-spec when a task meets any of the four spec-trigger criteria this skill defines.

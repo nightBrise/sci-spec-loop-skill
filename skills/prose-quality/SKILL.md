@@ -39,12 +39,13 @@ Accept `mode: automatic | interactive`; default to `automatic`.
 - Generated files (`__pycache__/`, `.mypy_cache/`, build artifacts)
 - Test fixtures and recorded snapshots
 - Frozen specs (`docs/specs/<slug>.md`) — scanned and reported on only; never edit them. Corrections go to the feature's Decision Log or a new spec (per write-spec)
+- Research reports — stage, overall, and deep-dive (per write-research-report) — point-in-time deliverables: scanned and reported on only; never edit one after it is written. Later findings and corrections go into a later report covering the same topic or leaf (routing per write-research-report)
 
 Treat generated catalogs, snapshots, and fixtures as derivative. Edit the owning source or scenario first, then regenerate the artifact.
 
 ### Exemptions (from one rule each, never from coverage)
 
-- Decision Log (`.decisions.md`) — exempt from the no-session-context rule: entries may reference session context and record decision-process fields (Phase, user dialogue, rejected alternatives). Change narration stays banned. The Decision-artifact coverage rule and the corpus audit still apply.
+- Decision Log (`.decisions.md`) — exempt from the no-session-context rule: entries may reference session context and record decision-process fields (Phase, user dialogue, rejected alternatives). Change narration stays banned. The Decision-artifact coverage entry and the corpus audit still apply.
 - Process journals — exempt from the no-narration rule: may narrate process, up to the item limit in trim-cot-leakage's surface tolerance table.
 
 ## Preserve the complete proposition
@@ -80,7 +81,7 @@ This is not a one-way shortening pass. Add or restore prose when code, types, an
 - **Module docstring:** module's role, dependencies, responsibilities, and non-obvious architecture choices; link choices to their owning explanation.
 - **Tests:** explain only non-obvious test design — why a fixture, assertion, platform accommodation, real entry path, or indirect observation is necessary. Delete walkthroughs and inventories.
 - **READMEs:** consumer contract: configuration, semantics, failures, limitations, extension points, and model-visible effects. Keep durable gaps and maintainer traps, not ordinary cleanup inventories.
-- **Decision Records:** unique rationale, mechanisms, alternatives, consequences, shipped verification evidence, and named coverage gaps. Implemented decisions state shipped reality in the present tense; remove planning checklists, not evidence of what pins the decision.
+- **Decision artifacts (Decision Log entries and standalone Decision Records):** unique rationale, mechanisms, alternatives, consequences, shipped verification evidence, and named coverage gaps. Implemented decisions state shipped reality in the present tense; remove planning checklists, not evidence of what pins the decision.
 - **Skills and agent instructions:** behavioral guardrails and explicit scope limitations. Keep the workflow concise and link its source of truth.
 - **Examples and configuration comments:** access limits, non-obvious wiring or load order, security stance, replay behavior, exceptions, and likely misuse. Do not narrate entries that the configuration already shows.
 - **Prompts and visible strings:** treat wording as behavior. Inspect generated output and run behavior validation or state why no snapshot applies.
@@ -89,9 +90,10 @@ This is not a one-way shortening pass. Add or restore prose when code, types, an
 ## Structure before prose
 
 Apply to every human-facing document in scope. Do not apply to documents whose
-format is owned by another skill: Decision Log entries (per write-spec),
-standalone Decision Records (per manage-decision-records), frozen specs (per
-write-spec), and research outlines (per write-research-outline).
+format or required content is owned by another skill: Decision Log entries (per
+write-spec), standalone Decision Records (per manage-decision-records), frozen
+specs (per write-spec), research outlines (per write-research-outline), and
+research reports — stage, overall, and deep-dive (per write-research-report).
 
 1. Locate the document in the repository and navigation trees. State its subject and identify its direct children.
 2. Set the permitted level of detail. Keep full detail about the document's subject, summarize direct children by purpose and responsibility, move deeper explanations to their owning descendants with links.
@@ -142,5 +144,7 @@ This skill is the standard layer that other skills reference:
 - **trim-cot-leakage:** references the complete-proposition rule before deleting leaked prose
 - **structured-code-review:** uses this skill's location coverage as a blocking requirement (#1: prose quality)
 - **write-spec:** applies this skill's proposition rules to spec and Decision Log documents
-- **write-research-outline:** the outline and investigation-report prose obeys this skill's coverage and proposition rules
+- **manage-decision-records:** applies this skill's present-tense shipped-state rule to `accepted` standalone records and their transitions
+- **write-research-outline:** the outline prose obeys this skill's coverage and proposition rules
+- **write-research-report:** the stage, overall, and deep-dive report prose obeys this skill's coverage and proposition rules
 - **simplification-audit:** candidate proposals' prose obeys this skill's coverage and proposition rules

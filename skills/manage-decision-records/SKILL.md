@@ -31,11 +31,13 @@ there. A decision that constrains or outlives a single feature becomes a
 standalone Decision Record. A decision has exactly one home; other files
 reference it and never copy its rationale.
 
-Research outcomes are two kinds: a leaf conclusion recorded inside a living
-outline (`docs/research/<topic>.md`) is a research record, not a decision
-artifact — this skill does not audit outlines. A conclusion promoted as a
-durable guardrail (a dead end a future agent might re-propose) becomes a
-standalone Decision Record with `Status: rejected` in `docs/specs/decisions/`.
+Research outcomes are three kinds: a leaf conclusion recorded inside a living
+outline (`docs/research/<topic>.md`), and a stage, overall, or deep-dive report
+derived from that outline (per write-research-report), are research records, not
+decision artifacts — this skill audits neither outlines nor reports. A conclusion
+promoted as a durable guardrail (a dead end a future agent might re-propose)
+becomes a standalone Decision Record with `Status: rejected` in
+`docs/specs/decisions/`.
 
 The Decision Log is the primary working document. The append-only constraint
 governs its `## Dn` entries; the `## Progress` board in the same file is a
@@ -196,7 +198,10 @@ deletion windows; other skills only reference, never duplicate.
 
 - **write-spec:** consults it for the supersession check when writing a spec's brainstorm Decision Log entries.
 - **prose-quality:** owns the present-tense shipped-state rule that the `accepted` state and its transitions apply.
+- **trim-cot-leakage:** its surface tolerance table sets the leakage tolerances for the Decision Log and standalone Decision Records this skill governs.
 - **simplification-audit:** writes durable proposals as standalone `proposed` records in this skill's format and delegates retention judgment to it.
 - **write-research-outline:** promotes durable research guardrails as standalone `rejected` records; in-outline leaf records stay outside this skill's scope.
+- **write-research-report:** stage, overall, and deep-dive reports are research records outside this skill's scope; a durable guardrail found while reporting is promoted by the main agent to a standalone `rejected` record per write-research-outline's handoff rules.
+- **structured-code-review:** its "Decision Record matches shipped reality" check verifies an implementing diff against a proposed record's `## Acceptance criteria` and reports the migration as pending; this skill owns the transition semantics that check defers to.
 - **reviewer / main agent:** reference it as decisions evolve during implementation and review; the main agent executes state transitions (including proposed → accepted migration) on main.
 - Its scope covers decision artifacts only; the per-feature `## Progress` board (a status table, not a decision) is excluded from its audit rules.

@@ -25,3 +25,4 @@ When the change is part of a spec-loop workflow:
 2. For every `[Sn]` section the change touches, enumerate the Claims and verify each: is it implemented? Is there evidence pointing to the code that satisfies it?
 3. Check `## Global Constraints` and `## Out of Scope` were not violated.
 4. Flag any claim implemented without evidence, or behavior shipped that no claim covers.
+5. A Claim left unmet by a deviation recorded in the task report is a finding for the acceptance gate, not a blocking defect: the gate rules on deviations (per `AGENTS.md`), and this role only reports them.

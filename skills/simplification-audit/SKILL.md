@@ -132,6 +132,8 @@ Run lint, typecheck, and `git diff --check`. For each simplification summary, re
 This skill is the maintenance layer for simplification candidates.
 
 - **manage-decision-records:** delegates retention judgment and supersession mechanics to it, and writes standalone proposals in its `proposed` format.
+- **write-spec:** owns the Decision Log entry format that this skill's feature-bound candidates are written in.
 - **prose-quality / trim-cot-leakage:** candidate proposals' prose obeys the complete-proposition rule; no leakage.
+- **structured-code-review:** supplies the Lifecycle and concurrency vocabulary that this skill's asynchronous-ownership analysis uses.
 - **main agent:** invokes it when asked to simplify, find dead code, or reduce surface area.
 - It produces standalone proposals, Decision Log entries, or inline TODO notes; the retention decision belongs to manage-decision-records.

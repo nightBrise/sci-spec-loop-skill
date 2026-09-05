@@ -36,11 +36,15 @@ Write one living document per research topic at `docs/research/<topic>.md`. Stru
   - Output: the frozen spec path for a spec leaf; for an investigation leaf, a
     conclusion — one line stating the outcome plus the evidence reference.
     Deep-dive reports are optional linked files
-    (`docs/research/<topic>-<leaf-slug>.md`); the leaf conclusion stays the
-    summary.
+    (`docs/research/<topic>-<leaf-slug>.md`); write-research-report owns their
+    triggers, structure, and content bar. `<leaf-slug>` is also subject to
+    write-research-report's reserved-token rule, which keeps a leaf file from
+    colliding with a report file name in the same directory. The leaf
+    conclusion stays the summary.
 
 The outline is the research-level progress board: its leaf status is the single
-source of truth for where the research stands.
+source of truth for where the research stands. The main agent is the outline's
+sole writer and updates it in place as leaves change status.
 
 ## Classify each leaf
 
@@ -59,6 +63,10 @@ source of truth for where the research stands.
   experiment/prototype → record the conclusion in the leaf (one line plus the
   evidence reference) → update the leaf `Status` (`dead-end` / `resolved` /
   `pivot`). Leaf outcomes are research records, not Decision Records.
+- **reports** → the stage, overall, and deep-dive reports are point-in-time
+  deliverables specified by write-research-report, which owns their triggers and
+  content bar; the main agent writes them. Reports are research records, not
+  Decision Records.
 - **durable guardrail** → when a dead end or rejection would still tempt a
   future agent, the main agent promotes the conclusion to a standalone Decision
   Record (`Status: rejected` — guardrail semantics) per manage-decision-records.
@@ -76,6 +84,7 @@ source of truth for where the research stands.
 This skill is the research-layer entry point above the spec loop.
 
 - **write-spec:** receives converged spec leaves and freezes them.
+- **write-research-report:** owns the triggers, structure, and content bar of the stage, overall, and deep-dive reports; this skill keeps the deep-dive path convention. The outline is the living board and the single source of truth for leaf status; reports are point-in-time deliverables that consume leaf status but never restate the outline. A report is not edited after it is written — later findings and corrections go into a later report covering the same topic or leaf, by the routing write-research-report owns.
 - **manage-decision-records:** governs promoted standalone guardrails (`Status: rejected`) from concluded leaves; in-outline leaf records are research records outside its scope.
-- **prose-quality / trim-cot-leakage:** the outline and investigation reports obey the complete-proposition rule; no leakage.
+- **prose-quality / trim-cot-leakage:** the outline and research-report prose obey the complete-proposition rule; no leakage.
 - **main agent:** invokes this skill when the task is a research question, before any spec is written.

@@ -22,6 +22,7 @@ Verify the change's base and head before reading the diff. Read enough surroundi
 Read the applicable sources before reviewing. Not all will exist in every project — read what is present:
 
 - **Project rules:** `AGENTS.md`, `CONVENTIONS.md`, or equivalent standing rules
+- **Code style:** the style document for each language the diff touches, resolved through the language → file index in the project rules above (this workflow keeps its entries at `references/style/<lang>.md`)
 - **Defensive patterns:** project-specific defensive-patterns documentation (if present)
 - **Prose standard:** prose-quality skill — required coverage and editorial judgment
 - **Leakage detection:** trim-cot-leakage skill — reasoning-transcript leakage
@@ -127,7 +128,7 @@ the migration as pending. Main-agent governance commits to a feature's
 not in scope of this gate. The
 main agent executes the migration to `accepted` (transition rules per
 manage-decision-records; present-tense text per prose-quality's Decision-artifact
-coverage) on main after the change merges; a later review or audit verifies the
+coverage entry) on main after the change merges; a later review or audit verifies the
 migration landed against shipped code. Conversely, flag design choices visible
 in the diff that no Decision Record or Decision Log entry covers — report them;
 the main agent appends the entry.
@@ -144,6 +145,17 @@ For agent-team workflows, inspect the exact prompts, tool schemas, results, and 
 
 For bilingual or internationalized content, compare meaning and terminology on both sides. Automated pairing checks (hash match, structure validation) do not prove translation quality — semantic review is required.
 
+### Declared style conformance
+
+Resolve the style document for each language the diff touches through the language → style-file index in the project's standing rules, and read it. Verify only its always-applicable core items:
+
+- Naming conventions
+- Language and presence of comments and docstrings
+- Line width
+- Function length
+
+This is not a full style audit: everything the resolved document states outside these four items stays out of this check, the green-gate exclusion in the reporting rules applies, and each item carries the modality its own document gives it — a stated preference is not a requirement. For example, a Python diff in a project whose index lists `references/style/python.md` verifies that document's naming table, its line-width and function-length limits, and its team rule on the language of comments and docstrings. Report violations as findings with `file:line` evidence; per this skill's opening priority they rank below correctness, lifecycle, and security defects and do not block a change on their own.
+
 ## Evidence selection
 
 Select the smallest tests and checks that cover the outgoing diff. Do not reflexively run the full test suite. Every behavior change needs the narrowest available test or purpose-built check that would fail for its regression; add broader checks only for surfaces the diff actually reaches.
@@ -152,6 +164,7 @@ Select the smallest tests and checks that cover the outgoing diff. Do not reflex
 |---|---|
 | Module/function behavior | Focused test file or test name for the owning module |
 | Documentation, comments, prose | Lint + project documentation checks (if configured) |
+| Report figure (chart, plot, diagram) | Output of the generating script or command + caption carrying its required elements + figure file present at its cited path, not overwriting a cited figure |
 | Visible output (UI/CLI/strings) | Snapshot test or behavior validation for the affected surface |
 | Build config, entry points, manifests | Build + smoke test for the affected artifact |
 | External service interaction | E2E test (when credentials/environment available); never print secrets |
@@ -202,4 +215,5 @@ This skill is the review layer that orchestrates other skills:
 - **write-spec:** produces the frozen spec and Decision Log that this review verifies against
 - **manage-decision-records:** owns the migration and supersession semantics the "Decision Record matches shipped reality" check verifies
 - **simplification-audit:** may reference this skill's lifecycle vocabulary when analyzing asynchronous ownership
+- **`references/style/`:** the per-language style documents that the "Declared style conformance" check resolves and reads; those documents own the rules they state and this skill does not restate them
 - **reviewer agent:** this skill's methodology is what the reviewer agent (or the main agent's review flow) applies as the code quality layer
