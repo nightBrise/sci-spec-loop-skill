@@ -121,7 +121,10 @@ Assertions fail on the intended regression and verify external state — logs, e
 
 When a change implements a proposed standalone Decision Record, the pre-merge
 review verifies that the diff satisfies the record's `## Acceptance criteria`
-and never touches `docs/specs/*`, then reports the migration as pending. The
+and does not modify the frozen spec file (`docs/specs/<slug>.md`), then reports
+the migration as pending. Main-agent governance commits to a feature's
+`.decisions.md` or to `docs/specs/decisions/` are not implementer diffs and are
+not in scope of this gate. The
 main agent executes the migration to `accepted` (transition rules per
 manage-decision-records; present-tense text per prose-quality's Decision-artifact
 coverage) on main after the change merges; a later review or audit verifies the
@@ -198,4 +201,5 @@ This skill is the review layer that orchestrates other skills:
 - **trim-cot-leakage:** invoked by blocking requirement #1 (leakage detection)
 - **write-spec:** produces the frozen spec and Decision Log that this review verifies against
 - **manage-decision-records:** owns the migration and supersession semantics the "Decision Record matches shipped reality" check verifies
+- **simplification-audit:** may reference this skill's lifecycle vocabulary when analyzing asynchronous ownership
 - **reviewer agent:** this skill's methodology is what the reviewer agent (or the main agent's review flow) applies as the code quality layer

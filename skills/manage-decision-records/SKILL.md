@@ -195,6 +195,7 @@ vocabulary, migration rules, supersession mechanics, retention judgment, and
 deletion windows; other skills only reference, never duplicate.
 
 - **write-spec:** consults it for the supersession check when writing a spec's brainstorm Decision Log entries.
+- **prose-quality:** owns the present-tense shipped-state rule that the `accepted` state and its transitions apply.
 - **simplification-audit:** writes durable proposals as standalone `proposed` records in this skill's format and delegates retention judgment to it.
 - **write-research-outline:** promotes durable research guardrails as standalone `rejected` records; in-outline leaf records stay outside this skill's scope.
 - **reviewer / main agent:** reference it as decisions evolve during implementation and review; the main agent executes state transitions (including proposed → accepted migration) on main.

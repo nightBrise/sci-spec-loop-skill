@@ -20,15 +20,18 @@
 - **研究课题先走 `write-research-outline`**（活大纲 + 叶子分类），收敛成 spec 叶子后再冻结。
 - **1 spec = 1 可交付变更**；`[Sn]` 是其内部可派发单元。
 - 每 `[Sn]`：`Claims`（可验证行为）、`Dependencies`（可选）、边界清晰。
+- 每份 spec 含 `Global Constraints`（强制）与 `Out of Scope`。
 - **拆判据**：契约耦合 / 可独立交付+回滚 / 不同结果；**拿不准归一个 spec**。
 - **每 feature 恒 2 文档**：`docs/specs/<slug>.md`（冻结 spec，纯契约，不含决策节）+ `<slug>.decisions.md`（决策 + `## Progress` 进度表）。
 - spec 冻结后不可改；全部设计决策（brainstorm 起）直接进 `.decisions.md`；跨 feature/跨 spec 的耐久决策进 standalone DR（`docs/specs/decisions/`，proposed/accepted/rejected，见 `manage-decision-records`）；进度板并入 decisions 但作用域为进度（`manage-decision-records` 排除它）。
+- 本仓库自身无 product `docs/specs/` 树：治理决策记录在 `docs/decisions/`（按 standalone DR 对待，审查时读取）；产品仓库按上文 `docs/specs/` 约定执行。
 
 ## 派发循环运行参数（不是模式）
 
 - **人工闸口在环（交互）** 或 **无人+预算（goal 自主）**；**是否并行**独立 `[Sn]`。
 - **无人值守（goal）**：逐 `[Sn]` 实现→commit→review→修复复审→整份 spec 全通过后**合并 PR + 删分支**（可用 `gh pr merge`）。
-- **并行 `[Sn]`**：每 `[Sn]` 独立 worktree+分支；**合并由主 agent 串行**；**决策/进度单写者（主 agent）**；`coder` 禁写 `docs/specs/*`。
+- **并行 `[Sn]`**：每 `[Sn]` 独立 worktree+分支；**合并由主 agent 串行**；**决策/进度单写者（主 agent）**；`coder` 禁写 `docs/specs/<slug>.md`。
+- **派发前绑定**：主 agent 读 `.decisions.md` 的 brainstorm 条目；被引用的 standalone DR 附进对应 implementer prompt（细则见 `write-spec` After freeze）。
 
 ## GitHub Flow 约定（非 skill）
 
@@ -41,6 +44,7 @@
 
 - 编码守则：Think Before Coding / Simplicity First / Surgical Changes / Goal-Driven。
 - 实现遵循 `Google_code_style.md`（Python，注释用中文）；中文注释规则优先于 trim-cot-leakage Class 8。
+- 非 Python 项目沿用其自身代码风格约定（本仓 `Google_code_style.md` 仅约束 Python）。
 
 ## 严重风险停止清单（无人值守命中即停+上报）
 
@@ -48,7 +52,7 @@
 
 ## 审查门禁
 
-- 每完成一个 `[Sn]` 派 `reviewer`；查 spec 合规（Claims）+ 两层结构化审查。
+- 每完成一个 `[Sn]` 派 `reviewer`；查 spec 合规（Claims，含 `Global Constraints`/`Out of Scope` 未违例）+ 两层结构化审查。
 - **证据要求：测试名 / 命令输出 / file:line。Prose 不是证据。**
 
 ## 技能目录与调用指南
@@ -58,17 +62,17 @@
 | Skill | 负责 | 触发时机 |
 |---|---|---|
 | `write-research-outline` | 把研究问题写成活大纲 + 叶子分类（spec / investigation）+ 叶子结局内联记录（耐久 guardrail 提升 standalone） | 任务是开放研究问题，"要造什么"尚未确定 |
-| `write-spec` | 把需求写成可派发 spec（`[Sn]`+Claims+Decision Log）；**本方法论重心** | 任务跨 2+ 文件/2+ 步，需先冻结契约 |
-| `prose-quality` | 编辑标准——完整命题规则 + 各位置必备文案覆盖率 | 写/审/修/剪任何文案：注释、文档、prompt、诊断、UI 字符串 |
-| `trim-cot-leakage` | 推理过程泄漏检测与修复（8 类分类） | 审查可能泄漏会话痕迹的文案：死引用、变更叙述、评审编排、兜底残留 |
-| `structured-code-review` | 两层审查方法论（阻塞项 + 语义检查） | 审任何改动：PR / diff / spec 合规 / 任务产出；评审者 agent 加载 |
+| `write-spec` | 把需求写成可派发 spec（`[Sn]`+Claims+Global Constraints）+ 配套 `.decisions.md`；**本方法论重心** | 任务跨 2+ 文件/2+ 步，需先冻结契约 |
+| `prose-quality` | 编辑标准——完整命题规则 + 各位置必备文案覆盖率 + 排除清单（冻结 spec 只扫不改） | 写/审/修/剪任何文案：注释、文档、prompt、诊断、UI 字符串 |
+| `trim-cot-leakage` | 推理过程泄漏检测与修复（8 类分类 + 表面容忍表） | 审查可能泄漏会话痕迹的文案：死引用、变更叙述、评审编排、兜底残留 |
+| `structured-code-review` | 两层审查方法论（阻塞项 + 语义检查）+ 报告格式 + git 只读白名单 | 审任何改动：PR / diff / spec 合规 / 任务产出；评审者 agent 加载 |
 | `manage-decision-records` | 决策生命周期——supersession 检查、保留判断、状态迁移（standalone 三状态） | 增/审/覆盖/整改 Decision Log、独立 DR 中的决策 |
-| `simplification-audit` | 简化候选挖掘（DR 或内联 TODO） | 用户让简化、清理、找死代码、审计未用 API、降表面积 |
+| `simplification-audit` | 简化候选挖掘（standalone DR、Decision Log 条目或内联 TODO） | 用户让简化、清理、找死代码、审计未用 API、降表面积 |
 
 ### 协作（一规则一归属，只引用不重复）
 
 - `write-spec` 应用 prose-quality（命题）与 manage-decision-records（写日志条目时做 supersession 检查）；`structured-code-review` 层1 调 prose-quality + trim-cot-leakage；`trim-cot-leakage` 删前引用 prose-quality；`simplification-audit` 委托 manage-decision-records 做保留判断，耐久提案按 MDR 的 proposed 格式写 standalone。
-- `write-research-outline` 是研究层入口：spec 叶子交给 `write-spec` 冻结；investigation 叶子的结局内联记在大纲（`docs/research/`，研究记录非决策）；满足 guardrail 判据的结论由主 agent 提升为 standalone DR（`Status: rejected`，落 `docs/specs/decisions/`）；大纲 prose 归 `prose-quality`/`trim-cot-leakage`。
+- `write-research-outline` 是研究层入口：spec 叶子交给 `write-spec` 冻结；investigation 叶子的结局内联记在大纲（`docs/research/`，研究记录非决策）；满足 guardrail 判据的结论由主 agent 提升为 standalone DR（`Status: rejected`，落 `docs/specs/decisions/`，按 `manage-decision-records` 治理）；大纲 prose 归 `prose-quality`/`trim-cot-leakage`。
 - 协作声明落盘在：`AGENTS.md`（本调用指南）+ 各 `SKILL.md` 的 `## Collaboration` 节 + `agents/reviewer.md`（评审路径）+ `README.md`（总图）。
 - **评审路径**：reviewer agent 加载 `structured-code-review`，用 prose-quality/trim-cot-leakage 做 prose 一遍，不在别处重复这些规则。
 - **spec 路径**：需求 → `write-spec`（冻结契约）→ 派发循环 → `structured-code-review` 验收；决策按 `manage-decision-records` 规则累积在 `<slug>.decisions.md`。

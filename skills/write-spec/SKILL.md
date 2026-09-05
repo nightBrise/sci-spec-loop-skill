@@ -58,7 +58,8 @@ Derive a kebab-case `<feature-slug>` from the feature name. Examples:
 
 The spec directory is `docs/specs/` by convention (register it in the project's
 AGENTS.md if the project uses a different location). Keep specs, their Decision
-Logs, and standalone decision records under this one directory.
+Logs, and standalone decision records under this one directory. `<spec-dir>` in
+the paths below refers to this directory.
 
 Target path: `docs/specs/<feature-slug>.md`
 Decision Log path: `docs/specs/<feature-slug>.decisions.md`
@@ -203,6 +204,7 @@ carries no decisions.
 **Rationale:** <why>
 **Rejected:** <alternative> — <reason>
 **Spec section:** [S1]
+**Status:** superseded by [D<n> in <location>]   <!-- optional; appended per manage-decision-records' supersede mechanics -->
 
 ## D2: <Decision title>
 **Phase:** write-spec
@@ -325,7 +327,7 @@ If requirements change substantially during implementation:
 2. Invoke write-spec again to produce a new spec
 3. The old spec and Decision Log remain as historical reference — do not delete them
 4. The new spec gets a new slug (append `-v2` or a distinguishing suffix)
-5. Update project memory to point to the new spec
+5. Record the successor: if the project maintains a spec index, update its entry to the new spec; otherwise append the new slug to the abandon entry written in step 1
 
 ## Collaboration
 

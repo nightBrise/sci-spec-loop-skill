@@ -2,13 +2,16 @@
 
 Status: accepted
 Date: 2026-09-05
-Specs: none (this record governs the workflow skill repo itself)
+Specs: none — governs the workflow skill repo itself
 
 Location note: this repo has no product `docs/specs/` tree, so its own
 governance decisions stay in `docs/decisions/` (see the README tree). Product
 repos follow the `docs/specs/decisions/` path that the skills legislate.
 
 ## Problem
+
+The `v2` in the title marks the second design iteration of this workflow's
+decision governance; it is not a file revision and no v1 record exists.
 
 The decision-recording vocabulary was duplicated across skills. The two
 standalone Decision Record templates — one in `manage-decision-records`, one in
@@ -19,7 +22,8 @@ same dsh Agent Note lifecycle machine, which the port split in two and
 flattened: dsh carried the proposed / implemented / rejected lifecycle in
 directory paths; the port flattened that into a single `Status:` line, kept
 only `accepted`, and lost the migration rules. This design keeps the
-`accepted` vocabulary and restores the state machine around it. (dsh = the
+`accepted` vocabulary and defines the state machine in the Decision section
+below. (dsh = the
 deepseek-harness Agent Notes lifecycle; its originals live only in the
 local `archive/` directory, not in this repo.)
 

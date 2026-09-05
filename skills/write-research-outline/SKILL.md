@@ -32,7 +32,7 @@ Write one living document per research topic at `docs/research/<topic>.md`. Stru
 - **Leaves** — one block per leaf:
   - Type: `spec` | `investigation`
   - Dependencies: which leaves must resolve first
-  - Status: `open` | `in-progress` | `dead-end` | `resolved`
+  - Status: `open` | `in-progress` | `dead-end` | `pivot` | `resolved` (`pivot`: the hypothesis failed but the inquiry turns to a new one; `dead-end`: the inquiry stops)
   - Output: the frozen spec path for a spec leaf; for an investigation leaf, a
     conclusion — one line stating the outcome plus the evidence reference.
     Deep-dive reports are optional linked files
@@ -66,7 +66,7 @@ source of truth for where the research stands.
 
 ## Review and evidence
 
-- spec leaves: standard evidence — test name / command output / file:line.
+- spec leaves: standard evidence — test name / command output / file:line (wording per AGENTS.md, review gate).
 - investigation leaves: evidence is experiment data, measurement, literature, or
   prototype behavior; the review standard is "conclusion is supported and the
   process is reproducible", not "behavior tests pass".
