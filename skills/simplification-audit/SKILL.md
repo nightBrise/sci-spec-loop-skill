@@ -92,7 +92,7 @@ Audit Decision Records when the user asks to reduce or coalesce them, or when th
 For each candidate chain:
 
 1. Identify the current owner from shipped code, configuration, newer Decision Records, and inbound links.
-2. Classify the old record and mark it per manage-decision-records' supersede mechanics — full supersession transfers every unique rationale, alternative, consequence, and named coverage gap into the current owner before the old record is marked superseded; partial supersession keeps both active and cross-linked.
+2. Classify the old record and mark it per manage-decision-records' supersede mechanics (full vs partial); do not restate the mechanics here.
 
 ## Write the Decision Record
 

@@ -35,6 +35,7 @@
 - 1 spec = 1 分支 = 1 PR；一 `[Sn]` 一 commit；并行用 **merge commit**；`main` 永远可部署。
 - 栈式 PR 只用来自 main 的 merge 更新 base（禁 rebase+force-push）。
 - **合并前 spec 门禁**：diff 未触碰 `docs/specs/<slug>.md`；合并前置：reviewer `approve` + 证据存在。
+- **治理性直推例外**：standalone DR 的状态迁移（proposed→accepted/rejected）由主 agent 在 main 直接提交（无分支/PR）；该迁移在下一次 review 或 audit 中复核。
 
 ## 编码规则
 
@@ -61,7 +62,7 @@
 | `prose-quality` | 编辑标准——完整命题规则 + 各位置必备文案覆盖率 | 写/审/修/剪任何文案：注释、文档、prompt、诊断、UI 字符串 |
 | `trim-cot-leakage` | 推理过程泄漏检测与修复（8 类分类） | 审查可能泄漏会话痕迹的文案：死引用、变更叙述、评审编排、兜底残留 |
 | `structured-code-review` | 两层审查方法论（阻塞项 + 语义检查） | 审任何改动：PR / diff / spec 合规 / 任务产出；评审者 agent 加载 |
-| `manage-decision-records` | 决策生命周期——supersession 检查、保留判断、standalone 三状态（proposed/accepted/rejected） | 增/审/覆盖/整改 Decision Log、独立 DR 中的决策 |
+| `manage-decision-records` | 决策生命周期——supersession 检查、保留判断、状态迁移（standalone 三状态） | 增/审/覆盖/整改 Decision Log、独立 DR 中的决策 |
 | `simplification-audit` | 简化候选挖掘（DR 或内联 TODO） | 用户让简化、清理、找死代码、审计未用 API、降表面积 |
 
 ### 协作（一规则一归属，只引用不重复）

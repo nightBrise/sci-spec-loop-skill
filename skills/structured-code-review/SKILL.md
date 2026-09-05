@@ -26,7 +26,8 @@ Read the applicable sources before reviewing. Not all will exist in every projec
 - **Prose standard:** prose-quality skill — required coverage and editorial judgment
 - **Leakage detection:** trim-cot-leakage skill — reasoning-transcript leakage
 - **Testing conventions:** project testing documentation or CI configuration
-- **Decision Records:** `.decisions.md` files — design rationale. Treat disagreement with a Decision Record as a design discussion, not an automatic veto
+- **Decision Logs:** `.decisions.md` files — per-feature design rationale
+- **Standalone Decision Records:** `docs/specs/decisions/` — cross-feature proposals and decisions (proposed / accepted / rejected states)
 - **Spec:** the frozen spec (if this review is part of a spec-loop workflow)
 
 ## Layer 1: Blocking requirements
@@ -118,7 +119,15 @@ Assertions fail on the intended regression and verify external state — logs, e
 
 ### Decision Record matches shipped reality
 
-When a change implements a proposed standalone Decision Record, verify the record was migrated to `accepted` (a present-tense `## Decision` plus `## Consequences`) per manage-decision-records' transition rules, then verify paths, names, and mechanisms against the implementation. The main agent executes the migration on main after the implementing change merges; a review must never ask an implementer to edit `docs/specs/*`. Conversely, flag design choices visible in the diff that no Decision Record or Decision Log entry covers — an implementation that silently introduces an unrecorded decision needs one.
+When a change implements a proposed standalone Decision Record, the pre-merge
+review verifies that the diff satisfies the record's `## Acceptance criteria`
+and never touches `docs/specs/*`, then reports the migration as pending. The
+main agent executes the migration to `accepted` (a present-tense `## Decision`
+plus `## Consequences`, per manage-decision-records' transition rules) on main
+after the change merges; a later review or audit verifies the migration landed
+against shipped code. Conversely, flag design choices visible in the diff that
+no Decision Record or Decision Log entry covers — report them; the main agent
+appends the entry.
 
 ### Snapshot and visible-output changes
 

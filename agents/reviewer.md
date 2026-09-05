@@ -27,7 +27,7 @@ A single failure blocks the change:
 
 When the change is part of a spec-loop workflow:
 
-1. Read the frozen spec (`docs/specs/<slug>.md`) and its Decision Log.
+1. Read the frozen spec (`docs/specs/<slug>.md`), its Decision Log (`.decisions.md`), and any standalone Decision Records (`docs/specs/decisions/`) the spec or log references.
 2. For every `[Sn]` section the change touches, enumerate the Claims and verify each: is it implemented? Is there evidence pointing to the code that satisfies it?
 3. Check `## Global Constraints` and `## Out of Scope` were not violated.
 4. Flag any claim implemented without evidence, or behavior shipped that no claim covers.

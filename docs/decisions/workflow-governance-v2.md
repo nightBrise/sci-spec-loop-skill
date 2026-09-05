@@ -4,6 +4,10 @@ Status: accepted
 Date: 2026-09-05
 Specs: none (this record governs the workflow skill repo itself)
 
+Location note: this repo has no product `docs/specs/` tree, so its own
+governance decisions stay in `docs/decisions/` (see the README tree). Product
+repos follow the `docs/specs/decisions/` path that the skills legislate.
+
 ## Problem
 
 The decision-recording vocabulary was duplicated across skills. The two
@@ -13,8 +17,11 @@ the same decision was written twice (a `## Decisions` section in every spec plus
 its mirror in the `.decisions.md` Decision Log). Both templates trace to the
 same dsh Agent Note lifecycle machine, which the port split in two and
 flattened: dsh carried the proposed / implemented / rejected lifecycle in
-directory paths, the port replaced that with a single invented `accepted`
-status, and the migration rules were lost.
+directory paths; the port flattened that into a single `Status:` line, kept
+only `accepted`, and lost the migration rules. This design keeps the
+`accepted` vocabulary and restores the state machine around it. (dsh = the
+deepseek-harness Agent Notes lifecycle; its originals live only in the
+local `archive/` directory, not in this repo.)
 
 ## Decision
 
@@ -25,9 +32,11 @@ Converge decision governance on the following model.
   one keep it as a frozen historical snapshot.
 - The Decision Log (`<slug>.decisions.md`) is the single per-feature decision
   home. D1, D2, ... numbering runs continuously from brainstorm through
-  acceptance. The log is append-only and never deleted; the only sanctioned
-  edits to an entry are appending a supersession or Status note in place and
-  restating implemented decisions as present-tense shipped reality.
+  acceptance. The `## Dn` entries are append-only and never deleted; the only
+  sanctioned edits to an entry are appending a supersession or Status note in
+  place and restating implemented decisions as present-tense shipped reality.
+  The `## Progress` board in the same file is updated in place by the main
+  agent.
 - Standalone Decision Records (`docs/specs/decisions/`) hold durable
   cross-feature or cross-spec proposals and decisions (architecture choices,
   simplification-audit proposals, research guardrails). They are the only

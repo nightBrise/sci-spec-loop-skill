@@ -163,18 +163,15 @@ write the file.
 - Acceptance criteria that only say "tests pass": name the specific behavior
   the test must verify
 
-### Decision rules (`Dn`)
+### Brainstorm decision entries (`Dn`)
 
 Brainstorm design choices are recorded directly in the Decision Log as
-`Phase: write-spec` entries — the WHY that code and Claims cannot carry. The
-spec itself carries no decisions.
+`Phase: write-spec` entries — the WHY that code and Claims cannot carry.
 
-- Record a decision only when a genuine alternative was considered and rejected.
+- Record an entry only when a genuine alternative was considered and rejected.
   If there was no real choice (only one viable approach), do not fabricate alternatives.
 - Each entry has: chosen option, rationale (1-2 sentences), rejected alternatives
   with reasons.
-- Number entries sequentially in the Decision Log: D1, D2, D3, ... — a single
-  continuous stream from brainstorm through acceptance.
 - Link each entry to its relevant `[Sn]` section if applicable.
 - If no meaningful alternatives were discussed during brainstorm, write no
   entries; the Decision Log holds only its header.
@@ -215,7 +212,7 @@ carries no decisions.
 Numbering runs as a single continuous stream in `.decisions.md`: D1, D2, ...
 Brainstorm entries are written during write-spec (`Phase: write-spec`);
 post-brainstorm decisions (implementation, review, user interaction) are
-appended with later numbers — the spec is frozen and carries no decisions.
+appended with later numbers — the spec is frozen.
 
 **Lifecycle decisions beyond the requirements phase:**
 
@@ -258,9 +255,9 @@ After writing, verify:
    git add <spec-dir>/<feature-slug>.md <spec-dir>/<feature-slug>.decisions.md
    git commit -m "spec: add <feature-name> spec and decision log"
    ```
-4. Display the full spec to the user
+4. Display the full spec and the Decision Log's brainstorm entries to the user
 5. Ask the user in conversation for explicit approval to freeze:
-   - question: `Spec saved to <spec-dir>/<feature-slug>.md. Approve to freeze?`
+   - question: `Spec and its brainstorm decisions saved to <spec-dir>/. Approve to freeze?`
    - Approve: freeze the spec — planning and implementation will follow it
    - Revise: user has changes — fix them and re-present
 
@@ -279,7 +276,9 @@ it continues to accumulate decisions throughout implementation and review.
    `- **Decision Log: <feature-name>**: <spec-dir>/<feature-slug>.decisions.md — active`
 
 2. Hand off to the dispatch loop (main agent). It must:
-   - Read the spec file
+   - Read the spec file and the Decision Log's brainstorm entries
+   - When an entry references a standalone Decision Record, attach that record
+     to the implementer prompt for the `[Sn]` it constrains
    - Dispatch one implementer per `[Sn]`, honoring `Dependencies` (a section stays
      pending until its dependencies are done)
    - Verify every `[Sn]` is dispatched before implementation
