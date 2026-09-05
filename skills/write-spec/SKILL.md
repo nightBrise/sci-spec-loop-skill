@@ -37,7 +37,7 @@ Before producing a new spec:
 1. `glob docs/specs/*.md` — check if a spec for this feature already exists
    - Exclude `*-design.md` (design doc from the requirements phase — treat as INPUT, not an existing spec)
    - Exclude `*.decisions.md` (per-feature Decision Logs)
-2. Check `docs/specs/README.md` (or the project's spec index) — check if a spec path was recorded
+2. If the project maintains a spec index (e.g. `docs/specs/README.md`), check whether this spec path was recorded there
 
 If a matching spec file (not design doc, not decision log) is found: read the
 existing spec and skip to Confirmation. Do not duplicate.
@@ -271,9 +271,10 @@ If the user requests changes: revise and re-present. Loop until approved.
 Once approved, the spec is a frozen contract. The Decision Log is NOT frozen —
 it continues to accumulate decisions throughout implementation and review.
 
-1. Record the spec path in `docs/specs/README.md` (the spec index):
+1. If the project maintains a spec index, record both paths there:
    `- **Spec: <feature-name>**: <spec-dir>/<feature-slug>.md — frozen`
    `- **Decision Log: <feature-name>**: <spec-dir>/<feature-slug>.decisions.md — active`
+   Otherwise rely on glob discovery of `docs/specs/*.md`; do not create an index.
 
 2. Hand off to the dispatch loop (main agent). It must:
    - Read the spec file and the Decision Log's brainstorm entries
