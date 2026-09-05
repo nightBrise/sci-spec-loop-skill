@@ -3,7 +3,8 @@ name: simplification-audit
 description: >
   Find non-obvious simplification candidates in a codebase. Use when asked to
   simplify, clean up, reduce surface area, find dead code, identify over-engineering,
-  or audit for unused APIs. Produces proposed Decision Records for durable proposals
+  or audit for unused APIs. Produces proposed standalone Decision Records for
+  durable cross-feature proposals, Decision Log entries for feature-bound items,
   and inline TODO/FIXME/XXX notes for small local cleanups. Especially targets:
   dead, duplicated, speculative, over-built, added-then-removed, or
   hand-rolled-where-a-dependency-exists surfaces.
@@ -86,26 +87,26 @@ Reject or downgrade a candidate when:
 
 ## Coalesce superseded Decision Records
 
-Audit Decision Records when the user asks to reduce or coalesce them, or when the simplification being implemented makes an owning record obsolete. Use manage-decision-records for retention judgment and supersession mechanics.
+Audit Decision Records when the user asks to reduce or coalesce them, or when the simplification being implemented makes an owning record obsolete. Retention judgment and the full/partial classification belong to manage-decision-records; this section only adds the audit-specific owner search.
 
 For each candidate chain:
 
 1. Identify the current owner from shipped code, configuration, newer Decision Records, and inbound links.
-2. Classify the old record as fully or partially superseded. Any surviving behavior, current contract, or independently current rejected alternative makes it partial.
-3. For full supersession, transfer every unique rationale, alternative, consequence, and named coverage gap into the current owner. Then mark the old record as superseded with a link.
-4. For partial supersession, keep both records active and cross-linked.
+2. Classify the old record and mark it per manage-decision-records' supersede mechanics — full supersession transfers every unique rationale, alternative, consequence, and named coverage gap into the current owner before the old record is marked superseded; partial supersession keeps both active and cross-linked.
 
 ## Write the Decision Record
 
-Create one record per durable proposal. For small proposals, add to the Decision Log (`.decisions.md`). For major proposals, create a standalone file in `docs/specs/decisions/`.
+Create one record per durable proposal. Route by scope:
 
-Prefer this structure:
+- A decided, feature-bound item goes in that feature's Decision Log (`.decisions.md`) as a numbered entry.
+- A durable cross-feature or cross-spec proposal becomes a standalone file in `docs/specs/decisions/` with `Status: proposed`, even when it is small — it needs a home that outlives any single feature.
+- A correct-but-tiny cleanup becomes an inline TODO note instead of a record.
 
-- `## Problem`: name the current API, cite the relevant files, and state the consumer evidence. Separate production callers from tests/docs.
-- `## Proposal`: say exactly what to remove, fold, demote, or rehome. Include tests, docs, and generated-file cleanup when relevant.
-- `## Why not keep it?` or `## What we give up`: make the strongest counterargument legible.
-- `## Acceptance criteria`: observable end state and gates.
-- `## Risks`: behavior changes and why the tradeoff is still reasonable.
+Write standalone proposals in manage-decision-records' proposed format (`## Problem` / `## Proposal` / `## Alternatives Considered` / `## Acceptance criteria` / `## Risks`) with these audit-specific contents:
+
+- `## Problem` names the current API, cites the relevant files, and separates production callers from tests/docs (consumer evidence).
+- `## Proposal` says exactly what to remove, fold, demote, or rehome, including tests, docs, and generated-file cleanup.
+- `## Alternatives Considered` and `## Risks` make the strongest counterargument legible: why not keep it, and what the change gives up.
 
 Be concrete enough that an implementing change can follow the trail. Avoid vague "simplify this" proposals. When a proposal overlaps an existing Decision Record, consolidate the useful details into the existing one rather than creating a duplicate.
 
@@ -130,7 +131,7 @@ Run lint, typecheck, and `git diff --check`. For each simplification summary, re
 
 This skill is the maintenance layer for simplification candidates.
 
-- **manage-decision-records:** delegates retention judgment and supersession mechanics to it.
+- **manage-decision-records:** delegates retention judgment and supersession mechanics to it, and writes standalone proposals in its `proposed` format.
 - **prose-quality / trim-cot-leakage:** candidate proposals' prose obeys the complete-proposition rule; no leakage.
 - **main agent:** invokes it when asked to simplify, find dead code, or reduce surface area.
-- It produces Decision Records or inline TODO notes; the retention decision belongs to manage-decision-records.
+- It produces standalone proposals, Decision Log entries, or inline TODO notes; the retention decision belongs to manage-decision-records.
