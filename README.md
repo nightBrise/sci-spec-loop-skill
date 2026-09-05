@@ -12,6 +12,8 @@ Spec-loop engineering 的核心：任何跨 2+ 文件或 2+ 步骤的任务，�
 ├── AGENTS.md            # 全局规则：主循环、spec 写法、派发参数、GitHub Flow 约定、编码规则、停止清单、skill 调用指南
 ├── agents/
 │   └── reviewer.md      # 严格评审 agent（两层结构化审查 + spec 合规核对；只读 + git diff）
+├── docs/
+│   └── decisions/       # 本仓库自身的工作流治理决策记录
 ├── skills/              # 七个 skill，每个目录一个 skill（SKILL.md）
 │   ├── write-research-outline/
 │   ├── write-spec/
@@ -40,7 +42,7 @@ cp Google_code_style.md ~/.kimi-code/Google_code_style.md
 
 研究课题：研究问题 → `write-research-outline`（活大纲 + 叶子分类）→ spec 叶子冻结 / investigation 叶子走调查循环。
 
-功能开发：requirements → `write-spec`（冻结 spec，含 `[Sn]`+Claims+`Dependencies`+决策）→ 派发循环（每 `[Sn]` 实现/commit/review）→ 对照 spec 验收。决策累积在 `<slug>.decisions.md`（含 `## Progress` 进度表），按 `manage-decision-records` 维护；prose 与推理泄漏审查由 `prose-quality` + `trim-cot-leakage` 承担；简化用 `simplification-audit`；GitHub Flow 约定见 `AGENTS.md`。
+功能开发：requirements → `write-spec`（冻结纯契约 spec：`[Sn]`+Claims+`Dependencies`）→ 派发循环（每 `[Sn]` 实现/commit/review）→ 对照 spec 验收。全部设计决策（brainstorm 起）直接进 `<slug>.decisions.md`（含 `## Progress` 进度表）；跨 feature/跨 spec 的耐久决策进 standalone DR（`docs/specs/decisions/`）。prose 与推理泄漏审查由 `prose-quality` + `trim-cot-leakage` 承担；简化用 `simplification-audit`；GitHub Flow 约定见 `AGENTS.md`。
 
 ## Skill 协作
 

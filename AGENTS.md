@@ -21,8 +21,8 @@
 - **1 spec = 1 可交付变更**；`[Sn]` 是其内部可派发单元。
 - 每 `[Sn]`：`Claims`（可验证行为）、`Dependencies`（可选）、边界清晰。
 - **拆判据**：契约耦合 / 可独立交付+回滚 / 不同结果；**拿不准归一个 spec**。
-- **每 feature 恒 2 文档**：`docs/specs/<slug>.md`（冻结 spec）+ `<slug>.decisions.md`（决策 + `## Progress` 进度表）。
-- spec 冻结后不可改；实现期设计决策只进 `.decisions.md`；进度板并入 decisions 但作用域为进度（`manage-decision-records` 排除它）。
+- **每 feature 恒 2 文档**：`docs/specs/<slug>.md`（冻结 spec，纯契约，不含决策节）+ `<slug>.decisions.md`（决策 + `## Progress` 进度表）。
+- spec 冻结后不可改；全部设计决策（brainstorm 起）直接进 `.decisions.md`；跨 feature/跨 spec 的耐久决策进 standalone DR（`docs/specs/decisions/`，proposed/accepted/rejected，见 `manage-decision-records`）；进度板并入 decisions 但作用域为进度（`manage-decision-records` 排除它）。
 
 ## 派发循环运行参数（不是模式）
 
@@ -61,12 +61,12 @@
 | `prose-quality` | 编辑标准——完整命题规则 + 各位置必备文案覆盖率 | 写/审/修/剪任何文案：注释、文档、prompt、诊断、UI 字符串 |
 | `trim-cot-leakage` | 推理过程泄漏检测与修复（8 类分类） | 审查可能泄漏会话痕迹的文案：死引用、变更叙述、评审编排、兜底残留 |
 | `structured-code-review` | 两层审查方法论（阻塞项 + 语义检查） | 审任何改动：PR / diff / spec 合规 / 任务产出；评审者 agent 加载 |
-| `manage-decision-records` | 决策生命周期——supersession 检查、保留判断 | 增/审/覆盖/整改 spec、Decision Log、独立 DR 中的决策 |
+| `manage-decision-records` | 决策生命周期——supersession 检查、保留判断、standalone 三状态（proposed/accepted/rejected） | 增/审/覆盖/整改 Decision Log、独立 DR 中的决策 |
 | `simplification-audit` | 简化候选挖掘（DR 或内联 TODO） | 用户让简化、清理、找死代码、审计未用 API、降表面积 |
 
 ### 协作（一规则一归属，只引用不重复）
 
-- `write-spec` 应用 prose-quality（命题）与 manage-decision-records（Decisions/ supersession）；`structured-code-review` 层1 调 prose-quality + trim-cot-leakage；`trim-cot-leakage` 删前引用 prose-quality；`simplification-audit` 委托 manage-decision-records 做保留判断。
+- `write-spec` 应用 prose-quality（命题）与 manage-decision-records（写日志条目时做 supersession 检查）；`structured-code-review` 层1 调 prose-quality + trim-cot-leakage；`trim-cot-leakage` 删前引用 prose-quality；`simplification-audit` 委托 manage-decision-records 做保留判断，耐久提案按 MDR 的 proposed 格式写 standalone。
 - `write-research-outline` 是研究层入口：spec 叶子交给 `write-spec` 冻结，investigation 叶子的负结果/死胡同交给 `manage-decision-records`，prose 交给 `prose-quality`/`trim-cot-leakage`。
 - 协作声明落盘在：`AGENTS.md`（本调用指南）+ 各 `SKILL.md` 的 `## Collaboration` 节 + `agents/reviewer.md`（评审路径）+ `README.md`（总图）。
 - **评审路径**：reviewer agent 加载 `structured-code-review`，用 prose-quality/trim-cot-leakage 做 prose 一遍，不在别处重复这些规则。
