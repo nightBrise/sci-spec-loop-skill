@@ -55,7 +55,7 @@ Start with the largest production-code deltas. A broad audit that stops after ob
 
 For every defensive copy, freeze, validator, and callback capture, name where the value came from and who owns it next. Same-process calls ordinarily borrow readonly values; parsers, config loaders, queues, durable files, workers, and wire decoders own or validate their data. Tests built around hostile getters, fake typed objects, or mutation after a same-process handoff are evidence of a potentially speculative contract, not automatic justification for keeping it.
 
-For complex asynchronous code, draw the ownership graph and map each sentinel, readiness promise, cancellation path, disposer, and state flag to a distinct owner or transition. When several mechanisms mirror the same liveness or settlement fact, propose one controller instead. Preserve separate machinery where it protects synchronous publication and rollback, callback containment, first-terminal-outcome arbitration, or dispose-to-quiescence.
+For complex asynchronous code, draw the ownership graph and map each sentinel, readiness promise, cancellation path, disposer, and state flag to a distinct owner or transition. When several mechanisms mirror the same liveness or settlement fact, propose one controller instead. Preserve separate machinery where it protects synchronous publication and rollback, callback containment, first-terminal-outcome arbitration, or dispose-to-quiescence (vocabulary per structured-code-review, Lifecycle and concurrency).
 
 ## Hand-rolled code versus a dependency
 

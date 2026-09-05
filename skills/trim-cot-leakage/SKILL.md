@@ -105,7 +105,7 @@ Different surfaces allow different leakage classes. This table overrides the bla
 | Spec Claims (`[Sn]`) | No | No | Frozen contract |
 | Legacy Spec Decisions (frozen specs only) | No | User dialogue as WHY | Historical snapshot; new specs carry no decisions |
 | Decision Log (`.decisions.md`) | No | Phase field + user dialogue | Sanctioned evidence surface |
-| Plan Steps | No | No | Implementation instructions only |
+| Plan Steps | No | No | For workflows that produce plan documents |
 | Delivery summary "What Was Built" | No | No | Final state, self-contained |
 | Delivery summary "Design Decisions" | "we chose X because Y" | No | Decision framing allowed |
 | Research outline leaf / investigation report | No | Leaf status tags (`dead-end`, `pivot`) + evidence refs | Leaf conclusions and one-line reasons are sanctioned |
@@ -114,7 +114,7 @@ Different surfaces allow different leakage classes. This table overrides the bla
 
 ## Overcorrection traps
 
-Every trap below shipped in an actual purge and was caught in review. **Enumerate a passage's propositions before trimming it.**
+Every trap below is an overcorrection observed in practice. **Enumerate a passage's propositions before trimming it.**
 
 ### Trap 1: Flipping an obligation into an endorsement
 
@@ -142,13 +142,13 @@ Every trap below shipped in an actual purge and was caught in review. **Enumerat
 
 ## Recall batteries
 
-Probes for the taxonomy. Every hit needs semantic judgment — the batteries over-match by design, and they under-match by nature: each review round found cases no battery caught, so pair them with an unpatterned read of the densest prose in scope.
+Probes for the taxonomy. Every hit needs semantic judgment — the batteries over-match by design, and they under-match by nature, so pair them with an unpatterned read of the densest prose in scope.
 
 ### Invocation rules
 
 - Add `--hidden --glob '!.git/**'` so dot-directories are searched; ripgrep skips them by default.
-- Exclusions go last so a later include cannot re-admit them: `--glob '!__pycache__/**' --glob '!.venv/**' --glob '!../FALCON/**' --glob '!node_modules/**'`. Also exclude the skill's own directory (it quotes leaked wording as calibration) and recorded fixture/snapshot directories.
-- Natural-language lines carry `-i` so sentence-initial capitals hit; code-token lines (`\bS\d\b`, `\bD\d\b`) stay case-sensitive — `-i` would turn them into noise.
+- Exclusions go last so a later include cannot re-admit them: `--glob '!__pycache__/**' --glob '!.venv/**' --glob '!<external-dependency-dir>/**' --glob '!node_modules/**'`. Also exclude the skill's own directory (it quotes leaked wording as calibration) and recorded fixture/snapshot directories.
+- Natural-language lines carry `-i` so sentence-initial capitals hit; numeric code-token patterns in the batteries (e.g. `\bW\d\b`, `\bT\d\b`) stay case-sensitive — `-i` would turn them into noise. `[Sn]`/`Dn` anchors are not probed raw: the class 1 resolvable-anchor rule protects them.
 - A zero-hit pattern proves nothing until you have seen it match: test it against a known-positive string before trusting the negative.
 
 ### English battery
@@ -172,7 +172,7 @@ rg -n --hidden '(^|[^a-zA-Z])端([^a-zA-Z]|$)' --glob '*.md' ...
 
 ### Known false-positive families
 
-Judged and kept during purges; expect them again:
+Known from past purges and re-expected; expect them again:
 
 - **Instrumental "used to"** — "the key used to sign requests" is instrumental, not temporal.
 - **Runtime old/new** — "the old connection drains before the new one accepts" names live objects during handover, not repo states.
@@ -185,9 +185,9 @@ Judged and kept during purges; expect them again:
 
 ## Workflow
 
-1. **Scope and exclusions** per prose-quality: require an explicit scope; never touch `../FALCON/`, `__pycache__/`, `.venv/`, generated files, recorded fixtures, or snapshots. Frozen specs are scanned but their `[Sn]` anchors are protected (class 1 resolvable-anchor rule).
+1. **Scope and exclusions** per prose-quality: require an explicit scope; apply its always-excluded list (external dependencies, generated files, test fixtures and snapshots, frozen specs — scanned and reported on only). This skill's own directory (it quotes leaked wording as calibration) and recorded fixture/snapshot directories are additionally excluded. Frozen spec `[Sn]` anchors are protected (class 1 resolvable-anchor rule).
 
-2. **Audit read-only first:** run the recall batteries with `--hidden` (see invocation rules), then judge every hit semantically. The batteries are probes, not the definition — each review round found cases the batteries missed, so also read the densest prose in scope (module docstrings, READMEs, Decision Records) without a pattern in hand.
+2. **Audit read-only first:** run the recall batteries with `--hidden` (see invocation rules), then judge every hit semantically. The batteries are probes, not the definition — they under-match by nature (see Recall batteries), so also read the densest prose in scope (module docstrings, READMEs, Decision Records) without a pattern in hand.
 
 3. **Fix owner-first per surface:**
    - Generated catalogs → fix the source docstring or generator template, then regenerate

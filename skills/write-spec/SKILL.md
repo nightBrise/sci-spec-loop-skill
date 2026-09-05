@@ -28,7 +28,7 @@ How downstream consumers use the spec:
   per independently-available `[Sn]`, and verifies every `[Sn]` is dispatched
 - **implementer prompt** receives verbatim `[Sn]` text as the intent for that task
 - **reviewer agent** enumerates individual Claims from `[Sn]` sections, verifies
-  each against the code and `git diff`, and requires evidence (test name / file:line / command output)
+  each against the code and `git diff`, and requires evidence (test name / command output / file:line)
 
 ## Check for existing spec
 

@@ -122,16 +122,16 @@ Assertions fail on the intended regression and verify external state — logs, e
 When a change implements a proposed standalone Decision Record, the pre-merge
 review verifies that the diff satisfies the record's `## Acceptance criteria`
 and never touches `docs/specs/*`, then reports the migration as pending. The
-main agent executes the migration to `accepted` (a present-tense `## Decision`
-plus `## Consequences`, per manage-decision-records' transition rules) on main
-after the change merges; a later review or audit verifies the migration landed
-against shipped code. Conversely, flag design choices visible in the diff that
-no Decision Record or Decision Log entry covers — report them; the main agent
-appends the entry.
+main agent executes the migration to `accepted` (transition rules per
+manage-decision-records; present-tense text per prose-quality's Decision-artifact
+coverage) on main after the change merges; a later review or audit verifies the
+migration landed against shipped code. Conversely, flag design choices visible
+in the diff that no Decision Record or Decision Log entry covers — report them;
+the main agent appends the entry.
 
 ### Snapshot and visible-output changes
 
-Editor-visible or user-visible changes update snapshots or explain why no snapshot applies. Review expected-output diffs as behavior changes, not formatting noise.
+User-visible or otherwise observable output changes update snapshots or explain why no snapshot applies. Review expected-output diffs as behavior changes, not formatting noise.
 
 ### Model-visible changes
 
@@ -198,4 +198,4 @@ This skill is the review layer that orchestrates other skills:
 - **trim-cot-leakage:** invoked by blocking requirement #1 (leakage detection)
 - **write-spec:** produces the frozen spec and Decision Log that this review verifies against
 - **manage-decision-records:** owns the migration and supersession semantics the "Decision Record matches shipped reality" check verifies
-- **reviewer agent:** this skill's methodology is what the reviewer agent (or the main agent's review flow) applies as the code quality layer (after spec compliance review passes)
+- **reviewer agent:** this skill's methodology is what the reviewer agent (or the main agent's review flow) applies as the code quality layer
