@@ -57,16 +57,9 @@ for s in ~/.kimi-code/skills/*/; do [ -s "$s/SKILL.md" ] || echo "missing: $s/SK
 
 ### Mimo Code
 
-全局位置与注册（mimo 已配置 `~/.config/mimocode/skills` 为 skill 目录、`~/.config/mimocode/agent/` 为 agent 目录；改动下一轮热重载生效，用 `mimo agent list` 校验 agent）：
+恢复方式：skill 目录原样拷贝进 `~/.config/mimocode/skills/`（mimocode.jsonc 的 `skills.paths` 需包含该目录）；`agents/` 下的 agent 前端是 harness 相关（本仓库按 kimi 格式书写），需翻译成 mimo 格式放进 `~/.config/mimocode/agent/`；AGENTS.md 按需同步（见下）。skill 与 agent 的改动下一轮热重载生效，用 `mimo agent list` 校验。
 
-| 仓库资产 | mimo 全局位置 | 安装方式 |
-|---|---|---|
-| `skills/*` | `~/.config/mimocode/skills/<name>/SKILL.md` | 原样拷贝（frontmatter 多余字段 `type: prompt`/`whenToUse` 被容忍） |
-| `agents/reviewer.md` | `~/.config/mimocode/agent/reviewer.md` | **前端翻译 + 正文重写**（见下），非拷贝 |
-| `AGENTS.md` | `~/.config/mimocode/AGENTS.md` | 按需对齐，保留 mimo compose 接线 |
-| `references/style/python.md` | `~/.config/mimocode/Google_code_style.md` | mimo 以该文件名 + mimocode.jsonc `instructions` key 注册全局生效，装后无需重复拷贝 |
-
-同步 skill（仓库原样覆盖，只增不删）：
+同步 skill（原样覆盖，只增不删）：
 
 ```sh
 for s in skills/*/; do
@@ -78,27 +71,26 @@ done
 
 维护要点：
 
-- **只增不删**：mimo 全局还装有个人 skill（如 `eli5`、`frontend-design`、`git-commit-push`、`weekly-report`），禁止删除整个 `~/.config/mimocode/skills/` 或用 `--delete` 同步；仅清理「已从仓库删除的 repo 系目录」。
-- repo 系 skill 正文是纯方法论，覆盖前无需 diff；mimo 用 frontmatter 的 `description` 做技能发现（`/skills`、`skill_search`），仓库 skill 的 description 已是触发向描述，无需改写。
+- **只增不删**：mimo 全局 skills 目录里可能还有本仓库之外的 skill，禁止删除整个目录或用 `--delete` 同步；只清理本仓库中已废弃的 skill 目录。
+- skill 正文是 harness 无关的纯方法论，原样覆盖即可，无需按 mimo 改写。
 
-适配 agent（仓库 `agents/reviewer.md` 是 kimi 前端格式，装 mimo 需翻译——**每次仓库改动它都要重翻译**；技能正文已是 harness 无关，无此负担）：
+适配 agent（每次改动 `agents/` 后都要重翻译）：
 
-| 仓库（kimi）前端字段 | mimo 前端字段 | 翻译规则 |
+| 本仓库（kimi） | mimo | 翻译规则 |
 |---|---|---|
-| 文件名 `agents/reviewer.md` | 文件名 `~/.config/mimocode/agent/reviewer.md` | `mode: subagent`；正文 = persona/system prompt |
+| 文件名（如 `agents/reviewer.md`） | `~/.config/mimocode/agent/<name>.md` | `mode: subagent`；正文即 persona/system prompt |
 | `description` + `whenToUse` | `description` | 合并为触发条件，改中文 |
-| `tools` / `disallowedTools` | `permission` | `write`/`edit`: deny；`bash`: `"*": deny` + git 只读白名单（`git diff/log/show/status/rev-parse *`: allow） |
-| `model` 档位 | `model` | reviewer 档 ≥ implementer 档（现配 `ultra`）；`temperature: 0.2` |
-| 正文（英文，harness 通用角色） | 正文（中文） | 按仓库现行语义改写：只读薄角色 + 委托 `structured-code-review`（两层方法论）+ 加载 `prose-quality`/`trim-cot-leakage` 做 prose pass + spec 合规程序（逐 `[Sn]` Claims 核验、Constraints/Out of Scope 检查、偏差交验收闸口）+ 三态 verdict `approve/needs fixes/reject` |
+| `tools` / `disallowedTools` | `permission` | 只读 agent：`write`/`edit` deny，`bash` `"*"` deny + git 只读白名单（`git diff/log/show/status/rev-parse *` allow） |
+| `model` | `model` | reviewer 档 ≥ implementer 档；`temperature: 0.2` |
+| 正文 | 正文 | 同一角色语义改写：只读薄角色 + 委托 `structured-code-review` + 加载 `prose-quality`/`trim-cot-leakage` 做 prose pass + spec 合规程序 + 三态 verdict |
 
-AGENTS.md：先 `diff` 仓库版与 `~/.config/mimocode/AGENTS.md` 再改。mimo 版保留自己的 compose 接线（§5-6）与个人 skill 条目（§7.3），只把 §7.1 的 skill 注册表对齐到当前 8-skill 套件（含 `write-research-outline`、`write-research-report` 两个研究层 skill）。
+AGENTS.md：若需全局同步，先 `diff` 仓库版与 `~/.config/mimocode/AGENTS.md`；mimo 版如有本地定制（如 compose 接线、个人 skill 条目），只对齐其中引用的 skill 注册表，不整文件覆盖。
 
 校验：
 
 ```sh
-mimo agent list                    # reviewer 以 (subagent) 出现
+mimo agent list                    # 已翻译的 agent 以 (subagent) 出现
 for s in skills/*/; do diff -q "$s/SKILL.md" ~/.config/mimocode/skills/$(basename "$s")/SKILL.md; done
-ls ~/.config/mimocode/skills       # repo 系 8 个 + 个人 skill 都在
 ```
 
 其他 harness：把 `skills/*/SKILL.md` 的方法与 `agents/*` 的提示词装到各自约定位置。技能正文是 harness-agnostic 方法论；只有前端 `type: prompt`、`whenToUse` 与 `agents/` 是 harness 相关，可按需改写。
