@@ -1,7 +1,5 @@
 # Sci-Spec-Loop Engineering
 
-> Language policy: this file, `skills/`, `agents/`, and `references/workflow/` form the English porting corpus; `README.md` is the Chinese owner-facing overview. Rule: `docs/decisions/repo-language-policy.md`.
-
 ## Core model
 
 The main agent (the main loop in the dialogue loop) is the controller. The harness dispatches subagents by **capability profile**: a read-only advisor, a writable implementer, a read-only reviewer. Any harness that can dispatch subagents can execute this methodology directly; the kimi mapping is `plan`/`explore`, `coder`, `reviewer`.

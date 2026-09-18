@@ -37,6 +37,13 @@ bodies remain governed by
 writing language of report deliverables; this one owns repository file
 language. Neither extends into the other's scope.
 
+The corpus files carry no repository-bound references to this policy: no
+pointers to the README or to `docs/decisions/`. AGENTS.md is deployed as other
+harnesses' global AGENTS.md, so it stays harness-agnostic and repository-
+agnostic; the README carries the policy pointer instead. At installed
+destinations the corpus's own English text is the working guard: an editor
+continues in the language the file already uses.
+
 ## Alternatives Considered
 
 - **Everything English** — rejected: the README is the owner's steering
@@ -56,6 +63,6 @@ language. Neither extends into the other's scope.
   match the table, not to update it.
 - New files follow the table: methodology corpus content is written in
   English, owner-facing content in Chinese.
-- Installed mirrors (`~/.kimi-code/`) do not carry `docs/decisions/`, so the
-  one-line policy pointers in `AGENTS.md` and `README.md` must stay
-  self-explanatory and not rely on the reader opening this record.
+- Installed mirrors (`~/.kimi-code/`) do not carry `docs/decisions/`; the
+  README's policy pointer must stay self-explanatory and not rely on the
+  reader opening this record.
