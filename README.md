@@ -1,6 +1,6 @@
 # Spec-Loop Skill 仓库
 
-这是我自己的跨设备、跨 harness 工作流恢复仓库：承载 spec-loop（规格驱动）工程方法论与评审 agent。
+跨设备、跨 harness 的工作流恢复仓库：承载 spec-loop（规格驱动）工程方法论与评审 agent，说明如何把仓库资产复原到各 harness。
 
 > 语言策略：`AGENTS.md`、`skills/`、`agents/`、`references/workflow/` 以英文维护（跨设备移植语料）；本 README 面向人阅读，保持中文。规则见 `docs/decisions/repo-language-policy.md`。
 
@@ -13,7 +13,7 @@ Spec-loop engineering 的核心：凡命中触发判据的任务——改对外�
 ```
 ├── AGENTS.md            # 全局规则与 skill 调用指南（主循环、派发参数、门禁、协作）
 ├── agents/
-│   └── reviewer.md      # 严格评审 agent（只读；方法论指针 → structured-code-review；含 spec 合规程序）
+│   └── reviewer.md      # 严格评审 agent（只读；方法论指针 → structured-code-review；含 spec 合规、spec 草稿与大纲骨架评审）
 ├── docs/
 │   └── decisions/       # 本仓库自身的工作流治理决策记录（不随安装拷贝）
 ├── references/
@@ -56,6 +56,9 @@ cp -r references/* ~/.kimi-code/references/
 n=$(find ~/.kimi-code/skills -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l); [ "$n" -eq 8 ] || echo "skill count: $n, expected 8"
 for s in ~/.kimi-code/skills/*/; do [ -s "$s/SKILL.md" ] || echo "missing: $s/SKILL.md"; done
 [ -s ~/.kimi-code/references/style/python.md ] || echo "missing: references/style/python.md"
+[ -s ~/.kimi-code/agents/reviewer.md ] || echo "missing: agents/reviewer.md"
+[ -s ~/.kimi-code/references/workflow/github-flow.md ] || echo "missing: references/workflow/github-flow.md"
+[ -s ~/.kimi-code/references/workflow/testing.md ] || echo "missing: references/workflow/testing.md"
 ```
 
 - `docs/` 是本仓库自己的治理记录，不随安装拷贝。
@@ -87,7 +90,7 @@ done
 | `description` + `whenToUse` | `description` | 合并为触发条件，改中文 |
 | `tools` / `disallowedTools` | `permission` | 只读 agent：`write`/`edit` deny，`bash` `"*"` deny + git 只读白名单（`git diff/log/show/status/rev-parse *` allow） |
 | `model` | `model` | reviewer 档 ≥ implementer 档；`temperature: 0.2` |
-| 正文 | 正文 | 同一角色语义改写：只读薄角色 + 委托 `structured-code-review` + 加载 `prose-quality`/`trim-cot-leakage` 做 prose pass + spec 合规程序 + 三态 verdict |
+| 正文 | 正文 | 同一角色语义改写：只读薄角色 + 委托 `structured-code-review` + 加载 `prose-quality`/`trim-cot-leakage` 做 prose pass + spec 合规程序 + spec 草稿评审（冻结前）与大纲骨架评审两个模式 + 三态 verdict |
 
 同步 workflow 细则（AGENTS.md 与 structured-code-review 引用为细节权威；按需阅读，不注册进 instructions）：
 
@@ -96,14 +99,17 @@ mkdir -p ~/.config/mimocode/references/workflow
 cp -r references/workflow/. ~/.config/mimocode/references/workflow/
 ```
 
-AGENTS.md：先 `diff` 仓库版与 `~/.config/mimocode/AGENTS.md`；mimo 版保留本地接线（compose 接线、个人 skill 条目、模型档位表），把仓库增量（spec 评审闸、Review tier、派发参数、GitHub Flow、停止清单、验收闸口）合并进去，不整文件覆盖。
+AGENTS.md：先 `diff` 仓库版与 `~/.config/mimocode/AGENTS.md`；mimo 版的本地定制原样保留，把仓库增量（spec 评审闸、Review tier、派发参数、GitHub Flow、停止清单、验收闸口）合并进去，不整文件覆盖。
 
 校验：
 
 ```sh
 mimo agent list                    # 已翻译的 agent 以 (subagent) 出现
 for s in skills/*/; do diff -q "$s/SKILL.md" ~/.config/mimocode/skills/$(basename "$s")/SKILL.md; done
+for f in references/workflow/*.md; do diff -q "$f" ~/.config/mimocode/"$f"; done
 ```
+
+范围说明：本仓库不含 mimo 主 agent 的提示词，该文件不在本节恢复范围内。
 
 其他 harness：把 `skills/*/SKILL.md` 的方法与 `agents/*` 的提示词装到各自约定位置。技能正文是 harness-agnostic 方法论；只有前端 `type: prompt`、`whenToUse` 与 `agents/` 是 harness 相关，可按需改写。
 
