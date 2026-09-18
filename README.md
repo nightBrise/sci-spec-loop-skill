@@ -89,7 +89,14 @@ done
 | `model` | `model` | reviewer 档 ≥ implementer 档；`temperature: 0.2` |
 | 正文 | 正文 | 同一角色语义改写：只读薄角色 + 委托 `structured-code-review` + 加载 `prose-quality`/`trim-cot-leakage` 做 prose pass + spec 合规程序 + 三态 verdict |
 
-AGENTS.md：若需全局同步，先 `diff` 仓库版与 `~/.config/mimocode/AGENTS.md`；mimo 版如有本地定制（如 compose 接线、个人 skill 条目），只对齐其中引用的 skill 注册表，不整文件覆盖。
+同步 workflow 细则（AGENTS.md 与 structured-code-review 引用为细节权威；按需阅读，不注册进 instructions）：
+
+```sh
+mkdir -p ~/.config/mimocode/references/workflow
+cp -r references/workflow/. ~/.config/mimocode/references/workflow/
+```
+
+AGENTS.md：先 `diff` 仓库版与 `~/.config/mimocode/AGENTS.md`；mimo 版保留本地接线（compose 接线、个人 skill 条目、模型档位表），把仓库增量（spec 评审闸、Review tier、派发参数、GitHub Flow、停止清单、验收闸口）合并进去，不整文件覆盖。
 
 校验：
 
