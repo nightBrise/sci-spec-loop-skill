@@ -35,7 +35,7 @@ bias, and the owner steers by exactly those shapes.
   trigger rules and other files reference them by name. Technical tokens — leaf status
   labels, spec and decision anchors, paths, code identifiers — stay untranslated
   inside Chinese prose; the authoritative token list lives in the skill. The language
-  → style-file index in `AGENTS.md` (`## 编码规则`) resolves *code* style documents;
+  → style-file index in `AGENTS.md` (`## Coding rules`) resolves *code* style documents;
   it is not this decision's home and is not extended into a documentation-language
   index. Rationale: the owner, whose working language is Chinese, reads these reports
   to steer direction, while English headings and tokens keep cross-file references
