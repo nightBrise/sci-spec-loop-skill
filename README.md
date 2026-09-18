@@ -2,6 +2,8 @@
 
 这是我自己的跨设备、跨 harness 工作流恢复仓库：承载 spec-loop（规格驱动）工程方法论与评审 agent。
 
+> 语言策略：`AGENTS.md`、`skills/`、`agents/`、`references/workflow/` 以英文维护（跨设备移植语料）；本 README 面向人阅读，保持中文。规则见 `docs/decisions/repo-language-policy.md`。
+
 ## 这是什么
 
 Spec-loop engineering 的核心：凡命中触发判据的任务——改对外契约、跨 2+ 模块不可单元回滚、无人值守执行、需先做取舍决策——都先把需求写成带 `[Sn]` 章节、Claims、`Global Constraints` 与 `Out of Scope` 的 spec 草稿、经 reviewer 评审后冻结，再按派发循环实现、由评审 agent 验收。方法论是 **harness 无关**的：凡能派发 subagent 的 harness 都能直接执行。
