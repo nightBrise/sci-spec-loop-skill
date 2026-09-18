@@ -17,16 +17,22 @@ whenToUse: When reviewing any code change — PR, diff, spec compliance, or task
 
 Verify the change's base and head before reading the diff. Read enough surrounding code to understand the design — the diff alone does not show intent. Re-establish the base and rerun after a retarget or merge. `git` access is read-only (`diff`/`log`/`show`/`status`/`merge-base`); never run mutating git commands. Reviews face the PR/task branch range rather than a single file.
 
+## Incremental re-review
+
+A re-review covers the diff from the last review head to the current head, plus the disposition of every prior blocker — each must be fixed or rebutted on technical grounds. Approved scope is not reopened unless the fix touches it. A rebuttal always receives a reviewer round — there is no skip condition. When the re-review is a batch review of the mechanical slices merged since the last batch review, the scope is that accumulated diff, and each finding routes to the owning slice's implementer. The base rules above apply unchanged: after a retarget or merge, re-establish the base and rerun.
+
 ## Sources of truth
 
 Read the applicable sources before reviewing. Not all will exist in every project — read what is present:
 
 - **Project rules:** `AGENTS.md`, `CONVENTIONS.md`, or equivalent standing rules
+- **GitHub Flow:** `references/workflow/github-flow.md` — branch topology, commit format, direct-to-main list, and PR description requirements (verify PR-description compliance against it)
 - **Code style:** the style document for each language the diff touches, resolved through the language → file index in the project rules above (this workflow keeps its entries at `references/style/<lang>.md`)
 - **Defensive patterns:** project-specific defensive-patterns documentation (if present)
 - **Prose standard:** prose-quality skill — required coverage and editorial judgment
 - **Leakage detection:** trim-cot-leakage skill — reasoning-transcript leakage
 - **Testing conventions:** project testing documentation or CI configuration
+- **Test layers:** `references/workflow/testing.md` — the L0–L3 test layers and the test-gate-before-review-gate boundary (evidence selection interplays with both)
 - **Decision Logs:** `.decisions.md` files — per-feature design rationale
 - **Standalone Decision Records:** `docs/specs/decisions/` — cross-feature proposals and decisions (proposed / accepted / rejected states)
 - **Spec:** the frozen spec (if this review is part of a spec-loop workflow)

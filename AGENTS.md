@@ -10,7 +10,7 @@
 
 ## 主循环（spec 驱动，4 段）
 
-`brainstorm（需求）→ write-spec（冻结 spec）→ 派发循环（实现/commit/审/修复）→ 对照 spec 验收`
+`brainstorm（需求）→ write-spec（评审→冻结 spec）→ 派发循环（实现/commit/审/修复）→ 对照 spec 验收`
 
 - 无独立 planning 阶段；`plan` 仅作只读顾问。
 - **覆盖检查在派发前由主 agent 执行**：每个 `[Sn]` 独立可派发（有 Claims、边界清晰、依赖可解析）。
@@ -26,26 +26,31 @@
 - **拆判据**：一份 spec 默认包含多个 `[Sn]`；拆成多份 spec 的三条判据、隐式规模上限、以及「`[Sn]` 数量不是判据，内聚性才是」见 `write-spec`。
 - **实现期发现的新工作按三分类处置**：可被现有 `[Sn]` 的 Claims 吸收的实现细节 / 契约错了（走 abandon）/ 邻近新范围（即延迟范围，记条目进 `.decisions.md`、冻结 spec 原样交付）；判据、条目格式与护栏见 `write-spec`，合并后由主 agent 汇总延迟条目决定后续处置。
 - **每 feature 恒 2 文档**：`docs/specs/<slug>.md`（冻结 spec，纯契约，不含决策节）+ `<slug>.decisions.md`（决策 + `## Progress` 进度表）。
+- **冻结前过评审闸**：`reviewer` 只读评审 → 修订 → 复审直到 `approve`；交互模式用户确认过审稿后冻结，无人值守过审即自动冻结、无用户步骤（细则见 `write-spec`）。
 - spec 冻结后不可改；全部设计决策（brainstorm 起）直接进 `.decisions.md`；跨 feature/跨 spec 的耐久决策进 standalone DR（`docs/specs/decisions/`，proposed/accepted/rejected，见 `manage-decision-records`）；进度板并入 decisions 但作用域为进度（`manage-decision-records` 排除它）。
 - 本仓库自身无 product `docs/specs/` 树：治理决策记录在 `docs/decisions/`（按 standalone DR 对待，审查时读取）；产品仓库按上文 `docs/specs/` 约定执行。
 
 ## 派发循环运行参数（不是模式）
 
 - **人工闸口在环（交互）** 或 **无人+预算（goal 自主）**；**是否并行**独立 `[Sn]`。
-- **无人值守（goal）**：逐 `[Sn]` 实现→commit→review→修复复审→整份 spec 全通过后**合并 PR + 删分支**（可用 `gh pr merge`）。
+- **无人值守（goal）**：spec 冻结前过评审闸；契约片走评审→跟进修复→增量复核；机械片凭测试证据（L0/L1）commit、波次完成时批次评审；整份 spec 全通过后**合并 PR + 删分支**（可用 `gh pr merge`）。
+- **预算检查**：片/批次边界对照剩余预算与剩余片数，不足 → 停机上报（Progress 板保证可恢复），不降质续跑。
+- **无人值守只修 blocker**：suggestions 记录上报、不追。
 - **并行 `[Sn]`**：每 `[Sn]` 独立 worktree+分支；**合并由主 agent 串行**；**决策/进度单写者（主 agent）**；`coder` 禁写 `docs/specs/<slug>.md`。
 - **派发前绑定**：主 agent 读 `.decisions.md` 的 brainstorm 条目；被引用的 standalone DR 附进对应 implementer prompt（细则见 `write-spec` After freeze）。
-- **派发指导（不给模板）**：不同 harness 有不同的派发标准，具体 prompt 由主 agent 在派发时按任务类型决定。建议侧重——实现类附 `[Sn]` 逐字文本 + 相关 standalone DR + 边界与禁令；调查类附假设 + 证据标准；审查类附 spec 路径 + diff 范围。
+- **派发指导（不给模板）**：不同 harness 有不同的派发标准，具体 prompt 由主 agent 在派发时按任务类型决定。建议侧重——实现类附 `[Sn]` 逐字文本 + 相关 standalone DR + 边界与禁令；调查类附假设 + 证据标准；审查类附 spec 路径 + diff 范围；spec 评审与大纲骨架评审派 `zhipuai-coding-plan/glm-5.3`（high），附 spec 草稿 + 需求基线 + Decision Log brainstorm 条目或大纲 + 骨架检查单。
 - **task report（实现者回报）**：最小必含内容——Claims 的偏差、发现的延迟范围、证据指针；形状由主 agent 定，不给模板。
 - **顾问触发**：主 agent 对同一目标连续 3 次未达成后，派只读顾问咨询。
-- **reviewer 拒绝上限**：同一 `[Sn]` 连续 3 次 `needs fixes`/`reject` → 停机上报（见停止清单）。
+- **reviewer 拒绝上限**：同一评审对象（片 / 批次 / 整分支 / spec 草稿 / 大纲骨架）连续 3 次 `needs fixes`/`reject` → 停机上报（见停止清单）；绿灯重置；偏差 finding 不计。
 
 ## GitHub Flow 约定（非 skill）
 
-- 1 spec = 1 分支 = 1 PR；一 `[Sn]` 一 commit；并行用 **merge commit**；`main` 永远可部署。
-- 栈式 PR 只用来自 main 的 merge 更新 base（禁 rebase+force-push）。
+- 1 spec = 1 分支 = 1 PR：spec 分支 `spec/<slug>`，片分支 `spec/<slug>-s<n>`；无依赖片自 main 切，有依赖片自依赖满足处切——片级栈式（PR 同规）、仅 merge 更新、禁 rebase/force-push；`main` 永远可部署。
+- **汇入规则**：主 agent 按依赖序串行 merge commit；契约片评审 `approve` 才汇入 spec 分支，机械片凭 L0/L1 证据汇入、波次完成时批次评审。
+- **提交格式**：一 `[Sn]` 一主提交（`[S2] feat: <摘要>`）+ 跟进提交（`[S2] review: <修复内容>`）；git pre-commit hook 执行 L0（细则见 `references/workflow/testing.md`）。
 - **合并前 spec 门禁**：diff 未触碰 `docs/specs/<slug>.md`；合并前置：reviewer `approve` + 证据存在。
-- **治理性直推例外**：standalone DR 的状态迁移（proposed→accepted/rejected）由主 agent 在 main 直接提交（无分支/PR）；该迁移在下一次 review 或 audit 中复核。
+- **治理性直推清单**：spec + Decision Log 冻结 commit、Progress 更新、standalone DR 状态迁移（proposed→accepted/rejected）由主 agent 在 main 直接提交（无分支/PR）；冻结后 decisions/Progress 只直推 main、不写 spec 分支；该迁移在下一次 review 或 audit 中复核。
+- `--no-verify` 与 force-push 同列禁令；分支/提交/PR 细则见 `references/workflow/github-flow.md`。
 
 ## 编码规则
 
@@ -63,17 +68,18 @@
 
 `改历史(含 force-push)` · `泄密` · `需用户判断` · `spec 实质变化` · `真实回归红` · `预算耗尽` · `合并冲突` · `环境/CI 不可用` · `reviewer 连续拒绝达上限` · `工具权限被拒`。
 
-边界注记——三条易混情形的归属：
+边界注记——四条易混情形的归属：
 
 - **延迟范围**（契约正确但不完整）**不是** `spec 实质变化`：记条目后继续跑，不停机。
 - **契约错**（与 Claim 矛盾，或改动 `Global Constraints`）才是 `spec 实质变化`：停机。
 - **偏差**（某个 `[Sn]` 自己的 Claim 实现不出来）既非延迟范围也非契约错：实现期记录问题、继续实现该 `[Sn]` 的其余部分、把偏差写进 task report、不改 spec，不停机；reviewer 把该 Claim 报为「未满足」并以该偏差作为解释——这是一条 finding，不是一次拒绝、不计入 3 次上限；偏差由验收闸口裁决，未经裁决的偏差属 `需用户判断`，无人值守下停机上报。
+- **新测试红**（新写用例失败）**不是** `真实回归红`：属修复循环——独立计数器，同片连续 3 轮红 → 停机上报，绿灯重置；既绿转红才是 `真实回归红`，命中既有停止项。
 
 `reviewer 连续拒绝达上限` 的数值见「派发循环运行参数」节。
 
 ## 审查门禁
 
-- 每完成一个 `[Sn]` 派 `reviewer`；查 spec 合规（Claims，含 `Global Constraints`/`Out of Scope` 未违例）+ 两层结构化审查。
+- 契约片每完成一个派 `reviewer`（评审 → 跟进修复 → 增量复核）；机械片免片级评审，波次完成时批次评审或整份 spec 评审覆盖；查 spec 合规（Claims，含 `Global Constraints`/`Out of Scope` 未违例）+ 两层结构化审查。
 - **证据要求：测试名 / 命令输出 / file:line。Prose 不是证据。**
 
 ## 技能目录与调用指南

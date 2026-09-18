@@ -58,6 +58,9 @@ sole writer and updates it in place as leaves change status.
 
 ## Hand off
 
+Leaves start only after the skeleton review approves the outline (see
+"Skeleton review").
+
 - **spec leaf** → write-spec produces the frozen spec and Decision Log.
 - **investigation leaf** → investigation loop: propose a hypothesis → run the
   experiment/prototype → record the conclusion in the leaf (one line plus the
@@ -71,6 +74,30 @@ sole writer and updates it in place as leaves change status.
   future agent, the main agent promotes the conclusion to a standalone Decision
   Record (`Status: rejected` — guardrail semantics) per manage-decision-records.
   Promotion is the exception, not the rule, for every negative result.
+
+## Skeleton review
+
+When a topic's outline is first produced, the main agent dispatches the
+reviewer (read-only) once against the skeleton. This skill owns the checklist:
+
+- **sub-question partition** — sub-questions divide the topic without gaps or
+  overlap.
+- **leaf-classification probes actually applied** — every leaf's type is
+  decided by the probes in "Classify each leaf", not a default.
+- **hypothesis testability** — investigation leaves state testable hypotheses.
+
+Verdict semantics, the rejection cap (3 consecutive `needs fixes`/`reject`
+verdicts on the outline skeleton stop the run), and the dispatch (glm-5.3 at
+high effort) are identical to write-spec's spec review.
+
+Leaves start only after approval. Spec leaves cut from an approved outline
+still pass write-spec's spec review at freeze — the skeleton review gates
+decomposition, not leaf contracts. Living outline updates carry no gate;
+direction-level review remains the stage report's job (write-research-report).
+
+Adding a new top-level branch to an approved outline is a new skeleton: that
+branch receives its own skeleton review before its leaves start. Adding or
+reclassifying leaves inside existing branches does not re-trigger it.
 
 ## Review and evidence
 

@@ -4,7 +4,7 @@
 
 ## 这是什么
 
-Spec-loop engineering 的核心：凡命中触发判据的任务——改对外契约、跨 2+ 模块不可单元回滚、无人值守执行、需先做取舍决策——都先冻结一份带 `[Sn]` 章节、Claims、`Global Constraints` 与 `Out of Scope` 的 spec，再按派发循环实现、由评审 agent 验收。方法论是 **harness 无关**的：凡能派发 subagent 的 harness 都能直接执行。
+Spec-loop engineering 的核心：凡命中触发判据的任务——改对外契约、跨 2+ 模块不可单元回滚、无人值守执行、需先做取舍决策——都先把需求写成带 `[Sn]` 章节、Claims、`Global Constraints` 与 `Out of Scope` 的 spec 草稿、经 reviewer 评审后冻结，再按派发循环实现、由评审 agent 验收。方法论是 **harness 无关**的：凡能派发 subagent 的 harness 都能直接执行。
 
 ## 目录结构
 
@@ -15,8 +15,11 @@ Spec-loop engineering 的核心：凡命中触发判据的任务——改对外�
 ├── docs/
 │   └── decisions/       # 本仓库自身的工作流治理决策记录（不随安装拷贝）
 ├── references/
-│   └── style/
-│       └── python.md    # Python 风格文档（Google Python 改编 + 注释中文团队规则）
+│   ├── style/
+│   │   └── python.md    # Python 风格文档（Google Python 改编 + 注释中文团队规则）
+│   └── workflow/
+│       ├── github-flow.md  # GitHub Flow 细则（分支拓扑、汇入规则、提交格式、PR 描述最低项）
+│       └── testing.md      # 测试分层 L0–L3 与 pre-commit hook 脚本（含安装步骤）
 ├── skills/              # 八个 skill，每个目录一个 skill（SKILL.md）
 │   ├── write-research-outline/
 │   ├── write-research-report/
@@ -73,22 +76,29 @@ flowchart TD
     H["需求<br/>要造什么已知"] --> I{"命中四维判据任一？"}
     D --> I
     I -->|否 · 机械性改动豁免| J["直接实现，不写 spec"]
-    I -->|是| K["write-spec<br/>冻结 spec + .decisions.md"]
+    I -->|是| K["write-spec<br/>spec 草稿"]
+    K --> K1{"spec 评审闸 · reviewer<br/>需求覆盖 + Verify the spec 检查单"}
+    K1 -->|"needs fixes · 修订 → 复审"| K
+    K1 -->|approve → 冻结| K2["冻结 spec + .decisions.md"]
 
-    K --> L["派发循环 · 1 spec = 1 分支 = 1 PR"]
-    L --> M["实现者：逐 [Sn] 实现 → commit"]
-    M --> N["reviewer：spec 合规 + 两层审查<br/>证据 = 测试名 / 命令输出 / file:line"]
-    N -->|"needs fixes · 同一 [Sn] 上限 3 次"| M
+    K2 --> L["派发循环 · 1 spec = 1 分支 = 1 PR"]
+    L --> M["实现者：逐 [Sn] 实现 → commit<br/>commit 前 L0 测试绿（git pre-commit hook）"]
+    M --> T{"Review tier<br/>spec 时逐 [Sn] 标注"}
+    T -->|契约片| N["reviewer 片评审<br/>spec 合规 + 两层审查<br/>证据 = 测试名 / 命令输出 / file:line"]
+    T -->|机械片| N2["免片级评审：凭 L0/L1 证据汇入 spec 分支<br/>波次完成时批次评审（累计 diff）"]
+    N -->|"needs fixes → 跟进修复 → 增量复核<br/>同一评审对象（片/批次/整分支/spec 草稿/大纲骨架）上限 3 次"| M
     M -.->|邻近新范围| P["延迟范围条目 → .decisions.md<br/>冻结 spec 原样交付 · 不停机"]
-    N -->|"approve · 全部 [Sn] 通过"| O["验收闸口<br/>Claims 偏差清单 + 延迟范围清单"]
+    N -->|approve · 汇入 spec 分支| W["reviewer 整份 spec 评审（PR 前）<br/>整分支 diff · 机械片在此全覆盖"]
+    N2 --> W
+    W -->|"approve · 全部 [Sn] 通过"| O["验收闸口<br/>Claims 偏差清单 + 延迟范围清单"]
     P -.-> O
     O --> Q["合并 PR + 删分支"]
     Q --> R["主 agent 汇总延迟条目<br/>后续 spec / 拆几份 / 丢弃"]
 ```
 
-研究课题：研究问题 → `write-research-outline`（活大纲 + 叶子分类）→ spec 叶子冻结 / investigation 叶子走调查循环；叶子结局内联记在大纲，耐久 guardrail 提升为 standalone DR；阶段报告 / 总体报告 / 深潜报告三种时点交付物由 `write-research-report` 规定、主 agent 撰写；报告正文用中文书写并附可视化图片（规则见该 skill）。
+研究课题：研究问题 → `write-research-outline`（活大纲 + 叶子分类）→ spec 叶子经评审冻结 / investigation 叶子走调查循环；叶子结局内联记在大纲，耐久 guardrail 提升为 standalone DR；阶段报告 / 总体报告 / 深潜报告三种时点交付物由 `write-research-report` 规定、主 agent 撰写；报告正文用中文书写并附可视化图片（规则见该 skill）。
 
-功能开发：requirements → `write-spec`（冻结纯契约 spec：`[Sn]`+Claims+`Global Constraints`+`Out of Scope`；`Dependencies` 可选）→ 派发循环（每 `[Sn]` 实现/commit/review）→ 对照 spec 验收。全部设计决策（brainstorm 起）直接进 `<slug>.decisions.md`（含 `## Progress` 进度表）；跨 feature/跨 spec 的耐久决策进 standalone DR（`docs/specs/decisions/`）。实现期发现的邻近新范围记为延迟范围条目（`.decisions.md`），冻结 spec 原样交付，合并后由主 agent 汇总处置（细则见 `write-spec`）。prose 与推理泄漏审查由 `prose-quality` + `trim-cot-leakage` 承担；简化用 `simplification-audit`；GitHub Flow 约定见 `AGENTS.md`。
+功能开发：requirements → `write-spec`（草稿过 reviewer 评审闸后冻结为纯契约 spec：`[Sn]`+Claims+`Global Constraints`+`Out of Scope`；`Dependencies` 可选）→ 派发循环（逐 `[Sn]` 标注 Review tier：契约片走评审→跟进修复→增量复核，机械片凭 L0/L1 证据 commit 汇入、波次完成时批次评审；commit 前 git pre-commit hook 跑 L0）→ 对照 spec 验收。全部设计决策（brainstorm 起）直接进 `<slug>.decisions.md`（含 `## Progress` 进度表）；跨 feature/跨 spec 的耐久决策进 standalone DR（`docs/specs/decisions/`）。实现期发现的邻近新范围记为延迟范围条目（`.decisions.md`），冻结 spec 原样交付，合并后由主 agent 汇总处置（细则见 `write-spec`）。prose 与推理泄漏审查由 `prose-quality` + `trim-cot-leakage` 承担；简化用 `simplification-audit`；GitHub Flow 约定见 `AGENTS.md`（细则在 `references/workflow/github-flow.md`，测试分层与 hook 在 `references/workflow/testing.md`）。
 
 ## Skill 协作
 

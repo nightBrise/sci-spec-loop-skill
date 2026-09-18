@@ -34,12 +34,14 @@ triggers a spec.
 ## Role in the workflow
 
 ```
-requirements → WRITE-SPEC → dispatch loop → implementation + review
-(main-agent    (this skill)   (main agent)     (coder + reviewer)
+requirements → WRITE-SPEC → spec review → dispatch loop → implementation + review
+(main-agent    (this skill) (reviewer)    (main agent)    (coder + reviewer)
  dialogue)
 ```
 
 How downstream consumers use the spec:
+- **spec review (reviewer, before freeze)** re-runs "Verify the spec"
+  adversarially against the uncommitted draft (dispatched per Save and confirm)
 - **dispatch loop (main agent)** reads `[Sn]` sections, dispatches one implementer
   per independently-available `[Sn]`, and verifies every `[Sn]` is dispatched
 - **implementer prompt** receives verbatim `[Sn]` text as the intent for that task
@@ -56,7 +58,7 @@ Before producing a new spec:
 2. If the project maintains a spec index (e.g. `docs/specs/README.md`), check whether this spec path was recorded there
 
 If a matching spec file (not design doc, not decision log) is found: read the
-existing spec and skip to Confirmation. Do not duplicate.
+existing spec and skip to Save and confirm. Do not duplicate.
 
 If a design doc is found but no spec: treat the design doc as brainstorm output
 and proceed to Convert — the design doc is input material, not a frozen spec.
@@ -105,6 +107,8 @@ write the file.
 
 ## [S1] <Section Title>
 
+**Review tier:** contract | mechanical
+
 <Brief description of this functional unit — what it does and why.>
 
 **Dependencies (optional):** [S0], [S2]
@@ -116,6 +120,8 @@ write the file.
 - C3: ...
 
 ## [S2] <Section Title>
+
+**Review tier:** contract | mechanical
 
 ### Claims
 
@@ -147,6 +153,14 @@ write the file.
   signal to split. The number of `[Sn]` is never the criterion — cohesion is.
 - One section per independently dispatchable unit — each `[Sn]` is handed to a single implementer.
 - `Dependencies (optional)`: list the `[Sn]` that must be done first; the section stays pending until its dependencies are done.
+- `**Review tier:**` tags every section header: `contract` or `mechanical`. A
+  **contract slice** has Claims that touch an external contract, `Global
+  Constraints`, or a cross-module boundary. A **mechanical slice** is
+  tests-only, docs, or a mechanical change. The spec review verifies the
+  tiering. A tier discovered mis-tagged mid-run is corrected procedurally:
+  the slice is handled as a contract slice from discovery onward, the main
+  agent records a Decision Log entry (`Phase: implementation`), and the
+  frozen spec text is not edited.
 - Every section SHOULD contain Claims. A section without claims is a warning —
   add at least one or merge it into another section.
 - `Global Constraints` is mandatory. Write at least one constraint (naming
@@ -161,8 +175,11 @@ write the file.
 - Prefer EARS format: `WHEN <trigger> THEN <system> SHALL <response>`
   - Not all claims fit EARS. Architecture constraints, performance bounds,
     data formats are valid without EARS. Use it when it fits.
-- Every claim MUST be testable: mappable to a test name, a `file:line`
-  reference, an observable UI state, or a measurable metric
+- **L1 mapping:** every claim maps to at least one named verification
+  artifact — a test name, a `file:line` reference, an observable UI state,
+  or a measurable metric. Where the evidence class is a test, it is a named
+  test the slice's run executes. A claim without a mapping leaves the slice
+  unfinished.
 - Each claim appears in exactly one section. If a claim spans two sections,
   split it or choose the primary owner.
 - Number claims sequentially within each section: C1, C2, C3, ...
@@ -270,27 +287,50 @@ After writing, verify:
 5. Every brainstorm Decision Log entry has a Chosen option, Rationale, and at
   least one Rejected alternative with a reason
 
+Findings against this checklist classify as:
+
+- **Blockers:** an untestable claim, a missing or empty `Global Constraints`,
+  a requirement coverage gap.
+- **Suggestions:** EARS phrasing, section-granularity advice.
+
+This checklist is the spec-review checklist the reviewer re-runs
+adversarially before freeze; this file is its home.
+
 ## Save and confirm
 
 1. Write the spec to `<spec-dir>/<feature-slug>.md`
 2. Write the Decision Log to `<spec-dir>/<feature-slug>.decisions.md`,
    holding the brainstorm entries written above (if no decisions were made,
    create the file with the header only and no entries)
-3. Commit both files:
+3. Do not commit — the commit happens at freeze (step 7), after approval.
+4. Before dispatching the reviewer, ensure the requirements baseline is on
+   disk; if the gathered requirements live only in conversation, write them
+   to disk first. The baseline quotes the user's goal verbatim, and the
+   reviewer receives the original goal text alongside the derived baseline.
+5. Dispatch the reviewer (read-only) with the spec draft, the requirements
+   baseline, and the Decision Log's brainstorm entries. The reviewer re-runs
+   "Verify the spec" adversarially, traces requirement coverage, and cites
+   quoted requirement text plus spec line references as evidence. Loop:
+   review → revise → re-review until approve. Re-review is always
+   full-text — incremental re-review is a code-only mechanism. The loop
+   contains no testing step.
+6. On approve, freeze by mode:
+   - **Interactive mode:** display the reviewed spec and the Decision Log's
+     brainstorm entries to the user, and ask in conversation for explicit
+     approval to freeze:
+     - question: `Spec and its brainstorm decisions saved to <spec-dir>/. Approve to freeze?`
+     - Approve: freeze the spec — planning and implementation will follow it
+     - Revise: user has changes — fix them, run one more review pass over the
+       revised draft, and re-present
+   - **Autonomous mode:** the review's approve verdict is the freeze
+     precondition — freeze on approve with no user step. Three consecutive
+     `needs fixes`/`reject` verdicts on the spec draft stop the run through
+     the reviewer-rejection cap; the review object here is the spec draft.
+7. Commit both files at freeze:
    ```bash
    git add <spec-dir>/<feature-slug>.md <spec-dir>/<feature-slug>.decisions.md
    git commit -m "spec: add <feature-name> spec and decision log"
    ```
-4. Display the full spec and the Decision Log's brainstorm entries to the user
-5. Ask the user in conversation for explicit approval to freeze:
-   - question: `Spec and its brainstorm decisions saved to <spec-dir>/. Approve to freeze?`
-   - Approve: freeze the spec — planning and implementation will follow it
-   - Revise: user has changes — fix them and re-present
-
-   **Autonomous mode:** If no user is available to approve, treat as approved
-   and proceed to the dispatch loop.
-
-If the user requests changes: revise and re-present. Loop until approved.
 
 ## After freeze
 

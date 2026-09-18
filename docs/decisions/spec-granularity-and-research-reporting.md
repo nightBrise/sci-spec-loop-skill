@@ -1,6 +1,6 @@
 # Decision: Spec granularity, deferred scope, research reporting, and style enforcement
 
-Status: accepted
+Status: accepted — partially superseded by [Standalone DR: Dispatch-loop process, v3] (reviewer-rejection-limit unit only)
 Date: 2026-09-05
 Specs: none — governs the workflow skill repo itself
 
