@@ -1,6 +1,6 @@
 # Decision: Dispatch-loop process, v3
 
-Status: proposed
+Status: accepted
 Date: 2026-09-18
 Specs: none — governs the workflow skill repo itself
 
@@ -269,3 +269,25 @@ Four structural gaps surfaced by use:
   removes a writer from the spec branch; the cost is that those updates are
   visible on main before the PR merges, which the one-PR-per-spec convention
   already treats as normal for governance artifacts.
+
+## Consequences
+
+- Every spec costs one review round and every research topic one skeleton
+  round, while mechanical slices stop costing per-slice rounds; net review
+  cost stays roughly flat and detection moves earlier for the contracts that
+  matter.
+- The rejection cap lives on the review object rather than the slice; the
+  AGENTS.md copies, the README diagram, and
+  `spec-granularity-and-research-reporting.md` carry the generalized wording
+  through the implementation pass, which appends the supersession marker to
+  the accepted record's status line.
+- L0 enforcement is only as present as each product repo's hook installation;
+  testing.md ships the script and install steps, and the README restore flow
+  copies the references tree that carries them.
+- Review-dispatch effort rides on model defaults (glm-5.3 at high) because
+  harnesses lack per-dispatch effort parameters; the config is runtime state
+  outside this repo and may lag the doc changes, in which case the acceptance
+  gate records a partial implementation.
+- Remaining gaps: the hook script is a generic template each product repo
+  adapts to its test runner, and mis-tagged tiers rely on the Decision Log
+  correction path rather than any automated detection.
