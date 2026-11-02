@@ -3,3 +3,9 @@ archive/
 
 # mimo code 会话运行时目录（plans/、cron-lock 等）—— 本地工具状态，不提交
 .mimocode/
+
+# 仓库级部署/维护手册 —— 仅本机 agent 使用，不入库；GitHub 门面只留 README / CHANGELOG / assets
+/AGENTS.md
+
+# 设计工作台（流程 v2 设计纪要 + 讨论记录）—— 本地讨论用，全部问题关闭后才落地
+DESIGN.md

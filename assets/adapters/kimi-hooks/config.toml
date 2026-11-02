@@ -1,0 +1,14 @@
+# Merge these entries into ~/.kimi-code/config.toml (see root AGENTS.md deployment manual).
+# R1: red-line interception. R2: push-evidence reminder.
+
+[[hooks]]
+event = "PreToolUse"
+matcher = "Bash"
+command = "node ~/.kimi-code/hooks/block-dangerous-git.mjs"
+timeout = 5
+
+[[hooks]]
+event = "PreToolUse"
+matcher = "Bash"
+command = "node ~/.kimi-code/hooks/push-evidence-reminder.mjs"
+timeout = 5

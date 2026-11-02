@@ -1,0 +1,8 @@
+#!/bin/sh
+# R3: L0 floor on every commit. L0 definition: references/workflow/testing.md.
+# Install: git config core.hooksPath .githooks
+if [ -x "scripts/run-l0" ]; then
+  exec scripts/run-l0
+fi
+echo "pre-commit: scripts/run-l0 not found; L0 skipped (define L0 before relying on this gate)" >&2
+exit 0
