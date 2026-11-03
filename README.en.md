@@ -195,7 +195,7 @@ cp -r assets/references/* ~/.<harness>/references/
 The sync is a mirror: the repository is authoritative — besides overwriting, a re-sync deletes whatever the repository no longer carries (`diff -rq` shows the residue); files that never came from the repository stay.
 
 - **Kimi Code**: target `~/.kimi-code/`, fragment `assets/adapters/kimi.md`.
-- **Mimo Code**: target `~/.config/mimocode/` (copy each skill into its own directory and register the path in `skills.paths` of `mimocode.jsonc`); diff the global AGENTS.md and merge increments rather than overwriting the file, keeping mimo-local wiring and model-tier concepts; model selection follows mimo's native `model` fields.
+- **MiMo Code**: target `~/.config/mimocode/`, fragment `assets/adapters/mimo.md`; see "Migrating to MiMo Code" below for the full procedure.
 
 ### 3. Hooks and git hooks (optional)
 
@@ -216,6 +216,128 @@ git config core.hooksPath .githooks
 ```
 
 Merge the `[[hooks]]` blocks from R1/R2 into `~/.kimi-code/config.toml`.
+
+MiMo Code implements R1 as a global plugin, keeps R2 in the rule layer, and uses the same git hook for R3; see the next section.
+
+### Migrating to MiMo Code
+
+MiMo Code differs from Kimi Code only in install paths, agent names, model tiers, and hook carriers; the method body is shared. The steps below bind no provider, model, or machine path.
+
+#### 1. Skills and references
+
+```sh
+for s in assets/skills/*/; do
+  n=$(basename "$s")
+  mkdir -p ~/.config/mimocode/skills/"$n"
+  cp -r "$s/." ~/.config/mimocode/skills/"$n"/
+done
+mkdir -p ~/.config/mimocode/references
+cp -r assets/references/. ~/.config/mimocode/references/
+```
+
+- Keep personal skills that never came from this repository; the mirror only overwrites repository content.
+- A skill's name comes from its frontmatter, not its directory; duplicate names are last-loaded-wins.
+- The default global directory is scanned automatically; add `skills.paths` only for extra roots.
+
+#### 2. Compose the global rules
+
+```sh
+mkdir -p ~/.config/mimocode
+{ cat assets/AGENTS.md; echo; cat assets/adapters/mimo.md; } > ~/.config/mimocode/AGENTS.md
+```
+
+- The installed file is a generated artifact; never hand-edit it. Re-compose after changing the body or the fragment.
+- MiMo Code loads a **project** `AGENTS.md` and the **global** file additively, not as overrides; `instructions` files are merged too.
+- The adapter carries only paths, capability mapping, model tiers, local mechanisms, and hooks. The main loop, dispatch briefs, and review mechanism stay in the body, shared by every harness.
+
+#### 3. Model tiers
+
+```jsonc
+{
+  "$schema": "https://mimo.xiaomi.com/mimocode/config.json",
+  "model": "standard",
+  "model_groups": {
+    "lite": "<provider>/<small-model>",
+    "standard": "<provider>/<main-model>"
+  },
+  "agent": {
+    "general":    { "model": "lite" },
+    "explore":    { "model": "lite" },
+    "title":      { "model": "lite" },
+    "summary":    { "model": "lite" },
+    "compaction": { "model": "lite" }
+  }
+}
+```
+
+- The main agent and `plan` use the top-level `model`; do not set `agent.build.model` / `agent.plan.model`, so the user can adjust them.
+- Every subagent uses a lower tier; **review ≥ implement** (the main agent's tier is not below the subagent it reviews).
+- Adjust tier count and names to your model pool; do not use the legacy `small_model`; cheap tasks go through the `lite` group.
+- `mimo run -m <group>` does not resolve groups; use a literal `-m <provider>/<model>` for headless checks.
+
+#### 4. Hooks
+
+**R1 dangerous-command guard**: global plugin `~/.config/mimocode/plugin/spec-loop-guard.ts`.
+
+```ts
+// R1: block history-rewriting git commands.
+// Fail-open: a load or hook failure leaves the rule layer as the guard.
+const BANNED: { re: RegExp; why: string }[] = [
+  { re: /git\s+push\b[^;&|]*\s(?:--force-with-lease|--force|-f)\b/, why: "force-push is banned (history rewrite)" },
+  { re: /git\s+rebase\b/, why: "git rebase is banned (merge-only flow)" },
+  { re: /git\s+reset\s+--hard\b/, why: "git reset --hard is banned" },
+  { re: /--no-verify\b/, why: "--no-verify is banned" },
+]
+
+export default async () => ({
+  "tool.execute.before": async (input: any, output: any) => {
+    if (input?.tool !== "bash") return
+    const command = String(output?.args?.command ?? input?.args?.command ?? "")
+    for (const { re, why } of BANNED) {
+      if (re.test(command)) throw new Error("Blocked: " + why)
+    }
+  },
+})
+```
+
+- This is an undocumented MiMo Code surface; `--pure` / `MIMOCODE_PURE` disables plugins, and upgrades should be re-verified.
+- Do not trust it untested: temporarily add a marker rule, run `echo <marker> > /tmp/probe-ran`, and confirm the file is absent while the tool reports Blocked; run a benign command as the negative control, then remove the marker rule.
+
+**R2 push-evidence reminder**: MiMo Code has no pre-command text-injection hook; the rule layer carries it — the trigger line in the body's GitHub Flow section plus the `pre-push-checks` skill, with evidence landing in `pr-description`.
+
+**R3 L0 floor**: installed per repository, not globally.
+
+```sh
+git config core.hooksPath .githooks
+```
+
+- Make `.githooks/pre-commit` executable; the product repository defines `scripts/run-l0` (tiers: `references/workflow/testing.md`).
+- Three-state test in a temporary repository: no `run-l0` → warn and pass; exit 1 → commit blocked; exit 0 → pass.
+
+#### 5. Verify
+
+```sh
+wc -l ~/.config/mimocode/AGENTS.md          # keep ≤ 200
+mimo agent list                              # built-in agents only; no custom overrides
+mimo debug config                            # model / model_groups / agent overrides
+mimo debug skill                             # repository skills visible
+mimo models <provider>                       # tier model IDs exist
+mimo run -m <provider>/<model> "Reply with exactly: ok"
+```
+
+#### 6. Pitfalls
+
+| Pitfall | Handling |
+|---|---|
+| A project `AGENTS.md` is present, so the global rules seem inactive | They load additively; the global rules still apply |
+| A style document sits in both `instructions` and references | Duplicate injection; keep references plus the index |
+| `skills.paths` uses `~` | Use an absolute path, or rely on the default global scan |
+| A custom `agent/<name>.md` shares a built-in name | It overrides the built-in's base prompt; delete it to restore |
+| A custom primary agent's body | It replaces the model-family prompt; environment/skills/instructions blocks are still appended |
+| `mimo run -m <group>` | Groups do not resolve there; use a literal `provider/model` |
+| The plugin does not fire | `--pure` disables it; the plugin API is undocumented, so re-verify after upgrades |
+| `git commit --no-verify` bypasses R3 | R1 blocks it; do not use `--no-verify` |
+| Config changed but the current session is unchanged | New sessions/restarted TUI; model selection is session-scoped |
 
 ### Verify
 

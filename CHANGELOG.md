@@ -2,6 +2,24 @@
 
 本文件是仓库的版本变更说明与理由：每一节讲清这一版改了什么、为什么这么改，以及当时为什么排除了其他方案。版本按时间倒序排列，新版本追加在最上面；仓库没有正式版本号，节名取该版的主题，日期用 ISO 格式，文件路径按该节所述版本当时的布局书写，当前布局见最新一节。
 
+## [mimo-migration-guide] - 2026-11-03
+
+**变了什么**
+
+- 新增 `assets/adapters/mimo.md`：MiMo Code 适配片段（安装布局、能力映射、模型档位、hooks），与 `assets/adapters/kimi.md` 同构。
+- `README.md` / `README.en.md` 新增「迁移到 MiMo Code / Migrating to MiMo Code」完整指南：skills 与 references 镜像、规则合成、模型档位占位配置、R1/R2/R3 落法、校验与常见坑。
+- 根 `AGENTS.md` 的 MiMo Code 安装节从「增量合并」改为「合成式安装」，补全 references、hooks 与验证步骤。
+
+**为什么**
+
+- 原安装说明是 merge-increment，与 v2 的合成式迁移不一致；实机安装还需要补齐 style references、处理 mimo 没有文档化 hooks 的事实。把这条路径写进 README，新用户不必从会话记录复原。
+- 指南刻意使用占位符：不绑定供应商、模型或机器路径；agent 分配只用自带 `build`/`plan`/`general`/`explore`，不引入自定义 agent。
+
+**对使用者的影响**
+
+- MiMo Code 用户可按 README 一次装好；Kimi Code 的安装路径不变。
+- 个人 skill、个人路径与模型选择仍由使用者自行决定；指南不包含这些信息。
+
 ## [mechanism-hardening] - 2026-11-03
 
 这一版补上机制审计发现的三处缺口（合并后回滚无受控出口、hooks 只有实现没有定义、知识层只进不出）与四处强制力薄弱点（分流乐观执行、覆盖盲区、进度树时效、顾问无闭环）。

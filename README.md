@@ -195,7 +195,7 @@ cp -r assets/references/* ~/.<harness>/references/
 同步是镜像：以仓库为准，覆盖之外，仓库已移除的内容一并从实机删除（`diff -rq` 可查残留）；非本仓库来源的文件不动。
 
 - **Kimi Code**：目标目录 `~/.kimi-code/`，片段用 `assets/adapters/kimi.md`。
-- **Mimo Code**：目标目录 `~/.config/mimocode/`（skill 逐个建目录拷入，并在 `mimocode.jsonc` 的 `skills.paths` 登记）；全局 AGENTS.md 先 diff 再合并增量、不整文件覆盖，mimo 本地的接线与模型档位概念保留；模型选择走 mimo 原生 `model` 字段。
+- **MiMo Code**：目标目录 `~/.config/mimocode/`，片段用 `assets/adapters/mimo.md`；完整步骤见下方「迁移到 MiMo Code」。
 
 ### 3. hooks 与 git 钩子（可选）
 
@@ -216,6 +216,128 @@ git config core.hooksPath .githooks
 ```
 
 R1/R2 的 `[[hooks]]` 块合并进 `~/.kimi-code/config.toml`。
+
+MiMo Code 的 R1 用全局插件实现，R2 由规则层承担，R3 与上述 git 钩子相同；具体落法见下一节。
+
+### 迁移到 MiMo Code
+
+MiMo Code 与 Kimi Code 的差别只在安装位置、agent 名称、模型档位和钩子载体；方法论主体完全共用。以下步骤不绑定具体供应商、模型或机器路径。
+
+#### 1. skills 与 references
+
+```sh
+for s in assets/skills/*/; do
+  n=$(basename "$s")
+  mkdir -p ~/.config/mimocode/skills/"$n"
+  cp -r "$s/." ~/.config/mimocode/skills/"$n"/
+done
+mkdir -p ~/.config/mimocode/references
+cp -r assets/references/. ~/.config/mimocode/references/
+```
+
+- 保留目标目录里非本仓库来源的个人 skill；镜像只覆盖仓库携带的内容。
+- skill 名来自 frontmatter，不来自目录名；重名时后加载的覆盖前一个。
+- 默认全局目录会被自动扫描；只有放在别处时才需要在 `mimocode.jsonc` 里写 `skills.paths`。
+
+#### 2. 合成全局规则
+
+```sh
+mkdir -p ~/.config/mimocode
+{ cat assets/AGENTS.md; echo; cat assets/adapters/mimo.md; } > ~/.config/mimocode/AGENTS.md
+```
+
+- 实机文件是生成物，不手改；改主体或片段后重新合成。
+- MiMo Code 的**项目级** `AGENTS.md` 与**全局**文件是叠加加载，不是互相遮蔽；`instructions` 配置的额外文件也会合并进来。
+- 适配段只写路径、能力映射、模型档位、本地机制与 hooks；主循环、派发简报、评审机制都在主体里，所有 harness 共用。
+
+#### 3. 模型档位
+
+```jsonc
+{
+  "$schema": "https://mimo.xiaomi.com/mimocode/config.json",
+  "model": "standard",
+  "model_groups": {
+    "lite": "<provider>/<small-model>",
+    "standard": "<provider>/<main-model>"
+  },
+  "agent": {
+    "general":    { "model": "lite" },
+    "explore":    { "model": "lite" },
+    "title":      { "model": "lite" },
+    "summary":    { "model": "lite" },
+    "compaction": { "model": "lite" }
+  }
+}
+```
+
+- 主 agent 与 `plan` 用顶层 `model`；不写 `agent.build.model` / `agent.plan.model`，保持用户可调。
+- 所有 subagent 用低档；约束是 **review ≥ implement**（主 agent 档位不低于被审 subagent）。
+- 档位数量与命名按你的模型池调整；不要用旧版 `small_model`，廉价任务走 `lite` 组。
+- `mimo run -m <group>` 不解析 group；headless 测试用字面量 `-m <provider>/<model>`。
+
+#### 4. hooks
+
+**R1 危险命令拦截**：全局插件 `~/.config/mimocode/plugin/spec-loop-guard.ts`。
+
+```ts
+// R1: block history-rewriting git commands.
+// Fail-open: a load or hook failure leaves the rule layer as the guard.
+const BANNED: { re: RegExp; why: string }[] = [
+  { re: /git\s+push\b[^;&|]*\s(?:--force-with-lease|--force|-f)\b/, why: "force-push is banned (history rewrite)" },
+  { re: /git\s+rebase\b/, why: "git rebase is banned (merge-only flow)" },
+  { re: /git\s+reset\s+--hard\b/, why: "git reset --hard is banned" },
+  { re: /--no-verify\b/, why: "--no-verify is banned" },
+]
+
+export default async () => ({
+  "tool.execute.before": async (input: any, output: any) => {
+    if (input?.tool !== "bash") return
+    const command = String(output?.args?.command ?? input?.args?.command ?? "")
+    for (const { re, why } of BANNED) {
+      if (re.test(command)) throw new Error("Blocked: " + why)
+    }
+  },
+})
+```
+
+- 这是 MiMo Code 的未文档化插件面，`--pure` / `MIMOCODE_PURE` 会关闭插件；升级后建议复验。
+- 不要直接相信它生效：先临时加一条「命令含某个标记即抛错」，让 agent 执行 `echo <标记> > /tmp/probe-ran`；文件不存在 + 工具返回 Blocked = 钩子触发且抛错能阻断；再跑一条普通命令做负向对照，通过后删掉标记规则。
+
+**R2 push 前证据提醒**：MiMo Code 没有「命令前注入文本」的钩子，由规则层承担——主体 GitHub Flow 节的触发行 + `pre-push-checks` skill；证据落进 `pr-description`。
+
+**R3 L0 提交闸**：每仓库安装，不是全局设置。
+
+```sh
+git config core.hooksPath .githooks
+```
+
+- 确保 `.githooks/pre-commit` 可执行；产品仓库定义 `scripts/run-l0`（分层见 `references/workflow/testing.md`）。
+- 临时仓库三态测试：无 `run-l0` → 告警放行；`run-l0` 退出 1 → commit 被阻断；退出 0 → 通过。
+
+#### 5. 校验
+
+```sh
+wc -l ~/.config/mimocode/AGENTS.md          # 建议 ≤ 200
+mimo agent list                              # 只剩自带 agent；无自定义覆盖
+mimo debug config                            # model / model_groups / agent 覆盖
+mimo debug skill                             # 仓库 skill 可见
+mimo models <provider>                       # 档位引用的模型 ID 存在
+mimo run -m <provider>/<model> "Reply with exactly: ok"
+```
+
+#### 6. 常见坑
+
+| 坑 | 处理 |
+|---|---|
+| 项目有 `AGENTS.md`，以为全局规则不生效 | 两者叠加加载；全局规则仍会加载 |
+| 把风格文档同时放进 `instructions` 和 references | 重复注入；只保留 references + 索引 |
+| `skills.paths` 写了 `~` | 用绝对路径，或依赖默认全局目录扫描 |
+| 自定义 `agent/<name>.md` 与自带同名 | 会覆盖自带 base prompt；删掉即恢复 |
+| 自定义 primary agent 的正文 | 会替换模型家族 prompt；环境/技能/instructions 块仍追加 |
+| `mimo run -m <group>` | 不解析 group；用字面量 `provider/model` |
+| 插件没生效 | `--pure` 会关闭；插件 API 未文档化，升级后复验 |
+| `git commit --no-verify` 绕过 R3 | 由 R1 拦；不要 `--no-verify` |
+| 改了配置但当前会话没变 | 新会话/重启 TUI 后生效；模型选择是会话级的 |
 
 ### 校验
 
