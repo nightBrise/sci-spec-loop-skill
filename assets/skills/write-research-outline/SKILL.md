@@ -1,6 +1,6 @@
 ---
 name: write-research-outline
-description: Use when an outline must be materialized — cross-session continuation, a Progress tree too coarse to navigate, an experiment that needs preregistration, or the owner asks for a board — and when registering a leaf status, a one-line conclusion, an inter-bred leaf, or a preregistration before work starts. Owns outline materialization, dual-speed registration, and the preregistration three-piece.
+description: Use when an outline must be materialized — cross-session continuation, a Progress tree too coarse to navigate, an experiment that needs preregistration, or the owner asks for a board — and when registering a leaf status, a one-line conclusion, a newly spawned leaf, or a preregistration before work starts. Owns outline materialization, dual-speed registration, and the preregistration three-piece.
 ---
 
 # Write Research Outline
@@ -56,7 +56,7 @@ new skeleton or a new top-level branch — that is a stop.
 **Exemptions.**
 
 - **Light registration.** A leaf status change, a one-line conclusion, or a
-  newly inter-bred leaf registers immediately with an inline one-line ticket
+  newly spawned leaf registers immediately with an inline one-line ticket
   judgment; `record-discipline` grants the exemption and this skill runs it.
 - **No board.** A build-only topic whose work items fit the Progress tree needs
   no outline; no outline means no leaves, only work items. An explore work item
@@ -115,7 +115,7 @@ leave one line.
 | Speed | Trigger | Steps | Gate |
 |---|---|---|---|
 | full | first materialization; a new top-level branch | skeleton → owner review → leaves start | owner approves the skeleton |
-| light | leaf status, one-line conclusion, inter-bred new leaf | correct the source, write the line, inline one-line judgment | none; registration completes immediately |
+| light | leaf status, one-line conclusion, newly spawned leaf | correct the source, write the line, inline one-line judgment | none; registration completes immediately |
 
 - The light channel is the default for a living board; routing it through the
   full flow is how the board starves.

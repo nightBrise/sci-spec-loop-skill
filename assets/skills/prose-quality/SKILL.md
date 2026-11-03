@@ -7,8 +7,6 @@ description: >
   prompts, descriptions, diagnostics, and UI strings. Covers proposition
   preservation, required coverage by location, structure-before-prose, corpus
   auditing, and borderline decisions.
-type: prompt
-whenToUse: When writing, reviewing, restoring, trimming, or auditing any prose — comments, docstrings, docs, prompts, diagnostics, UI strings — or deciding where documentation is required
 ---
 
 # Prose Quality Standard

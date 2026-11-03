@@ -37,6 +37,9 @@ wrong thing.
 - Existing records on the topic: `docs/specs/*.md`, their `.decisions.md`,
   standalone Decision Records.
 
+A missing required input is reported and stops the write; never infer the
+baseline or the requirements from context.
+
 **Scope.** One deliverable change, from requirements to the freeze commit, plus
 the after-freeze channels for that spec.
 

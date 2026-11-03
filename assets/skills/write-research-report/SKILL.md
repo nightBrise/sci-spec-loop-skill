@@ -9,13 +9,19 @@ description: >
   when the owner asks for a readout. Reports aggregate and interpret findings
   for direction decisions; they never restate the outline and never authorize
   implementation.
-type: prompt
-whenToUse: When writing a stage, overall, or deep-dive report for a research topic — at leaf-resolution checkpoints, at topic closure, at the end of an unattended run, or on the owner's request
 ---
 
 # Write Research Report
 
 Reports turn the accumulated state of a living research outline into point-in-time deliverables for direction decisions: what changed, what the findings mean, and which ways forward are open. This skill owns the three report forms — their names, triggers, structure, language, figure requirements, evidence bar, and audience. It is guidance, not a script: keep every finding traceable to leaf evidence and keep reports at the altitude of findings and options.
+
+**Inputs.** The covered period; every leaf terminal in it, with its evidence references; the decision entries ruled in it. A missing required input is reported and stops the write; never infer a finding, a period boundary, or an evidence reference from context.
+
+## The one test
+
+**The altitude test.** A passage belongs in a report only when it changes a direction decision or is needed for the reader to trust a finding. Implementation detail — code layout, API shape, test internals — lives in the spec, the deep-dive report, or the code.
+
+A report passes only when every passage earns its place; one that does not is cut, not shrunk.
 
 ## The three reports
 
@@ -95,7 +101,7 @@ The answer the research reached, or the reason the question was abandoned.
 ## Findings
 Positive and negative findings across all leaves, each with confidence and evidence; the figures for findings in this section appear here, under the trigger and summary-floor rules in the Figures section.
 ## Deliverables
-The frozen specs, prototypes, and promoted guardrails the topic produced, cited by path.
+The frozen specs, prototypes, and promoted knowledge records the topic produced, cited by path.
 ## Limitations and unknowns
 What the topic did not settle and where the findings are weakest.
 ## Follow-up options
@@ -132,8 +138,8 @@ A figure is evidence and is held to the same standard as text.
 
 - The reader is the repository owner steering the project who did not participate in the run that produced the report.
 - Every report is self-contained: no session-context references, and no phrasing such as "we discussed", "as noted earlier", or their Chinese equivalents. These rules constrain content in any language and apply to the Chinese body prose in full. Each claim carries enough of its basis to stand alone, and anything in the repository is cited by path.
-- Reports serve direction decisions and stay at the findings-and-options altitude. Altitude test: a passage belongs in a report only when it changes a direction decision or is needed for the reader to trust a finding. Implementation detail — code layout, API shape, test internals — lives in the spec, the deep-dive report, or the code.
-- "Detailed and reasonable" names interpretive quality, not word count: explanation depth earns its place by serving direction decisions, and the record-discipline size soft cap still applies — overflow moves to evidence files.
+- Reports serve direction decisions and stay at the findings-and-options altitude.
+- "Detailed and reasonable" names interpretive quality, not word count: explanation depth earns its place by serving direction decisions; the size soft cap and its overflow rule are `skills/record-discipline`'s.
 - The constraint is altitude, not word count; length follows content under that test.
 - Report prose obeys the complete-proposition rule owned by prose-quality and is an audit surface for trim-cot-leakage.
 
@@ -151,12 +157,23 @@ A figure is evidence and is held to the same standard as text.
 ## Reports are records, not decisions and not specs
 
 - A report is a research record, outside manage-decision-records' governance, and carries no state machine.
-- A durable guardrail discovered while writing is promoted by the main agent to a standalone `rejected` Decision Record per write-research-outline's handoff rules; the report records the finding, and the promotion has its own governance.
+- A knowledge-class conclusion discovered while writing is promoted by the main agent to a standalone `rejected` Decision Record per write-research-outline's handoff rules; the report records the finding, and the promotion has its own governance.
 - A recommendation becomes real work only when it lands as a spec leaf in the outline and freezes via write-spec. A report never authorizes implementation directly.
 
 ## Writer
 
 The main agent is the sole writer of all three report forms, consistent with the single-writer principle for decisions and progress in `AGENTS.md`. Implementer and investigation subagents supply material upward — leaf conclusions, evidence references, experiment records — and never write report files.
+
+## Workflow
+
+1. Fix the inputs and the form: stage, overall, or deep-dive per Triggers.
+2. Run `skills/record-discipline`'s write-before ticket over the planned units; a report is a record, and its narrative and recommendation segments are source units under the soft cap.
+3. Write from the Report structure skeletons: findings at the Evidence bar, rulings from decision entries, interpretation at the altitude the one test allows.
+4. Render and inspect every figure before insertion (Figures, Inspection); drop any that fail traceability.
+5. Self-check: the one test on every passage; Report language and its token rules; the negative-results rule — every leaf terminal in the span appears.
+6. Hand off to the owner; a report is never edited afterward, so every fix belongs before this step.
+
+**Report content.** The report's path and number; the covered period and leaf span; each figure with its verification method (rendered inspected, or command-verified as its caption states); and every gap left open — a leaf whose evidence is missing, an uninspected figure, a finding without its evidence reference.
 
 ## Collaboration
 
@@ -164,6 +181,6 @@ This skill is the research layer's reporting layer; write-research-outline owns 
 
 - **write-research-outline:** the outline is the living board and a projection of the Progress tree's leaf status; reports are point-in-time deliverables that consume leaf status without restating the outline and are never edited once written. The outline skill owns the deep-dive file's path; this skill owns its triggers, structure, and content bar.
 - **write-spec:** a report's recommendation becomes work only as a spec leaf in the outline frozen via write-spec.
-- **manage-decision-records:** reports are research records outside its governance; durable guardrails found while reporting are promoted to standalone Decision Records by the main agent per write-research-outline's handoff rules.
+- **manage-decision-records:** reports are research records outside its governance; knowledge-class conclusions found while reporting are promoted to standalone Decision Records by the main agent per write-research-outline's handoff rules.
 - **prose-quality / trim-cot-leakage:** report prose obeys the complete-proposition rule and is a leakage audit surface; reports carry no session context. The Report language section is the project rule that trim-cot-leakage's Class 8 override for mandated writing languages defers to, and its token rule — the report-surface increments over the Class 8 categories — defines which English tokens in Chinese report prose are mandated rather than slips.
 - **main agent:** the sole writer of every report; produces a stage report at the end of each unattended run.

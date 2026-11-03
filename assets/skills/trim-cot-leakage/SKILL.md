@@ -7,8 +7,6 @@ description: >
   change narration, review choreography, hedged planning residue, and other
   chain-of-thought leakage. Provides an 8-class taxonomy, per-class fix rules,
   surface tolerance table, overcorrection traps, and recall batteries.
-type: prompt
-whenToUse: When reviewing or fixing comments, docstrings, docs, spec, reports, prompts, or UI strings for reasoning-transcript leakage — dead session citations, change narration, review choreography, hedging residue
 ---
 
 # Trimming Chain-of-Thought Leakage

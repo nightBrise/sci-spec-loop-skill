@@ -24,6 +24,9 @@ Required inputs:
 - The feature's `.decisions.md` — the deviation and deferred-scope entries.
 - Evidence actually produced: named tests, command output, `file:line`.
 
+A missing required input is reported and stops the write; never reconstruct an
+entry from memory.
+
 Scope is the PR's own diff against its base; for a stacked PR, that is this
 layer only.
 

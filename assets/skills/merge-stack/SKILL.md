@@ -23,6 +23,9 @@ Required inputs:
 - Each layer's review verdict and the evidence behind it, both at the current head.
 - The merge method and red lines from `references/workflow/github-flow.md`.
 
+A missing required input is reported and stops the merge; never merge on an
+earlier plan.
+
 Scope is one merge train: a spec's slice series into its spec branch, or a
 stack of spec PRs into `main`.
 

@@ -171,7 +171,7 @@ Specs: <implementing spec links>  or  `Specs: none — <why>`
 | the epitaph: decision, reason, review condition, historical pointer | keep in the live decision file or CHANGELOG | prevents re-proposal |
 | research report | keep | a deliverable is not a corpse |
 | superseded entry | keep, annotated | the revision chain stays traceable |
-| rejected standalone record | keep | knowledge-class guardrail |
+| rejected standalone record | keep | the home of promoted knowledge |
 
 - Delete an abandoned item's process file whole; never delete an individual
   entry from a live log.
@@ -252,7 +252,7 @@ It is the only progress truth; every status statement elsewhere is a projection.
   meets the item's criterion; these are the only meanings the words carry.
 - A corrected triage keeps its history in place: `misclassified → done |
   dead-end | absorbed`, the replacement drawn from the same words.
-- Indentation is derivation: an inter-bred child node is indented under its
+- Indentation is derivation: a spawned child node is indented under its
   parent; a flat list is wrong when the work produced children.
 - State words are grep-able — that is the batch-reconciliation entry point — and
   every line is a stable diff line.
