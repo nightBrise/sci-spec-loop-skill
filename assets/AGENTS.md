@@ -1,6 +1,6 @@
 # Sci-Spec-Loop Engineering
 
-Mission: produce trustworthy work under little supervision, and keep process overhead from eating the output. This file is the always-loaded rule set; procedures live in skills, depth lives in references (routing table at the end). One rule, one owner: cite, never restate.
+Mission: produce trustworthy work under little supervision, and keep process overhead from eating the output. This file is the always-loaded rule set; procedures live in skills, depth lives in references (routing table at the end). One rule, one owner: cite, never restate (short safety invariants may repeat at point of use).
 
 ## Role contract
 
@@ -15,12 +15,15 @@ Mission: produce trustworthy work under little supervision, and keep process ove
 
 ## Main loop (single entry)
 
-Input → topic (untyped container) → work item → triage test → build / explore branches (inter-breeding) → topic closing gate.
+Input → topic (untyped container) → work item → triage test → build / explore branches → topic closing gate.
 
-- **Triage** (main agent rules; disagreement or misjudgment under unattended → stop as "needs user judgment"): Claims writable now, verifiable without experiment → build; the answer needs experiments → explore. Signals: build = implement/add/fix/integrate; explore = feasible?/why?/which/limit?. Demo with quantifiable acceptance → build; open question → explore.
+- **Triage** (the main agent decides; disagreement or misjudgment under unattended → stop as "needs user judgment"): Claims writable now, verifiable without experiment → build; the answer needs experiments → explore.
+- Triage fallbacks, when the main question is unclear: the outcome has multiple possibilities and needs experiments → explore; the output is a deliverable → build, a decision basis → explore. Signals: build = implement/add/fix/integrate; explore = feasible?/why?/which/limit?. Demo: quantifiable acceptance → build; open question → explore.
+- **Mutual generation**: either branch can spawn new work items of either kind — findings → build items; open questions or anomalies → explore items. Every new item re-enters triage and needs its own dispatch brief.
 - **Misjudgment** = deviation labeled `misclassification`: correct through existing channels (judged build but Claims are guesses → abandon any frozen spec if one exists and re-tag as explore; judged explore but investigation converges → new build item); log a decision entry and a Progress node state. No new mechanism.
 - **Outline (living board) materializes on demand** — cross-session continuation, tree too coarse, preregistration needed, or owner asks. See `write-research-outline`.
-- **Dispatch brief** (assembly IS the coverage check; if it cannot be assembled — Claims unquotable, boundary unclear, dependencies unresolvable — the [Sn] is not dispatchable, return to `write-spec`): implementation = [Sn] verbatim + related decision records + boundaries; investigation = hypotheses + evidence standard; review = spec path + diff scope (prompt composition: see `structured-code-review`).
+- **Dispatch brief**: implementation = [Sn] verbatim + related decision records + boundaries; investigation = hypotheses + evidence standard; review = spec path + diff scope (prompt composition: see `structured-code-review`).
+- **Assembly is the coverage check**: unquotable Claims, unclear boundary, or unresolvable dependencies = the [Sn] is not dispatchable; return to `write-spec`.
 
 ## Contract changes after freeze (four channels)
 
@@ -28,14 +31,14 @@ Route every finding that touches existing claims:
 
 | Channel | When | Action |
 |---|---|---|
-| ① deviation | Claim cannot be met (technical) | do not change spec; log honestly; acceptance gate rules; no stop |
-| ② Amendment | measure written wrong, deliverable unchanged | owner rules → amendment batch appended → re-freeze; unattended = stop |
-| ③ abandon | foundation gone (deliverable definition changed) | owner rules → epitaph + de-link + delete, one commit |
+| ① deviation | Claim cannot be met (technical) | do not change spec; log honestly; the acceptance gate rules on it; no stop |
+| ② Amendment | measure written wrong, deliverable unchanged | owner rules on it → amendment batch appended → re-freeze; unattended = stop |
+| ③ abandon | foundation gone (deliverable definition changed) | owner rules on it → epitaph + de-link + delete, one commit |
 | ④ deferred scope | new scope, claims not contradicted | record entry; ship frozen spec as-is |
 
 - Amend "how to measure"; abandon "what to deliver". Preregistered criteria are strong-frozen: never via ② (owner ruling, or abandon + rewrite).
 - Before ruling ①/② on exploratory findings, check the attribution anchor (see `write-research-outline` preregistration): principle-unreachable → ②/③; principle-reachable but method/optimization fell short → ①.
-- Touching Global Constraints or Out of Scope = substantive change → stop + owner; record at ② heaviest.
+- Touching Global Constraints or Out of Scope = substantive change → stop; owner rules on it; log it as a substantive Amendment.
 - Vocabulary map: stop-list terms ↔ channels — deviation = ①, deferred scope = ④, contract error = ②/③.
 - Procedures: see `write-spec` After-freeze. Epitaph format: see `manage-decision-records`.
 
@@ -43,8 +46,8 @@ Route every finding that touches existing claims:
 
 Checklist — all five must pass before a topic may reach terminal state (unattended failure → stop + report; never "close now, fix later"):
 
-1. Epitaphs triaged: knowledge-class → rejected DR (knowledge promotion); situational → review-condition check.
-2. Review-check report delivered to owner and ruled on.
+1. Epitaphs triaged: knowledge-class → rejected DR (knowledge promotion); situational → condition review.
+2. Condition-review report delivered to owner and ruled on.
 3. Deferred-scope entries disposed.
 4. Deliverables shipped (report or acceptance summary).
 5. Governance scan done: `simplification-audit` quick pass (or confirmed no candidates); candidates recorded — they do not block closing; zero candidates is evidence.
@@ -81,7 +84,8 @@ Three carriers (no reviewer role):
 | outline skeleton | owner | direction split is owner input |
 | report | owner | the owner is the reader |
 | subagent-written code | main agent, or dispatched review | writer ≠ reviewer |
-| small prose | main agent self pass | cost |
+| whole-spec branch (pre-PR) | dispatched review | full-branch scope |
+| small prose | main agent self pass | cost consideration |
 
 - Dispatched review = generic subagent + review prompt (composition: see `structured-code-review`).
 - Acceptance gate: main agent + owner rule on the deviation + deferred lists (kept in the PR description) before merge.
