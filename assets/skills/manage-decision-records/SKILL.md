@@ -225,7 +225,9 @@ repeated here.
    recommended dispositions — and let the owner rule before the gate closes.
 6. Audit the rejected corpus: supersede a record that no longer holds, merge a
    duplicate, and move over-budget narrative to an evidence file; a rejected
-   record is simplified, never deleted.
+   record is simplified, never deleted. A knowledge-base pruning raised by
+   `simplification-audit`'s closing scan runs this audit as a dedicated pass,
+   with the owner ruling on each disposition.
 7. Record the batch outcome with evidence pointers: triaged, promoted,
    conditions checked, triggered, and borderline cases.
 

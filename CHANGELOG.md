@@ -2,6 +2,33 @@
 
 本文件是仓库的版本变更说明与理由：每一节讲清这一版改了什么、为什么这么改，以及当时为什么排除了其他方案。版本按时间倒序排列，新版本追加在最上面；仓库没有正式版本号，节名取该版的主题，日期用 ISO 格式，文件路径按该节所述版本当时的布局书写，当前布局见最新一节。
 
+## [mechanism-hardening] - 2026-11-03
+
+这一版补上机制审计发现的三处缺口（合并后回滚无受控出口、hooks 只有实现没有定义、知识层只进不出）与四处强制力薄弱点（分流乐观执行、覆盖盲区、进度树时效、顾问无闭环）。
+
+**变了什么**
+
+- 新增**合并后回滚**规则：owner 裁决 revert 还是向前修；revert 是普通正向 commit（永不 reset / force-push），一次回滚一个 merge、多个时逆依赖序，走治理性直推；教训落在 revert message 与重做 spec 的 Claims，guardrail 级教训经 owner 发话才提升知识类 DR；撞冲突走既有"合并冲突 → 停机"。落点：`assets/AGENTS.md` GitHub Flow 节与直推清单、`assets/references/workflow/github-flow.md` 新增 Post-merge rollback 节。
+- hooks 从"给模板"改为"给契约"：`github-flow.md` 新增 Hook contract 节（R1/R2/R3 五字段表：作用点 / 作用方式 / 守护对象 / 失败模式 / 所需能力），README 适配节同步投影并写明 R3 参考实现的拷贝来源；`assets/adapters/kimi-hooks/*.mjs` 降格为 kimi 参考实现，其他 harness 按自己的扩展点自建。
+- 知识库闭环补齐：派发前强制检索独立 DR 与决策日志、零命中明写（`assets/AGENTS.md` 主循环 Dispatch brief 一带 + `write-spec` 开工与回报步骤）；知识库精简由收尾治理扫描按累积阈值（独立记录 +10）提请 owner 裁决，执行走 `manage-decision-records` 留存判断（`simplification-audit` 收尾例行 + MDR 批处理第 6 步）。
+- 四处薄弱点各以一两行加固或强制问答闭合：分流测试收紧"数值出处"——可预写 = 数值有出处（实测 / 标准 / 需求），预测值 = 隐藏预注册退回探索（`assets/AGENTS.md` Triage + `write-spec` 开工）；Progress 节点钉死在工作项边界更新（无人值守包络节）；顾问咨询与处置（advised X / adopted Y / because Z）记决策条目、进收尾分流；任务报告与审查报告双侧**覆盖边界陈述**（处理了什么 / 明确不处理什么 / 未验证假设），对照不上即发现（`assets/AGENTS.md` task report 元组 + `structured-code-review` 报告内容）。
+- 同步语义定案为**镜像**：以仓库为准，覆盖之外，仓库已移除的内容一并从实机删除，非仓库来源文件不动（README 适配节"add-only"表述更正）。
+
+**为什么**
+
+- 对照 README 全景做机制审计，三处缺口各有实害：合并后出事无程序可循（revert 不违 merge-only 却没人敢用）、hooks 换 harness 即失传（模板不可移植）、知识层单向流入（沉淀越多、查得越少，会重复已记录的失败）。三处均以最小文本闭合：零新 skill、零新仪式。
+- 回滚记账刻意做轻：教训的权威家是重做的 spec Claims 与 revert message，不另立墓志铭或 supersession 仪式——回滚是 owner 已有结论的撤除，不是判据变更，四通道记账仍只服务 ②③；"记录层不回滚"由既有 Progress 节点更新规则覆盖。
+- 排除的方案：回滚带完整记账仪式（四住处表 + supersession + 墓志铭，复杂度超过收益）；随仓分发统一 hook 模板（各 harness 扩展点不同，改为契约 + 参考实现）。
+- 四处薄弱点以必答项或时机钉死闭合，其中覆盖盲区（缺失需求）是认识论极限——不加"完整性 checklist"式假严谨，只把边界扫描从隐式改强制：任务报告与审查报告各自独立陈述覆盖边界并对照，分歧即信号。
+
+**对使用者的影响**
+
+- 合并后发现问题有了明确路径：owner 裁决 revert 或向前修，revert 不触发"改历史"停止清单。
+- 在非 kimi harness 上自建 hooks 时照契约表实现；kimi 用户可直接用参考实现；R3 需产品自定义 `scripts/run-l0`。
+- 派发简报会带一行"检索结果"（含零命中）；独立记录累积后 owner 会在主题收尾收到知识库精简提请。
+- 分流、任务报告、审查报告各多一个必答项（Claim 数值出处 / 覆盖边界陈述与双侧对照）；无人值守下进度节点与顾问处置有账可查。
+- 重复安装 / 升级不再留下退役文件：以仓库为准的镜像同步会清掉过时件，无需手工清理实机。
+
 ## [workflow-v2] - 2026-11-02
 
 这一版把方法论从"双入口 + reviewer 评审"的 v1 升级为"单入口 + 分流测试 + 互产循环"的 v2，并落地配套的记账纪律、变更通道与合成式安装。
@@ -18,10 +45,16 @@
 
 **为什么**
 
-- 六能力目标里成本可控是 diff_fel 实证的最弱项（69% 流程 commit、验收结论 6–7 倍写）：分流测试在工作项粒度容纳"边测试边探索"（互产循环取代换轨）；四通道给冻结后变更以受控出口（旧二分下 abandon 一刀切，宁可留尸）；`record-discipline` 的源/投影 + 软上限 + 禁投影的投影直接治倍写与无界膨胀；收尾关卡的治理例行扫描（门禁强制"扫了"不强制"清完"）补上治理"易饿死"的固定触发。
+- 六能力目标里成本可控是前期对一个真实工程仓库做提交实证时暴露的最弱项（69% 流程 commit、验收结论 6–7 倍写）：分流测试在工作项粒度容纳"边测试边探索"（互产循环取代换轨）；四通道给冻结后变更以受控出口（旧二分下 abandon 一刀切，宁可留尸）；`record-discipline` 的源/投影 + 软上限 + 禁投影的投影直接治倍写与无界膨胀；收尾关卡的治理例行扫描（门禁强制"扫了"不强制"清完"）补上治理"易饿死"的固定触发。
 - reviewer 不是角色而是行为：契约承诺要 owner 认账，subagent 代码由主 agent 或派发审把关（写者≠审者天然独立），审查 prompt 构成收归 `structured-code-review` 一处。
 - 合成式迁移：不同 harness 只差少量文字（能力画像映射、模型池规则），独立片段文件 + 安装时拼接，主体保持零专名、换 harness 只换片段；hooks 把红线从"事后停机"前移为"打不出去"，且 fail-open——没有 hooks 的 harness 由规则层完整兜底，移植性不受损。
 - 排除的方案：主题的工程/研究预分类与"复杂/简单"分解分类（与工作项粒度判定自相矛盾，且判定标准不可操作）；写作治理的纯标准层/合并/极简三铁律三案（细则压恒载层 = 永久注意力税）；独立的"覆盖检查"步骤（与派发简报组装是同一个动作，内联即可）；SA 候选阻塞主题关闭（提案是未来工作，不该挡终结）。
+
+**对使用者的影响**
+
+- 从 v1 升级：不再需要 reviewer agent（`assets/agents/` 已清空）；skill 集 8 → 13，按需加载面变大，但恒载规则文件保持 ≤200 行预算。
+- 安装方式从镜像拷贝改为合成式迁移：实机规则文件 = 主体 + 适配片段的拼接产物，勿手改；重装与升级按 README「适配到你的 harness」三步执行。
+- hooks（kimi）与 git 钩子是可选项，装与不装不影响方法论完整性。
 
 ## [repo-structure] - 2026-10-30
 
@@ -95,7 +128,7 @@ README 的流程讲解与 `AGENTS.md`（方法论）及各 skill 重复：同一
 - **测试分层 L0–L3**：L0 是每切片提交前的聚焦自测，由 git pre-commit hook 强制执行；L1 是每条 Claim 映射到至少一个具名验证证据（测试名、`file:line`、可观察 UI 状态或可度量指标），映射不上的切片算未完成；L2 在 wave 完成或合入 spec 分支后跑跨切片集成；L3 在 PR 合并前连同 CI 跑全量回归，永不放进 hook。`references/workflow/testing.md` 直接给出可拷贝的钩子脚本与安装步骤（`core.hooksPath` 或 `.git/hooks`），按改动文件选测试、无测试可跑时放行并提示、测试红则带失败输出阻断。测试闸在评审闸之前：红测试退回 implementer，不派 reviewer。新写的测试红属于修复循环，自带计数器（同一 slice 连续 3 轮红才升级到停止清单，绿 commit 清零）；曾经绿的行为转红才是既有的真实回归停止项——停止清单的边界注记把这条差异写成第四条：新测试红 ≠ 真实回归红。`--no-verify` 与 force-push 一起进禁用清单。
 - **GitHub Flow 细则外移**：分支拓扑、汇入规则、提交格式、PR 描述最低项落到 `references/workflow/github-flow.md`，两份 AGENTS.md 只留摘要加指针。spec 分支 `spec/<slug>`，切片分支 `spec/<slug>-s<n>`；无依赖切片从 `main` 切，有依赖切片从依赖满足点切（slice 级 stacking、只 merge 不改基、禁 rebase 与 force-push）；主 agent 按依赖顺序串行 merge；commit 格式 `[S2] feat: <summary>` 加后续 `[S2] review: <what was fixed>`；PR 描述最低项是 spec 路径、每切片 Claims 与证据指针、偏差清单、延迟范围清单——正是验收闸口要报的两份清单。治理直推清单（spec 与 Decision Log 冻结 commit、Progress 更新、standalone DR 状态流转）只写 `main`，冻结后不写 spec 分支。
 - **无人值守的预算检查**：每个切片或 batch 边界比较剩余预算与剩余切片，不够就停跑上报，靠 Progress 板恢复；绝不降门禁硬跑。建议只记录不追，只修阻断项。
-- **模型侧**：glm-5.3 的 `default_effort` 从 max 降到 high，spec 评审与骨架评审按 high 派发；配置改动随实现落地，滞后则按部分实现记录。
+- **模型侧**：评审类派发从最高档降到 high 档（spec 评审与骨架评审）；模型名与档位的具体映射属 per-harness 适配层，不进语料；配置改动随实现落地，滞后则按部分实现记录。
 
 **为什么**
 
@@ -188,7 +221,7 @@ Mimo 是第二个实际在用的 harness，它的 skill 目录布局与 agent �
 
 | Zone | Files | Language | Why |
 |---|---|---|---|
-| Porting corpus | `assets/AGENTS.md`, `assets/skills/**`, `assets/agents/**`, `assets/references/workflow/**` | English | `assets/AGENTS.md` is the methodology that gets copied cross-device and cross-harness. A single source language avoids re-translating the corpus per harness (the Mimo adaptation already translates agent front-ends; English source bounds that work) and keeps cross-machine diffs stable. |
+| Porting corpus | `assets/AGENTS.md`, `assets/skills/**`, `assets/agents/**`, `assets/references/**`, `assets/adapters/**` | English | `assets/AGENTS.md` is the methodology that gets copied cross-device and cross-harness. A single source language avoids re-translating the corpus per harness (the Mimo adaptation already translates agent front-ends; English source bounds that work) and keeps cross-machine diffs stable. |
 | Owner-facing surfaces | `README.md`, `.gitignore` comments | Chinese | Read only by the owner, whose working language is Chinese. These files are never copied to installs, so English buys nothing there. |
 
 `docs/decisions/` 的 standalone DR 原属语料区（英文，供任何机器上的 agent 阅读），其内容已并入本文件。`assets/references/style/python.md` 里的中文（TODO 用中文的团队规则）与 `trim-cot-leakage` 检测模式里的中文是这些文档所教、所检的内容，不是语言违规，不得翻译。研究层报告正文的语言由 [report-language] 一节决定，不由这张表决定。

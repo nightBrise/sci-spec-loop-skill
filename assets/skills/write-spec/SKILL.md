@@ -367,7 +367,11 @@ Git history keeps the deleted text; the worktree keeps only current truth.
 
 1. Confirm the entry: build work item (`AGENTS.md`, Main loop), no frozen spec
    covers it — glob `docs/specs/*.md`; a design doc is input, `.decisions.md`
-   is a log.
+   is a log. Check every planned Claim value's source — measurement, standard,
+   requirement; a predicted value is a hidden preregistration, and the item
+   goes back to triage as explore. Search the standalone DRs and the decision
+   logs for entries touching this deliverable — a rejected record on this
+   surface is input — and record the search result, zero hits included.
 2. Fix the deliverable: the one change, what it excludes, the slug, the two
    paths.
 3. Run record-discipline's write-before ticket per planned unit, then draft:
@@ -388,7 +392,7 @@ Git history keeps the deleted text; the worktree keeps only current truth.
    entries and attached records; an unassemblable brief returns here
    (`AGENTS.md`, Dispatch brief).
 10. Report: spec path, `[Sn]` and tier counts, verdict, freeze state, entries,
-    open questions.
+    knowledge-recall result, open questions.
 
 **After freeze.** Match the finding to a channel (`AGENTS.md`), then run that
 channel's numbered steps: Deferred scope, Amendment, Abandon, Preregistered

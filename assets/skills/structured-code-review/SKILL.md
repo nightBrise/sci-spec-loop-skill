@@ -259,10 +259,10 @@ Rules:
 4. Run Layer 1; a single failure blocks. When a spec is in scope, enumerate the Claims of every touched `[Sn]`.
 5. Run the Layer 2 checks the change makes relevant.
 6. Admit evidence; mark each promise evidenced, unmet, or unevidenced.
-7. Write the findings and the verdict: verdict, blockers with location/impact/evidence, suggestions, unevidenced Claims, and for a batch, the owning slice per finding.
+7. Write the findings and the verdict: verdict, blockers with location/impact/evidence, suggestions, unevidenced Claims, the coverage boundary, and for a batch, the owning slice per finding.
 8. For a dispatched review, compose the prompt from the four blocks and verify the returned report is self-contained and evidence-backed.
 
-**Report content.** The verdict; every blocker with `file:line` and evidence; suggestions kept separate; the Claims accounted for; the owning slice for each finding in a batch review; and every check reported pending or not run.
+**Report content.** The verdict; every blocker with `file:line` and evidence; suggestions kept separate; the Claims accounted for; the coverage boundary — independently state what the change handles and explicitly leaves out, unverified assumptions included; where a task report exists, compare against its statement, and a mismatch is a finding; the owning slice for each finding in a batch review; and every check reported pending or not run.
 
 ## Collaboration
 

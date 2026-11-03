@@ -67,6 +67,38 @@ implementation code alone and merges stay clean.
   The base is updated only by merging `main` into it; rebase plus force-push
   is banned — it rewrites the history the stack's descendants build on.
 
+## Post-merge rollback
+
+- When merged work turns out wrong — a mistaken acceptance, a real regression,
+  a collapsed foundation — the owner rules revert or fix-forward.
+- A revert is an ordinary forward commit: never `git reset`, never force-push,
+  never `--amend`. One merge per revert commit; several merges roll back in
+  reverse dependency order. Revert commits go direct-to-main.
+- What rolls back: the deliverable content — everything the reverted merge
+  changed. What does not: the records layer — the Progress node updates in
+  place ("rolled back, see <sha>"), and the lesson lives in the revert message
+  (one line of why) and the redo's spec Claims. A guardrail-grade lesson
+  becomes a knowledge-class decision record only at the owner's word.
+- A revert that hits conflicts stops and reports (stop list: merge conflict);
+  the owner may switch to fix-forward.
+- The redo is an ordinary new work item: it re-enters triage and carries the
+  fixed deficiency as Claims.
+
+## Hook contract
+
+Hooks are optional per-harness implementations of three abstract guardrails.
+The table below is the harness-neutral contract — wire each one to your own
+harness's extension points. Kimi Code reference implementations live in
+`assets/adapters/kimi-hooks/`; R3 is plain git, portable to any harness via
+this repository's `.githooks/pre-commit`. Hooks are fail-open by design: on a
+harness without hook capability, the rule layer covers all three completely.
+
+| Hook | Trigger point | Action | Guards | Failure mode | Required capability |
+|---|---|---|---|---|---|
+| R1 dangerous-command guard | before a shell or git command executes | block commands in the danger set (force-push, rebase, `reset --hard`, `--no-verify`) | merge-only red line; stop-list "history rewrite" | fail-open | pre-command hook |
+| R2 push-evidence reminder | before a push | non-blocking reminder of the evidence requirement | "prose is not evidence"; `pre-push-checks` | fail-open | pre-push hook |
+| R3 L0 floor | git `pre-commit` | run the product's `scripts/run-l0` (L0 is defined per product; tiers: `testing.md`) | the L0 mechanical floor | no L0 defined → skip with a loud warning | git hooks |
+
 ## Pointers
 
 - Before a push, a ready-for-review transition, or any claim that checks pass:

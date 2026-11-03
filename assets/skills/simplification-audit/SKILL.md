@@ -116,6 +116,7 @@ For asynchronous machinery, map each promise, flag, cancellation path, disposer,
 - Record each candidate as a `manage-decision-records` entry; a candidate too small to decide becomes an inline TODO or is left out.
 - Never block closing on the routine: the gate requires that the scan happened, not that its candidates are resolved.
 - Report the scan scope and the candidate count; zero candidates is evidence.
+- Count the standalone corpus at each scan; when it has grown by ten records since the last pruning, raise a knowledge-base pruning for the owner to rule on (the owner may also call one at any time). The run is `manage-decision-records`' retention judgment — its topic-closing batch step 6 as a dedicated pass, with the owner ruling on each disposition.
 
 ## Workflow
 
