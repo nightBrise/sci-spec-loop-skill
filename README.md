@@ -169,6 +169,8 @@ flowchart LR
 
 语料本身 harness 无关。不同 harness 只差少量文字（能力画像映射、模型池规则、安装路径），拆成独立**适配片段**，安装时与主体拼接——实机规则文件是**生成物，不手维护**。
 
+适配 = 三件事：合成规则文件、镜像 skills 与 references、按需接 hooks。下面给出 Kimi Code 的完整步骤；MiMo Code 见下一节，新 harness 只需新增一个适配片段。
+
 ```mermaid
 flowchart LR
     A["assets/AGENTS.md<br/>主体：零 harness 专名"] --> P["安装时拼接"]
@@ -178,26 +180,34 @@ flowchart LR
     H["hooks 与 git 钩子（可选）"] -.-> J
 ```
 
-### 1. 拼接规则文件
+### 迁移到 Kimi Code
+
+前提：Kimi Code 已安装、已登录并连上模型（新建会话能正常对话）。以下命令在仓库根目录执行。
+
+#### 1. 合成规则文件
 
 ```sh
-mkdir -p ~/.<harness>/
-{ cat assets/AGENTS.md; echo; cat assets/adapters/<harness>.md; } > ~/.<harness>/AGENTS.md
+mkdir -p ~/.kimi-code
+{ cat assets/AGENTS.md; echo; cat assets/adapters/kimi.md; } > ~/.kimi-code/AGENTS.md
 ```
 
-### 2. skills 与 references 落位（镜像同步）
+- 全局规则读 `~/.kimi-code/AGENTS.md`；项目里的 `AGENTS.md` 与它叠加加载，不互相覆盖。
+- 实机文件是生成物：改主体或片段后重新合成，不要手改。
+- 适配片段只写能力映射、模型池约束、安装路径与 hooks；主循环、派发简报与评审机制都在主体里，所有 harness 共用。
+
+#### 2. skills 与 references（镜像同步）
 
 ```sh
-cp -r assets/skills/*     ~/.<harness>/skills/
-cp -r assets/references/* ~/.<harness>/references/
+mkdir -p ~/.kimi-code/skills ~/.kimi-code/references
+cp -r assets/skills/*     ~/.kimi-code/skills/
+cp -r assets/references/* ~/.kimi-code/references/
 ```
 
-同步是镜像：以仓库为准，覆盖之外，仓库已移除的内容一并从实机删除（`diff -rq` 可查残留）；非本仓库来源的文件不动。
+- 同步是镜像：以仓库为准，覆盖之外，仓库已移除的内容一并从实机删除（`diff -rq` 可查残留）；非本仓库来源的文件不动。
+- skill 名来自 `SKILL.md` 的 frontmatter，不来自目录名。
+- references 是深潜层，由规则与 skill 按路径引用，不自动注入上下文。
 
-- **Kimi Code**：目标目录 `~/.kimi-code/`，片段用 `assets/adapters/kimi.md`。
-- **MiMo Code**：目标目录 `~/.config/mimocode/`，片段用 `assets/adapters/mimo.md`；完整步骤见下方「迁移到 MiMo Code」。
-
-### 3. hooks 与 git 钩子（可选）
+#### 3. hooks 与 git 钩子（可选）
 
 hooks 是防手滑护栏（fail-open）：**没有 hooks 的 harness 由规则层完整兜底**，方法论不依赖它。三个 hook 是抽象护栏，契约如下（权威定义见 `assets/references/workflow/github-flow.md`「Hook contract」），任何 harness 按自己的扩展点实现：
 
@@ -207,17 +217,31 @@ hooks 是防手滑护栏（fail-open）：**没有 hooks 的 harness 由规则�
 | R2 push 证据提醒 | push 前 | 仅提醒证据要求，不阻断 | "prose 不是证据"、`pre-push-checks` | fail-open | push 前的钩子 |
 | R3 L0 站岗 | git pre-commit | 执行产品自定义的 `scripts/run-l0`（L0 分层见 `references/workflow/testing.md`） | L0 机械底座 | 无 L0 定义时跳过并大声警告 | git hooks |
 
-Kimi Code 的参考实现在 `assets/adapters/kimi-hooks/`；R3 是普通 git 钩子，本仓库根目录的 `.githooks/pre-commit` 可直接拷用（产品需定义自己的 `scripts/run-l0`）：
+Kimi Code 的参考实现在 `assets/adapters/kimi-hooks/`。R1/R2 装到全局：
 
 ```sh
-cp assets/adapters/kimi-hooks/*.mjs ~/.kimi-code/hooks/   # R1 / R2
-cp .githooks/pre-commit <你的产品仓>/.githooks/            # R3
-git config core.hooksPath .githooks
+mkdir -p ~/.kimi-code/hooks
+cp assets/adapters/kimi-hooks/*.mjs ~/.kimi-code/hooks/
 ```
 
-R1/R2 的 `[[hooks]]` 块合并进 `~/.kimi-code/config.toml`。
+把 `assets/adapters/kimi-hooks/config.toml` 里的两个 `[[hooks]]` 块合并进 `~/.kimi-code/config.toml`——不要整文件覆盖，你的 provider / model 配置在同一个文件里。
 
-MiMo Code 的 R1 用全局插件实现，R2 由规则层承担，R3 与上述 git 钩子相同；具体落法见下一节。
+R3 是普通 git 钩子，装到产品仓库（产品需定义自己的 `scripts/run-l0`）：
+
+```sh
+cp .githooks/pre-commit <你的产品仓>/.githooks/
+cd <你的产品仓> && git config core.hooksPath .githooks
+```
+
+#### 4. 校验
+
+```sh
+{ cat assets/AGENTS.md; echo; cat assets/adapters/kimi.md; } | diff -q - ~/.kimi-code/AGENTS.md
+find ~/.kimi-code/skills -mindepth 1 -maxdepth 1 -type d | wc -l   # 应为 13
+ls ~/.kimi-code/hooks/block-dangerous-git.mjs ~/.kimi-code/hooks/push-evidence-reminder.mjs
+```
+
+改完在新会话里验证规则与 skill 已加载。
 
 ### 迁移到 MiMo Code
 
@@ -339,7 +363,7 @@ mimo run -m <provider>/<model> "Reply with exactly: ok"
 | `git commit --no-verify` 绕过 R3 | 由 R1 拦；不要 `--no-verify` |
 | 改了配置但当前会话没变 | 新会话/重启 TUI 后生效；模型选择是会话级的 |
 
-### 校验
+### 通用校验
 
 ```sh
 { cat assets/AGENTS.md; echo; cat assets/adapters/<harness>.md; } | diff -q - ~/.<harness>/AGENTS.md || echo "stale: re-run step 1"

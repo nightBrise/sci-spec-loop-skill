@@ -169,6 +169,8 @@ flowchart LR
 
 The corpus itself is harness-agnostic. Harnesses differ only in a few lines of text (capability mapping, model-pool rules, install paths), kept in an **adapter fragment** and composed at install time — the installed rule file is a **generated artifact, never hand-maintained**.
 
+Adapting means three things: compose the rule file, mirror skills and references, attach hooks if the harness supports them. The full Kimi Code procedure follows; MiMo Code is the next section, and a new harness needs only a new adapter fragment.
+
 ```mermaid
 flowchart LR
     A["assets/AGENTS.md<br/>body: zero harness names"] --> P["compose at install"]
@@ -178,26 +180,34 @@ flowchart LR
     H["hooks & git hooks (optional)"] -.-> J
 ```
 
-### 1. Compose the rule file
+### Migrating to Kimi Code
+
+Prerequisite: Kimi Code is installed, signed in, and connected to a model (a new session can converse). Run the commands below from the repository root.
+
+#### 1. Compose the rule file
 
 ```sh
-mkdir -p ~/.<harness>/
-{ cat assets/AGENTS.md; echo; cat assets/adapters/<harness>.md; } > ~/.<harness>/AGENTS.md
+mkdir -p ~/.kimi-code
+{ cat assets/AGENTS.md; echo; cat assets/adapters/kimi.md; } > ~/.kimi-code/AGENTS.md
 ```
 
-### 2. Place skills and references (mirror sync)
+- Global rules load from `~/.kimi-code/AGENTS.md`; a project's own `AGENTS.md` loads additively, not as an override.
+- The installed file is a generated artifact: re-compose after changing the body or the fragment; never hand-edit it.
+- The adapter carries only capability mapping, model-pool constraints, install paths, and hooks. The main loop, dispatch briefs, and review mechanism stay in the body, shared by every harness.
+
+#### 2. Skills and references (mirror sync)
 
 ```sh
-cp -r assets/skills/*     ~/.<harness>/skills/
-cp -r assets/references/* ~/.<harness>/references/
+mkdir -p ~/.kimi-code/skills ~/.kimi-code/references
+cp -r assets/skills/*     ~/.kimi-code/skills/
+cp -r assets/references/* ~/.kimi-code/references/
 ```
 
-The sync is a mirror: the repository is authoritative — besides overwriting, a re-sync deletes whatever the repository no longer carries (`diff -rq` shows the residue); files that never came from the repository stay.
+- The sync is a mirror: the repository is authoritative — besides overwriting, a re-sync deletes whatever the repository no longer carries (`diff -rq` shows the residue); files that never came from the repository stay.
+- A skill's name comes from its `SKILL.md` frontmatter, not its directory.
+- References are the deep layer, resolved by path from rules and skills; they are not injected automatically.
 
-- **Kimi Code**: target `~/.kimi-code/`, fragment `assets/adapters/kimi.md`.
-- **MiMo Code**: target `~/.config/mimocode/`, fragment `assets/adapters/mimo.md`; see "Migrating to MiMo Code" below for the full procedure.
-
-### 3. Hooks and git hooks (optional)
+#### 3. Hooks and git hooks (optional)
 
 Hooks are fail-open guardrails against slips: **the rule layer stands complete on any harness without hooks** — the methodology does not depend on them. The three hooks are abstract guardrails; the contract below (authoritative definition: "Hook contract" in `assets/references/workflow/github-flow.md`) lets any harness implement them against its own extension points:
 
@@ -207,17 +217,31 @@ Hooks are fail-open guardrails against slips: **the rule layer stands complete o
 | R2 push-evidence reminder | before a push | non-blocking reminder of the evidence requirement | "prose is not evidence"; `pre-push-checks` | fail-open | pre-push hook |
 | R3 L0 floor | git `pre-commit` | run the product's `scripts/run-l0` (L0 tiers: `references/workflow/testing.md`) | the L0 mechanical floor | no L0 defined → skip with a loud warning | git hooks |
 
-Kimi Code reference implementations live in `assets/adapters/kimi-hooks/`; R3 is plain git — this repository's `.githooks/pre-commit` can be copied as-is (the product must define its own `scripts/run-l0`):
+Kimi Code reference implementations live in `assets/adapters/kimi-hooks/`. Install R1/R2 globally:
 
 ```sh
-cp assets/adapters/kimi-hooks/*.mjs ~/.kimi-code/hooks/   # R1 / R2
-cp .githooks/pre-commit <your-product-repo>/.githooks/    # R3
-git config core.hooksPath .githooks
+mkdir -p ~/.kimi-code/hooks
+cp assets/adapters/kimi-hooks/*.mjs ~/.kimi-code/hooks/
 ```
 
-Merge the `[[hooks]]` blocks from R1/R2 into `~/.kimi-code/config.toml`.
+Merge the two `[[hooks]]` blocks from `assets/adapters/kimi-hooks/config.toml` into `~/.kimi-code/config.toml` — never replace the whole file: your provider/model configuration lives there.
 
-MiMo Code implements R1 as a global plugin, keeps R2 in the rule layer, and uses the same git hook for R3; see the next section.
+R3 is plain git, installed per product repository (the product must define its own `scripts/run-l0`):
+
+```sh
+cp .githooks/pre-commit <your-product-repo>/.githooks/
+cd <your-product-repo> && git config core.hooksPath .githooks
+```
+
+#### 4. Verify
+
+```sh
+{ cat assets/AGENTS.md; echo; cat assets/adapters/kimi.md; } | diff -q - ~/.kimi-code/AGENTS.md
+find ~/.kimi-code/skills -mindepth 1 -maxdepth 1 -type d | wc -l   # should be 13
+ls ~/.kimi-code/hooks/block-dangerous-git.mjs ~/.kimi-code/hooks/push-evidence-reminder.mjs
+```
+
+Verify in a new session that the rules and skills load.
 
 ### Migrating to MiMo Code
 
@@ -339,7 +363,7 @@ mimo run -m <provider>/<model> "Reply with exactly: ok"
 | `git commit --no-verify` bypasses R3 | R1 blocks it; do not use `--no-verify` |
 | Config changed but the current session is unchanged | New sessions/restarted TUI; model selection is session-scoped |
 
-### Verify
+### Generic verification
 
 ```sh
 { cat assets/AGENTS.md; echo; cat assets/adapters/<harness>.md; } | diff -q - ~/.<harness>/AGENTS.md || echo "stale: re-run step 1"

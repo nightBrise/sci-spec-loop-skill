@@ -8,16 +8,19 @@
 
 - 新增 `assets/adapters/mimo.md`：MiMo Code 适配片段（安装布局、能力映射、模型档位、hooks），与 `assets/adapters/kimi.md` 同构。
 - `README.md` / `README.en.md` 新增「迁移到 MiMo Code / Migrating to MiMo Code」完整指南：skills 与 references 镜像、规则合成、模型档位占位配置、R1/R2/R3 落法、校验与常见坑。
+- `README.md` / `README.en.md` 的 Kimi Code 安装段改写为面向新用户的完整步骤：合成规则文件、镜像 skills/references、R1/R2/R3 落法、安装后校验；`assets/adapters/kimi.md` 与 `assets/adapters/kimi-hooks/config.toml` 的安装指引改指 README，不再引用未入库的根 `AGENTS.md`。
 - 根 `AGENTS.md` 的 MiMo Code 安装节从「增量合并」改为「合成式安装」，补全 references、hooks 与验证步骤。
 
 **为什么**
 
 - 原安装说明是 merge-increment，与 v2 的合成式迁移不一致；实机安装还需要补齐 style references、处理 mimo 没有文档化 hooks 的事实。把这条路径写进 README，新用户不必从会话记录复原。
+- 原 Kimi Code 段只有目标目录与片段名，读者得自己把 `<harness>` 占位符翻译成具体命令；hooks 指引还指向仅存在于本机的部署手册。README 是唯一随仓库发布的安装手册，必须自足。
 - 指南刻意使用占位符：不绑定供应商、模型或机器路径；agent 分配只用自带 `build`/`plan`/`general`/`explore`，不引入自定义 agent。
 
 **对使用者的影响**
 
 - MiMo Code 用户可按 README 一次装好；Kimi Code 的安装路径不变。
+- 刚装好并连上模型的 Kimi Code 用户，从 README 即可完成全部安装与校验，不需要其他本机文档。
 - 个人 skill、个人路径与模型选择仍由使用者自行决定；指南不包含这些信息。
 
 ## [mechanism-hardening] - 2026-11-03

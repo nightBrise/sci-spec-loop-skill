@@ -1,4 +1,4 @@
-# Merge these entries into ~/.kimi-code/config.toml (see root AGENTS.md deployment manual).
+# Merge these entries into ~/.kimi-code/config.toml (see README, "Migrating to Kimi Code").
 # R1: red-line interception. R2: push-evidence reminder.
 
 [[hooks]]
