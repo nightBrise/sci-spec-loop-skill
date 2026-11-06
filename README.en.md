@@ -16,7 +16,7 @@ flowchart LR
 ```
 
 - **Owner (human)**: sets direction and requirements, and rules at the key gates — spec freeze, amendment/abandon, acceptance, topic closing.
-- **Main agent**: talks with the human, understands requirements, decomposes work, dispatches, reviews, and accepts; the **sole writer** of decisions, progress, contracts, and reports. Applies small fixes directly; resumes the implementing subagent for large ones.
+- **Main agent**: talks with the human, understands requirements, decomposes work, dispatches, reviews, and accepts; the **sole writer** among agents of decisions, progress, contracts, and reports (the owner rules on a deliverable report's draft and may edit it directly). Applies small fixes directly; resumes the implementing subagent for large ones.
 - **Subagent**: implements the dispatched task (bulk code or prose) and returns a task report; never writes contract or decision artifacts.
 
 ### Six core ideas
@@ -120,7 +120,7 @@ flowchart TB
 |---|---|---|
 | `write-spec` | Contract writing: `[Sn]`/Claims, freeze, after-freeze change procedures | A build work item starts; amendment / abandon / deferred handling |
 | `write-research-outline` | Board writing (materialized on demand), preregistration, dual-speed registration | Board materialization; lightweight registration; before experiments |
-| `write-research-report` | Explanatory writing: stage / overall / deep-dive reports | Leaf batches terminal; topic closing; owner asks |
+| `write-research-report` | Explanatory writing: stage / overall / deep-dive reports; record reports are write-once, deliverable reports are reviewed to final | Leaf batches terminal; topic closing; owner asks for a readout or formal report |
 
 **Record governance** — putting "one source, many projections" into practice:
 
@@ -159,7 +159,7 @@ flowchart LR
     end
 ```
 
-- **Writing chain**: `record-discipline` tickets every unit before writing (belong? where? how big? source?) → the artifact skill's genre writing → RD verification → hand-off. High-frequency outline updates ride the light path (registration completes immediately).
+- **Writing chain**: `record-discipline` tickets every unit before writing (belong? where? how big? source?) → the artifact skill's genre writing → RD verification → hand-off. Record reports are final at hand-off; deliverable reports enter the owner's review loop and freeze at `Status: final`. High-frequency outline updates ride the light path (registration completes immediately).
 - **Review chain**: `structured-code-review` is the single methodology — Layer 1 runs `prose-quality` + `trim-cot-leakage` first, Layer 2 applies semantic checks per change surface. Carriers as needed: owner direct review of documents, main agent review of subagent code (writer ≠ reviewer), or a dispatched review. Evidence is mandatory: **prose is not evidence**.
 - **Change chain**: a finding touching claims → the four channels → Amendment / Abandon bookkeeping and epitaphs live in `manage-decision-records`; de-linking pointers is `trim-cot-leakage`'s.
 - **Quality-gate chain**: risky tests pass `test-reliability` design criteria → `pre-push-checks` selects evidence before push → `pr-description` records the two lists → `merge-stack` lands with approve + evidence. Engineering red lines: merge-only, never rebase / force-push, never `--no-verify`; a post-merge rollback is an owner-ruled revert commit (history moves forward; the lesson lands in the redo's spec).

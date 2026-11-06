@@ -110,7 +110,7 @@ Different surfaces allow different leakage classes. This table overrides the bla
 | Delivery summary "What Was Built" | No | No | For workflows that produce delivery summaries; final state, self-contained |
 | Delivery summary "Design Decisions" | "we chose X because Y" | No | For workflows that produce delivery summaries; decision framing allowed |
 | Research outline leaf | No | Leaf status tags (`dead-end`, `pivot`) + evidence refs | Leaf conclusions and one-line reasons are sanctioned |
-| Research report (stage, overall, deep-dive) | No | Leaf status tags (`dead-end`, `pivot`) + evidence refs | A point-in-time deliverable that must stand alone for a reader outside the session; leaf conclusions and their one-line reasons are sanctioned. write-research-report owns the body language (Report language) and the figures with their captions (Figures), so the English technical tokens and section anchors inside a report are sanctioned per Class 8 |
+| Research report (stage, overall, deep-dive) | No | Leaf status tags (`dead-end`, `pivot`) + evidence refs | A self-contained deliverable that must stand alone for a reader outside the session; leaf conclusions and their one-line reasons are sanctioned. write-research-report owns the body language (Report language), the lifecycle and editability, and the figures with their captions (Figures), so the English technical tokens and section anchors inside a report are sanctioned per Class 8 |
 | Process journal | Yes (≤5 items) | `[dead end]`/`[pivot]`/`[lesson]` tags | Sanctioned narrative surface |
 | Prompts/UI strings | No | No | Wording is behavior |
 
@@ -188,7 +188,7 @@ Judged and kept as false positives in past purges; expect them again:
 
 ## Workflow
 
-1. **Scope and exclusions** per prose-quality: require an explicit scope; apply its always-excluded list (external dependencies, generated files, test fixtures and snapshots, frozen specs and research reports — scanned and reported on only). This skill's own directory (it quotes leaked wording as calibration) and recorded fixture/snapshot directories are additionally excluded. Frozen spec `[Sn]` anchors are protected (class 1 resolvable-anchor rule).
+1. **Scope and exclusions** per prose-quality: require an explicit scope; apply its always-excluded list (external dependencies, generated files, test fixtures and snapshots, frozen specs and finalized research reports — scanned and reported on only; a deliverable report before `Status: final` stays in scope for in-place fixes). This skill's own directory (it quotes leaked wording as calibration) and recorded fixture/snapshot directories are additionally excluded. Frozen spec `[Sn]` anchors are protected (class 1 resolvable-anchor rule).
 
 2. **Audit read-only first:** run the recall batteries with `--hidden` (see invocation rules), then judge every hit semantically. The batteries are probes, not the definition — they under-match by nature (see Recall batteries), so also read the densest prose in scope (module docstrings, READMEs, Decision Records) without a pattern in hand.
 
@@ -197,8 +197,8 @@ Judged and kept as false positives in past purges; expect them again:
    - Model-visible strings → wording is behavior, flag for snapshot-backed change instead of silently rewording
    - Bilingual pairs → update the counterpart (if a surface has a derived/paired counterpart, update it)
    - Decision Log → session-context entries are tolerated per surface table; dead citations are fixed
-   - Research reports → report findings only; never edit a written report and never overwrite a figure file it cites. A figure error that changes no finding is corrected by a new figure file carried by the next report covering the same topic or leaf — once the topic has closed, by a supplementary stage report written at the owner's request or by a stage report from a later unattended run (write-research-report's `## Figures` owns the channel's rules)
-     - A figure error that changes a finding is substantive: the living outline (leaf status or conclusion) is updated first, and the corrected figure ships with the next report covering that leaf
+   - Research reports → for a record report and a deliverable report at `Status: final`, report findings only; never edit a finalized report and never overwrite a figure file it cites. A deliverable report before `Status: final` is an editable surface: apply the fix in place, and a figure may be regenerated or replaced during its review loop. A figure error that changes no finding is corrected by a new figure file carried by the next report covering the same topic or leaf — once the topic has closed, by a supplementary stage report written at the owner's request or by a stage report from a later unattended run (write-research-report's `## Figures` owns the channel's rules)
+     - A figure error that changes a finding is substantive: the living outline (leaf status or conclusion) is updated first. For a deliverable report before `Status: final`, correct the figure and the finding in place; after final, the corrected figure ships with the next report covering that leaf
 
 4. **Overcorrection check before deleting:** enumerate the passage's propositions (per prose-quality's complete-proposition rule), then check the 4 overcorrection traps:
    - Does deleting flip an obligation into an endorsement?
@@ -218,5 +218,5 @@ This skill is the detection/repair layer. It references prose-quality as its sta
 - **write-spec** — the Decision Log is a sanctioned surface per the tolerance table; frozen legacy specs keep their historical `## Decisions` sections as snapshots
 - **manage-decision-records** — the Decision Log and standalone Decision Records it governs are leakage-checked surfaces per the tolerance table
 - **write-research-outline** — the living outline is a leakage-checked surface per the tolerance table
-- **write-research-report** — the stage, overall, and deep-dive reports are leakage-checked surfaces per the tolerance table: self-contained for a reader outside the session, never edited after writing. It owns the report body language Class 8 defers to and the figures whose captions freeze with each report
+- **write-research-report** — the stage, overall, and deep-dive reports are leakage-checked surfaces per the tolerance table: self-contained for a reader outside the session. A record report and a finalized deliverable report are scan-only; a deliverable report before `Status: final` is an editable surface. It owns the report body language Class 8 defers to and the figures whose captions freeze with the report (record: at handoff; deliverable: at `Status: final`)
 - **simplification-audit** — the candidate proposals it writes are standalone Decision Records, a leakage-checked surface per the tolerance table

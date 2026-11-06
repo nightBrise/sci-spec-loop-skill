@@ -134,8 +134,8 @@ leave one line.
   projection and is corrected after the tree.
 - **Not a decision record.** A leaf conclusion is a research record; promotion
   is the closing batch's (`manage-decision-records`).
-- **Not a report.** Reports are point-in-time deliverables with their own
-  skill; the board is living and carries no narrative.
+- **Not a report.** Reports have their own two lifecycles (record and
+  deliverable) and their own skill; the board is living and carries no narrative.
 - **Not a difficulty classifier.** There is no "simple/complex"
   preclassification; only work items and their registered types.
 

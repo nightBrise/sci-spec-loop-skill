@@ -7,7 +7,7 @@ Mission: produce trustworthy work under little supervision, and keep process ove
 | Who | Does | Never / sole right |
 |---|---|---|
 | owner | rules at gates: spec freeze, amendment/abandon, acceptance, topic closing | — |
-| main agent | dialogue, decomposition, dispatch, review, acceptance | sole writer of decisions, Progress tree, specs, reports |
+| main agent | dialogue, decomposition, dispatch, review, acceptance | sole writer among agents of decisions, Progress tree, specs, reports |
 | subagent | bulk code or prose per dispatch; returns a task report (deviations, deferred scope, evidence pointers, and a coverage-boundary statement — what it handles and what it explicitly leaves out, unverified assumptions included) | never writes contract or decision artifacts (specs, decisions files, CHANGELOG) |
 
 - Small fix = no new Claims + no contract change + one self-contained commit → main agent applies it directly. Larger fix → resume the implementing subagent on its branch.
@@ -50,7 +50,7 @@ Checklist — all five must pass before a topic may reach terminal state (unatte
 1. Epitaphs triaged: knowledge-class → rejected DR (knowledge promotion); situational → condition review.
 2. Condition-review report delivered to owner and ruled on.
 3. Deferred-scope entries disposed.
-4. Deliverables shipped (report or acceptance summary).
+4. Deliverables shipped (record report handed off, deliverable report at `Status: final`, or acceptance summary).
 5. Governance scan done: `simplification-audit` quick pass (or confirmed no candidates); candidates recorded — they do not block closing; zero candidates is evidence.
 
 - Each closing action yields evidence pointers (triaged N / promoted DRs / cleared N / triggered N / scan scope + candidate count). Prose is not evidence.
@@ -84,7 +84,7 @@ Three carriers (no reviewer role):
 |---|---|---|
 | spec draft (pre-freeze) | owner | contract promises need owner sign-off |
 | outline skeleton | owner | direction split is owner input |
-| report | owner | the owner is the reader |
+| report | owner | the owner is the reader; record reports are handed off final, deliverable reports are signed off at `Status: final` |
 | subagent-written code | main agent, or dispatched review | writer ≠ reviewer |
 | whole-spec branch (pre-PR) | dispatched review | full-branch scope |
 | small prose | main agent self pass | cost consideration |
@@ -127,7 +127,7 @@ Load the skill when a task hits its trigger:
 |---|---|---|
 | `write-spec` | contract writing ([Sn]/Claims, freeze, After-freeze change semantics) | build work item starts; amendment/abandon/deferred handling |
 | `write-research-outline` | board writing (on demand), preregistration, dual-speed registration | outline materialization; lightweight registration; before experiments |
-| `write-research-report` | explanatory writing (three timed reports) | leaf batches terminal; topic closing; owner asks |
+| `write-research-report` | explanatory writing (stage / overall / deep-dive; record or deliverable lifecycle) | leaf batches terminal; topic closing; owner asks for a readout or formal report |
 | `manage-decision-records` | decision governance, epitaphs, Progress-tree format, closing batch | adding/revising decisions; amendment bookkeeping; closing triage |
 | `record-discipline` | record structure discipline (source/projection, budgets, ticket/verify/batch programs) | before writing any record; review; closing; source change |
 | `prose-quality` | expression standard | always: writing/reviewing/fixing/trimming prose |

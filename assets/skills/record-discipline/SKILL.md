@@ -69,10 +69,11 @@ judgments do not change with the presence of a human.
   or a newly produced leaf registers through the light path: the ticket
   collapses to an inline one-line judgment and registration completes
   immediately. A full pass would starve the loop's highest-frequency update.
-- **Frozen artifacts and reports.** A frozen spec and a written report are
-  point-in-time snapshots. Their change route is their own channel — amendment
-  for a spec, a later report for a report — never an in-place refresh. Refresh
-  obligations attach to live projections only.
+- **Frozen artifacts and finalized reports.** A frozen spec and a finalized
+  report are point-in-time snapshots. Their change route is their own channel —
+  amendment for a spec, a later report for a report — never an in-place refresh.
+  A deliverable report before `Status: final` is a live source and may be
+  revised in place. Refresh obligations attach to live projections only.
 - **Mechanical edits.** A formatting or typo change that creates or moves no
   content unit needs no ticket and no check.
 
@@ -303,10 +304,11 @@ These hold at every write and again at the closing batch. Check them as a list.
    over-budget unit carries a pointer to where the excess went.
 5. **Unique revision style.** Never keep the original text and append an inline
    correction in the body. Revise by the artifact's own channel: supersession
-   for a decision entry, amendment for a spec, a later report for a report.
-   Test: the artifact holds one current statement and no in-body correction
-   note. Mechanics: `skills/manage-decision-records`, `skills/write-spec`,
-   `skills/write-research-report`.
+   for a decision entry, amendment for a spec, in-place revision until
+   `Status: final` for a deliverable report, a later report for a record or
+   finalized report. Test: the artifact holds one current statement and no
+   in-body correction note. Mechanics: `skills/manage-decision-records`,
+   `skills/write-spec`, `skills/write-research-report`.
 
 An inline correction leaves both statements standing: the reader cannot tell
 which one binds, and the artifact carries the same text twice.

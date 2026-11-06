@@ -2,6 +2,28 @@
 
 本文件是仓库的版本变更说明与理由：每一节讲清这一版改了什么、为什么这么改，以及当时为什么排除了其他方案。版本按时间倒序排列，新版本追加在最上面；仓库没有正式版本号，节名取该版的主题，日期用 ISO 格式，文件路径按该节所述版本当时的布局书写，当前布局见最新一节。
 
+## [report-lifecycle] - 2026-11-07
+
+**变了什么**
+
+- `write-research-report` 引入两轴模型：范围（stage / overall / deep-dive）× 生命周期（record / deliverable）。默认 stage / deep-dive 为 record，overall 为 deliverable；生命周期在开写时选定，owner 可裁决覆盖。
+- 交付型报告新增 `Status: draft | in review | final` 头字段：主 agent 起草 → owner 审阅 → 原地修订 → owner 认可后置 `final` 并冻结；修订历史由 git 承担，不产生 per-draft 文件。
+- 记录型报告保持写一次：交棒即终态，后续发现进入覆盖同一主题/叶子的下一份报告。交付型报告不充当 stage checkpoint；stage 跨度的交付型报告使用独立文件名（`<topic>-report-<slug>.md`），`report-<NNN>` 编号保留给记录型；已有 `report-<NNN>` 被 owner 裁决重分类时保留原名并停止充当 checkpoint，下一份记录型报告的 `Period:` 锚到最后一份记录型报告。
+- 图的生命周期同步：记录型报告交棒时冻结，交付型报告 `Status: final` 时冻结；审阅环内可重新生成或替换图。
+- 关联 skill 同步箍范围：`prose-quality`、`trim-cot-leakage`、`record-discipline`、`write-research-outline` 的“报告写后不改”改为“记录型 / 已定稿报告不改；交付型定稿前可改”。`AGENTS.md` 的审查表与主题收尾关卡区分两种生命周期；README 中英 skill 表与写作链同步。
+
+**为什么**
+
+- 原规则把“记录完整性”和“交付质量”压成一条不可变规则：stage 报告写一次是对的，但正式报告需要 owner 审阅返工，原 skill 没有这个生命周期。
+- 正式报告被误分类为 stage 报告后，agent 只能拒绝修改或违反规则；两轴模型在开写时显式选生命周期，避免误分类。
+- 记录型报告链保持不可变，交付型报告的修订历史由 git 承担，两者各自拿到需要的保证。
+
+**对使用者的影响**
+
+- 正式报告可按“起草 → owner 审阅 → 修订 → `Status: final`”定稿；记录型报告仍写一次。
+- 主题收尾关卡要求交付型报告达到 `Status: final`，草稿不能算交付。
+- 现有 stage 报告不受影响；若要把它作为正式报告继续写，应复制到交付型文件或按 owner 裁决显式重分类。
+
 ## [mimo-migration-guide] - 2026-11-03
 
 **变了什么**

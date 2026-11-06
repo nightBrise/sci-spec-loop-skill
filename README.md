@@ -16,7 +16,7 @@ flowchart LR
 ```
 
 - **owner（人）**：定方向、给需求，在关键闸口裁决——spec 冻结、amendment/abandon、验收、主题收尾。
-- **主 agent**：与人对话、理解需求、拆解任务、派发、审查与验收；决策、进度、契约、报告的**唯一写者**。少量修复亲自改，大量修复 resume 原 subagent 继续。
+- **主 agent**：与人对话、理解需求、拆解任务、派发、审查与验收；决策、进度、契约、报告的**唯一写者**（agent 内；交付型报告的审阅稿由 owner 裁决，owner 可直接改）。少量修复亲自改，大量修复 resume 原 subagent 继续。
 - **subagent**：实现主 agent 派发的任务（大量代码或成篇文字），交付 task report；不写契约与决策工件。
 
 ### 六条核心观念
@@ -120,7 +120,7 @@ flowchart TB
 |---|---|---|
 | `write-spec` | 契约写作：`[Sn]`/Claims、冻结、After-freeze 变更程序 | 建设型工作项开工；amendment / abandon / 延迟处置 |
 | `write-research-outline` | 看板写作（按需物化）、实验预注册、双速登记 | 大纲物化；轻登记；实验前 |
-| `write-research-report` | 解释写作：阶段 / 总体 / 深潜三种报告 | 叶子批次终态；主题收尾；owner 索要 |
+| `write-research-report` | 解释写作：阶段 / 总体 / 深潜三种报告；记录型写一次，交付型审到定稿 | 叶子批次终态；主题收尾；owner 索要正式报告 |
 
 **记录治理**——"一源多投影"的落地：
 
@@ -159,7 +159,7 @@ flowchart LR
     end
 ```
 
-- **写作链**：动笔前 `record-discipline` 开票（放不放 / 放哪 / 多大 / 源在哪）→ 工件 skill 文体写作 → RD 验票 → 交棒；大纲高频登记走轻量通道（登记即完成）。
+- **写作链**：动笔前 `record-discipline` 开票（放不放 / 放哪 / 多大 / 源在哪）→ 工件 skill 文体写作 → RD 验票 → 交棒；记录型交棒即终态，交付型交棒后进入 owner 审阅循环，`Status: final` 才定稿；大纲高频登记走轻量通道（登记即完成）。
 - **审查链**：`structured-code-review` 是唯一方法论——Layer 1 先过 `prose-quality` + `trim-cot-leakage`，Layer 2 按改动面做语义检查。承载按需：owner 直审文稿、主 agent 审 subagent 代码（写者≠审者）、或派发审。证据硬要求：**prose 不是证据**。
 - **变更链**：实现发现触及判据 → 四通道分流 → Amendment / Abandon 的记账与墓志铭归 `manage-decision-records`，清引用归 `trim-cot-leakage`。
 - **质量门链**：并发测试先过 `test-reliability` 设计判据 → push 前 `pre-push-checks` 选证据 → `pr-description` 写清两份清单 → `merge-stack` 带 approve + 证据落盘。工程红线：merge-only、禁 rebase / force-push、禁 `--no-verify`；合并后回滚 = owner 裁决的 revert 正向 commit（不改历史，教训随重做 spec 落地）。
