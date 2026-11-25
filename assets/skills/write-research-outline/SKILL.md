@@ -30,13 +30,14 @@ passes every check can still point the wrong way.
 
 ## Inputs and exclusions
 
-**Scope.** The topic's outline at `docs/research/<topic>.md`, its leaves, and
-preregistration blocks. The unit is the leaf or the preregistration part, not
-the file.
+**Scope.** The topic's outline at `docs/topics/<topic>/research/outline.md`, its
+leaves, and preregistration blocks. The unit is the leaf or the preregistration
+part, not the file.
 
 **Inputs.** The topic's question; the work items and their Progress nodes; leaf
-outcomes with evidence pointers; the triage result for each work item; the
-experiment's target criterion and attribution design before work starts.
+outcomes with evidence pointers; the triage result for each work item; and
+either a confirmatory criterion and attribution design or an exploratory
+observation objective and measurement/analysis design before work starts.
 
 **Mode.** Materialization and the skeleton review are owner-gated. An unattended
 run may use an approved skeleton and register into it; it never establishes a
@@ -94,17 +95,20 @@ leave one line.
   re-derived here. A build leaf hands off to `write-spec`; an explore leaf runs
   the investigation loop.
 - Leaf block fields: `ID`, `Type`, `Question` or hypothesis (explore) /
-  `Deliverable` (build), `Dependencies`, `Status`, `Conclusion`, `Prereg`,
-  `Deep-dive`.
+  `Deliverable` (build), `Dependencies`, `Status`, `Evidence`, `Conclusion`,
+  `Prereg`, `Deep-dive`.
 - `Question`, the hypothesis, and the leaf definition are first-hand; `Status`
   and `Conclusion` project their homes in `record-discipline`'s one-line form.
+- `Evidence` points to the first-hand evidence home and its writer, registered
+  before an experiment, measurement, or prototype investigation starts. An
+  existing test, benchmark, or findings record may be the home.
 - `Status` carries the tree node's state word; the vocabulary belongs to
   `manage-decision-records`, and a leaf never invents a second one.
 - `Dependencies` names the leaf IDs that must resolve first; the leaf starts
   only when they are terminal.
 - `Conclusion` is one line plus the pointer to its home; a deep-dive link never
   replaces it.
-- `Deep-dive` links `docs/research/<topic>-<leaf-slug>.md` when
+- `Deep-dive` links `docs/topics/<topic>/research/<leaf-slug>.md` when
   `write-research-report`'s triggers fire; that skill owns the reserved-token
   rule.
 - A leaf that becomes a spec keeps its node and status; the frozen spec path
@@ -144,8 +148,8 @@ leave one line.
 ### Materializing the board
 
 1. Read the Progress tree, the existing findings, and any frozen specs.
-2. Write the research question (first-hand) and the sub-questions or
-   hypotheses, each falsifiable.
+2. Write the research question and sub-questions (first-hand): a confirmatory
+   sub-question is falsifiable; an exploratory sub-question is observable.
 3. Write one leaf block per tree node; carry `ID`, `Type`, `Dependencies`, and
    the current `Status`.
 4. Mark every `explore` leaf as requiring a preregistration before its work
@@ -162,8 +166,9 @@ here:
 - the sub-question partition divides the topic without gaps or overlap;
 - every leaf carries its triage result and a one-line basis for it, and the
   review never re-runs the triage;
-- every `explore` leaf states a testable hypothesis and its preregistration
-  route;
+- every `explore` leaf states its question and preregistration route — a
+  testable hypothesis for confirmatory work or an observation objective for
+  exploratory work;
 - dependencies form no cycle and name real leaves;
 - every leaf names its evidence standard.
 
@@ -176,60 +181,90 @@ here:
 
 ### Preregistration (the sole template home)
 
-An experiment's number is an attribution anchor, not a target: with the number
-and the interpretation frozen, "met" and "missed" can be explained. Without the
-freeze the target moves with the result, and the attribution chain fails.
+`Type: explore` says an experiment is needed; `Mode` says how it produces
+evidence. Every explore item selects `confirmatory` or `exploratory` before work
+starts. There is no implicit mode or legacy compatibility default.
+
+#### Confirmatory
+
+A confirmatory criterion is an attribution anchor, not an optimization target.
+Freeze the criterion and the interpretation together so `met` and `unmet` have a
+causal reading that cannot move with the result.
 
 ```markdown
 ### Prereg: <leaf ID>
+Mode: confirmatory
 
-1. Target criterion: <number or condition> — the attribution anchor.
+1. Target criterion: <number or discriminating condition> — the attribution anchor.
 2. Attribution design: <what each possible result would mean — controls, ablations, discriminating conditions>.
-3. Result duty: an attribution analysis is produced whether the criterion is met or missed; "principle-reachable but not reached" must be analyzed.
+3. Result duty: <attribution analysis required for both met and unmet outcomes>.
 
 Version: v1
 ```
 
+#### Exploratory
+
+Exploratory work freezes observation and evidence duties rather than an expected
+result. It may start without a success threshold or a causal hypothesis.
+
+```markdown
+### Prereg: <leaf ID>
+Mode: exploratory
+
+1. Observation objective: <what to measure or observe; reference if any; no success threshold required>.
+2. Measurement and analysis design: <scope, sampling, controls, data quality, exclusions, stopping rule, or a versioned measurement-card Plan pointer>.
+3. Result duty: <observations, uncertainty or coverage, anomalies, possible explanations, and next questions>.
+
+Version: v1
+```
+
+#### Common freeze semantics
+
 - All three parts are written before work starts; a missing part fails
   `record-discipline`'s completeness check and blocks the start.
-- The number and the attribution design freeze together; a design added after
-  the results is not an attribution design.
-- The result duty is a template part, not advice: a missed criterion without an
-  attribution analysis is an incomplete leaf.
+- Before work starts, a revision appends `prereg v2: <changed part>` and leaves
+  the original text untouched; the highest version binds.
+- At work start the leaf carries `preregistered @ <version>`; the start step is
+  `AGENTS.md` orchestration, and the marker's form is owned here.
+- After the marker the complete preregistration is strong-frozen: change only by
+  owner ruling or by abandoning the work item. Amendment never applies.
+- Supplementary diagnostics are appended to the leaf's evidence record outside
+  the frozen Prereg block and labeled post-hoc. They never rewrite the
+  registered design or retroactively change its outcome. A run that needs an
+  acceptance-affecting change stops for the owner.
 - Every `explore` work item is preregistered in a leaf; if no board exists,
   materialize the leaf before the experiment starts.
 - A spec Claim that restates a preregistered criterion inherits its strong
   freezing (`write-spec`).
 
-**Freeze semantics.**
+#### Result and evidence duties
 
-- Before work starts, a revision appends `prereg v2: <changed part>` and leaves
-  the original text untouched; the highest version binds.
-- At work start the leaf carries `preregistered @ <version>`; the start step is
-  `AGENTS.md` orchestration, and the marker's form is owned here.
-- After the marker the preregistration is strong-frozen: change only by owner
-  ruling or by abandoning the work item. Amendment never applies — changing the
-  criterion changes the experiment's promise.
-- A run that needs a change after the marker stops for the owner; unattended
-  operation never edits a frozen criterion.
+- Claim and criterion outcomes are `met`, `unmet`, or `unevidenced`. Invalid,
+  missing, or inconclusive evidence is `unevidenced`, never `unmet`; PASS and
+  FAIL remain raw test facts.
+- A confirmatory item produces its attribution analysis for both `met` and
+  `unmet`: distinguish method contribution from principle necessity, and analyze
+  principle-reachable shortfalls before declaring a principle unreachable.
+- An exploratory item reports observations, evidence coverage, anomalies, and
+  unresolved questions. It may complete without producing a candidate causal
+  explanation; an inconclusive but complete observation is a valid result.
+- A causal interpretation formed after seeing results is a candidate explanation,
+  not part of the original attribution design. Promote it to a confirmed
+  attribution only through a successor investigation with independent data,
+  holdout evidence, or new discriminating controls.
+- An exploratory measurement does not become an acceptance threshold without an
+  owner or requirement decision.
+- A dead-end with a completed result duty is a result; one without it is an
+  unfinished experiment.
 
-**Result duty.**
-
-- Report the attribution analysis for a met criterion as well as a missed one:
-  distinguish the method's contribution from the principle's necessity.
-- For a missed criterion, analyze the "principle-reachable but not reached" case
-  before concluding anything; it separates an unreachable principle from a
-  method or optimization shortfall.
-- A dead-end with a completed attribution analysis is a result; one without it
-  is an unfinished experiment.
-
-### Attribution-anchor usage
+#### Attribution-anchor usage
 
 - An exploratory finding that touches an existing spec's Claims goes to
   `AGENTS.md`'s four channels; this skill supplies the anchor the routing reads.
 - Before ruling ① deviation or ② Amendment, read the leaf's attribution design:
-  principle-unreachable → ② or ③; principle-reachable but method or optimization
-  short → ①.
+  principle-unreachable under the declared constraints → ② or ③;
+  principle-reachable but method or optimization short → ①. Record the
+  constraints and the review condition.
 - Never rule from the raw number alone; the number means nothing without the
   frozen design that says what it would imply.
 - A finding with no preregistration has no anchor: the owner rules on it, and it
@@ -241,7 +276,8 @@ Version: v1
   `file:line` (`structured-code-review` owns the evidence standard).
 - An `explore` leaf's evidence is experiment data, measurement, literature, or
   prototype behavior; the bar is "the conclusion is supported and the process is
-  reproducible", not "the tests pass".
+  reproducible", not "the tests pass". Distinguish observed facts, candidate
+  explanations, and confirmed attributions through their evidence pointers.
 
 ## Workflow
 
@@ -263,16 +299,17 @@ Version: v1
 
 **Preregister (before an experiment)**
 
-7. Write the three-piece into the leaf; version pre-work revisions by appending
-   and leave the originals untouched.
+7. Select the preregistration mode, write its three-piece into the leaf, and
+   register the evidence home and writer. Version pre-work revisions by
+   appending and leave the originals untouched.
 8. At work start, confirm the three-piece is complete and add
    `preregistered @ <version>`.
 9. At the end, update the leaf status, the one-line conclusion, and the
-   attribution-analysis pointer.
+   attribution-analysis or observation-analysis pointer.
 
-**Report content.** What was materialized, leaves registered, preregistrations
-and their versions, terminals reached, and anything that blocks a start or a
-conclusion.
+**Report content.** What was materialized, leaves registered, preregistration
+modes and versions, evidence homes and writers, terminals reached, and anything
+that blocks a start or a conclusion.
 
 ## Collaboration
 

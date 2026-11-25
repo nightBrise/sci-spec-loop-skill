@@ -103,7 +103,7 @@ sentence by sentence: the type carries the attribute.
 |---|---|---|
 | First-hand source unit | Content that is authoritative at this location: a definition, claim, decision, method, data point, or interpretation (a spec Claim, a decision rationale, a report's direction recommendation). | Write it in full within its type's budget; every other location points here. |
 | Projected unit | Content whose home is elsewhere (a leaf conclusion line, an evidence pointer in a spec, a status sentence in a report). | One sentence plus a pointer; refresh when the home changes. |
-| Status line | A position marker whose content is a state and an evidence pointer (for example `[F-004] experiment: s30 probe · done (findings#s30-04)`). | One line; the Progress tree is the canonical instance (see `skills/manage-decision-records`). |
+| Status line | A position marker whose content is a state and an evidence pointer (for example `[F-004] explore: s30 probe · done (findings#s30-04)`). | One line; the Progress tree is the canonical instance (see `skills/manage-decision-records`). |
 | Not a unit | A restatement, session narration, a duplicated table, or a template segment with no content. | Do not write it; delete it if it exists. |
 
 ### One line, defined here
@@ -122,7 +122,7 @@ two sentences is already the failure this skill exists to prevent.
 
 | Artifact | First-hand content (authoritative here) | Projected content (drawn from elsewhere) |
 |---|---|---|
-| Outline | Research question, hypotheses, leaf definitions, pre-registered criteria. | Leaf status and conclusion lines (from findings or decision entries). |
+| Outline | Research question, hypotheses, leaf definitions, pre-registered criteria. | Leaf status (from the topic Progress tree) and conclusion lines (from findings or decision entries). |
 | Findings / evidence files | Experiment method, data, figures, FAIL and PASS facts. | Quoted criteria text (from outline pre-registration or spec Claims). |
 | Decision entry | The decision, rationale, rejected alternatives, review condition. | Conclusion summary (from findings), Claim citations. |
 | Spec | Claims, obligations, criteria. | Evidence pointers (from findings). |
@@ -133,6 +133,26 @@ Read each row as a question: does this artifact keep its authoritative slots
 authoritative and its projected slots as projections? A spec that retells
 evidence instead of pointing at it, or a report that copies a data table,
 inverts its row and fails the home test however well it reads.
+
+### Topic and evidence layout
+
+Each topic uses `docs/topics/<topic>/` with one `decisions.md` and one Progress
+tree. Research navigation and interpretation live under `research/`, contracts
+under `specs/`, and first-hand observations under `evidence/`. These
+subdirectories materialize only when needed; standalone cross-topic Decision
+Records live at `docs/decisions/`.
+
+- Before an experiment, measurement, or prototype investigation starts, register
+  the first-hand evidence home and its writer in the owning leaf or dispatch
+  brief. An existing test, benchmark, or findings record is a valid home; never
+  create a document merely to satisfy the field.
+- Each shared evidence record has one writer at a time. Subagents return task
+  reports and isolated raw artifacts rather than editing the shared record.
+- Raw Runs are append-only, and corrections reference earlier Runs instead of
+  overwriting them. A new campaign gets a new evidence record or Plan version;
+  it does not generate one prose report per Run.
+- An evidence home may point to large artifacts only through a first-hand index;
+  reports, outlines, and Progress remain projections, not raw-data stores.
 
 ### Budgets and attributes
 

@@ -16,17 +16,19 @@ flowchart LR
 ```
 
 - **owner（人）**：定方向、给需求，在关键闸口裁决——spec 冻结、amendment/abandon、验收、主题收尾。
-- **主 agent**：与人对话、理解需求、拆解任务、派发、审查与验收；决策、进度、契约、报告的**唯一写者**（agent 内；交付型报告的审阅稿由 owner 裁决，owner 可直接改）。少量修复亲自改，大量修复 resume 原 subagent 继续。
-- **subagent**：实现主 agent 派发的任务（大量代码或成篇文字），交付 task report；不写契约与决策工件。
+- **主 agent**：与人对话、理解需求、拆解任务、派发、审查与验收；决策、进度、契约、报告、共享证据的**唯一写者**（agent 内；交付型报告的审阅稿由 owner 裁决，owner 可直接改）。少量修复亲自改，大量修复 resume 原 subagent 继续。
+- **subagent**：实现主 agent 派发的任务（大量代码或成篇文字），交付 task report 与独立原始产物；不写契约、决策或共享证据工件。
 
-### 六条核心观念
+### 八条核心观念
 
 1. **单入口 + 分流测试**——任务不分"工程/研究"。每个工作项单独问一句"Claims 现在可预写吗？"：能（可预写 = 数值有出处——实测 / 标准 / 需求；预测值 = 隐藏预注册）→ 建设型，走 spec 契约；须实验才知 → 探索型，走预注册。
 2. **互产循环**——探索结论生成新建设项，实现反常生成新探索项。"边测试边探索"不需要换轨，只需要不断生成新工作项。
 3. **判据变更四通道**——冻结的 spec 不是死的：偏差（不改契约）、Amendment（改度量）、Abandon（立足点塌，干净删除）、延迟范围（新范围另记），各有受控出口。
 4. **一源多投影**——同一事实多处出现是多读者需求，不是病；病在无规格的复制。每条事实一个权威家，其余位置只放一行投影，且禁止投影的投影。
-5. **预注册 = 归因锚**——探索型实验先冻结目标判据与归因设计，"达到/未达"才有因果解释力；FAIL 分析是探索的黄金产出。
+5. **双模式预注册**——confirmatory 冻结目标判据、归因设计与结果义务；exploratory 冻结观察目标、测量协议与结果义务，不要求理想值或成功阈值。达标与否都必须分析；事后因果解释须经独立后继验证。
 6. **渐进式披露 + 强制力四层**——规则分三层按需加载（恒载规则文件 → 事件加载 skill → 引用深潜 references）；强制力分层布置：机械拦截 > 流程结构（闸口/checklist）> 规则文本 > 角色自觉。
+7. **一个主题一个记录根**——`docs/topics/<topic>/` 中只有一个 `decisions.md` 和一个 Progress 树；研究、spec、证据按需进入子目录，新增工件不迁移历史。独立 DR 放在 `docs/decisions/`。
+8. **验收与停止分离**——Claim 结果只有 `met / unmet / unevidenced`；优化停止不等于验收。无争议零改动可自动完成，owner 接受偏差可完成但保留 `unmet`。
 
 ### 主循环全景
 
@@ -42,6 +44,18 @@ flowchart TB
     B --> C["主题收尾关卡"]
     E --> C
 ```
+
+### 主题目录与记录
+
+```text
+docs/topics/<topic>/
+├── decisions.md      # 全部决策、唯一 Progress、零改动验收
+├── research/         # 可选：outline、reports、assets
+├── specs/            # 可选：只有 spec 契约
+└── evidence/         # 可选：findings、测量卡、原始证据
+```
+
+主题以 owner 级收尾目标为界，不以研究/建设形态为界。主题工作项使用 `[W<n]`，spec 切片使用 `[<slug>#S<n>]`；跨主题独立 DR 使用 `docs/decisions/`。Progress 状态统一为 `pending / in progress / blocked / done / dead-end / pivot`，`misclassified` 只作转移标记，`no-change` 只作交付标记。
 
 ### 判据变更四通道
 
@@ -79,7 +93,7 @@ flowchart LR
     Q -->|"否"| S["停跑上报<br/>Progress 树 = 恢复点"]
 ```
 
-## Skill 集（13 个，四层）
+## Skill 集（14 个，四层）
 
 ```mermaid
 flowchart TB
@@ -103,6 +117,7 @@ flowchart TB
         PRD["pr-description"]
         MST["merge-stack"]
         TR["test-reliability"]
+        OP["optimize-performance"]
     end
     WS -->|"决策记账"| MDR
     WRO -->|"看板登记"| RD
@@ -146,6 +161,7 @@ flowchart TB
 | `pr-description` | PR 叙事四节 + 验收最低项（两份清单） | 创建 / 更新 PR |
 | `merge-stack` | 合并落盘：依赖序、修复传播、merge-only | 合并 PR / 切片栈 |
 | `test-reliability` | 测试可靠性：拓扑建模、原子资源、隔离与 teardown | 并发/资源型测试；flaky 诊断 |
+| `optimize-performance` | 性能测量、轻量/完整优化路径、停止规则、测量卡 | 性能优化/回归诊断；基准或性能门禁设计 |
 
 ## 如何协作
 
@@ -160,6 +176,8 @@ flowchart LR
 ```
 
 - **写作链**：动笔前 `record-discipline` 开票（放不放 / 放哪 / 多大 / 源在哪）→ 工件 skill 文体写作 → RD 验票 → 交棒；记录型交棒即终态，交付型交棒后进入 owner 审阅循环，`Status: final` 才定稿；大纲高频登记走轻量通道（登记即完成）。
+- **派发链**：每次简报包含目标/Claims 逐字文本、skill 与模式、边界、证据契约、停止/升级条件、task report；通用结构归 `assets/AGENTS.md`，领域增量归对应 skill，完整 prompt 不默认落盘。
+- **性能链**：先基线与零改动检查，再按已有校准选轻量路径、按新基准/多假设选完整路径；测量卡采用版本化 Plan + 追加 Runs，优化停止与 Claim 验收分别记录。
 - **审查链**：`structured-code-review` 是唯一方法论——Layer 1 先过 `prose-quality` + `trim-cot-leakage`，Layer 2 按改动面做语义检查。承载按需：owner 直审文稿、主 agent 审 subagent 代码（写者≠审者）、或派发审。证据硬要求：**prose 不是证据**。
 - **变更链**：实现发现触及判据 → 四通道分流 → Amendment / Abandon 的记账与墓志铭归 `manage-decision-records`，清引用归 `trim-cot-leakage`。
 - **质量门链**：并发测试先过 `test-reliability` 设计判据 → push 前 `pre-push-checks` 选证据 → `pr-description` 写清两份清单 → `merge-stack` 带 approve + 证据落盘。工程红线：merge-only、禁 rebase / force-push、禁 `--no-verify`；合并后回滚 = owner 裁决的 revert 正向 commit（不改历史，教训随重做 spec 落地）。
@@ -203,7 +221,7 @@ cp -r assets/skills/*     ~/.kimi-code/skills/
 cp -r assets/references/* ~/.kimi-code/references/
 ```
 
-- 同步是镜像：以仓库为准，覆盖之外，仓库已移除的内容一并从实机删除（`diff -rq` 可查残留）；非本仓库来源的文件不动。
+- 同步覆盖仓源拥有的文件；只在安装目录出现的文件标为 `unknown-origin`，仅报告、经 owner 确认后才删除，个人文件不自动删除。
 - skill 名来自 `SKILL.md` 的 frontmatter，不来自目录名。
 - references 是深潜层，由规则与 skill 按路径引用，不自动注入上下文。
 
@@ -237,11 +255,19 @@ cd <你的产品仓> && git config core.hooksPath .githooks
 
 ```sh
 { cat assets/AGENTS.md; echo; cat assets/adapters/kimi.md; } | diff -q - ~/.kimi-code/AGENTS.md
-find ~/.kimi-code/skills -mindepth 1 -maxdepth 1 -type d | wc -l   # 应为 13
+for s in assets/skills/*/; do
+  n=$(basename "$s")
+  diff -q "$s/SKILL.md" ~/.kimi-code/skills/"$n"/SKILL.md || echo "missing/stale: $n"
+done
+for f in style/python.md style/engineering.md style/error-handling.md workflow/github-flow.md workflow/testing.md; do
+  diff -q "assets/references/$f" ~/.kimi-code/references/"$f" || echo "missing/stale: $f"
+done
 ls ~/.kimi-code/hooks/block-dangerous-git.mjs ~/.kimi-code/hooks/push-evidence-reminder.mjs
+diff -rq assets/skills ~/.kimi-code/skills || true
+diff -rq assets/references ~/.kimi-code/references || true
 ```
 
-改完在新会话里验证规则与 skill 已加载。
+仓源应含 14 个 skill。`missing/stale` 必须重新同步；`diff -rq` 中只在安装目录出现的文件标为 `unknown-origin`，仅报告、经 owner 确认后才删除，个人 skill 不参与数量统计。改完在新会话里验证规则与 skill 已加载。
 
 ### 迁移到 MiMo Code
 
@@ -367,8 +393,15 @@ mimo run -m <provider>/<model> "Reply with exactly: ok"
 
 ```sh
 { cat assets/AGENTS.md; echo; cat assets/adapters/<harness>.md; } | diff -q - ~/.<harness>/AGENTS.md || echo "stale: re-run step 1"
-find ~/.<harness>/skills -mindepth 1 -maxdepth 1 -type d | wc -l   # 应为 13
+for s in assets/skills/*/; do
+  n=$(basename "$s")
+  diff -q "$s/SKILL.md" ~/.<harness>/skills/"$n"/SKILL.md || echo "missing/stale: $n"
+done
+diff -rq assets/skills ~/.<harness>/skills || true
+diff -rq assets/references ~/.<harness>/references || true
 ```
+
+通用校验要求 14 个仓源 skill 内容一致；只在安装目录出现的文件标为 `unknown-origin`，不自动删除。
 
 ## 仓库结构
 
@@ -376,9 +409,10 @@ find ~/.<harness>/skills -mindepth 1 -maxdepth 1 -type d | wc -l   # 应为 13
 |---|---|
 | `assets/AGENTS.md` | 规则主体（harness 无关；合成迁移的一半） |
 | `assets/adapters/` | 每 harness 一个适配片段 + 可选 hooks 脚本 |
-| `assets/skills/` | 13 个 skill，每个一个目录一份 `SKILL.md` |
+| `assets/skills/` | 14 个 skill，每个一个目录一份 `SKILL.md` |
 | `assets/references/` | `style/`（风格、工程原则、错误处理）与 `workflow/`（测试法、GitHub Flow） |
 | `.githooks/` | R3 pre-commit 钩子参考实现（普通 git 钩子，任何 harness 通用） |
+| `docs/` | 本机过程记录（spec、Decision Log、主题工作区）；不提交、不推送 |
 | `README.md` / `README.en.md` | 中英门面（本文件） |
 | `CHANGELOG.md` | 版本变更说明与理由（含语言政策） |
 

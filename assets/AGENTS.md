@@ -7,8 +7,8 @@ Mission: produce trustworthy work under little supervision, and keep process ove
 | Who | Does | Never / sole right |
 |---|---|---|
 | owner | rules at gates: spec freeze, amendment/abandon, acceptance, topic closing | — |
-| main agent | dialogue, decomposition, dispatch, review, acceptance | sole writer among agents of decisions, Progress tree, specs, reports |
-| subagent | bulk code or prose per dispatch; returns a task report (deviations, deferred scope, evidence pointers, and a coverage-boundary statement — what it handles and what it explicitly leaves out, unverified assumptions included) | never writes contract or decision artifacts (specs, decisions files, CHANGELOG) |
+| main agent | dialogue, decomposition, dispatch, review, acceptance | sole writer among agents of decisions, Progress tree, specs, reports, shared evidence records |
+| subagent | bulk code or prose per dispatch; returns a task report (deviations, deferred scope, evidence pointers, and a coverage-boundary statement — what it handles and what it explicitly leaves out, unverified assumptions included) | never writes contract, decision, or shared evidence artifacts (specs, decisions files, CHANGELOG, measurement cards) |
 
 - Small fix = no new Claims + no contract change + one self-contained commit → main agent applies it directly. Larger fix → resume the implementing subagent on its branch.
 - Bulk prose (SKILL.md, README sections) may be drafted by subagent; the main agent finalizes.
@@ -17,12 +17,13 @@ Mission: produce trustworthy work under little supervision, and keep process ove
 
 Input → topic (untyped container) → work item → triage test → build / explore branches → topic closing gate.
 
+- **Topic boundary and home**: a new topic needs an independent owner-level closing objective. Each topic uses `docs/topics/<topic>/` with one `decisions.md` and one Progress tree; `research/`, `specs/`, and `evidence/` materialize only when needed. Gaining artifacts never migrates topic history.
 - **Triage** (the main agent decides; disagreement or misjudgment under unattended → stop as "needs user judgment"): Claims writable now, verifiable without experiment → build; the answer needs experiments → explore. Writable = every Claim value has a source (measurement, standard, requirement); a predicted value is a hidden preregistration → explore.
 - Triage fallbacks, when the main question is unclear: the outcome has multiple possibilities and needs experiments → explore; the output is a deliverable → build, a decision basis → explore. Signals: build = implement/add/fix/integrate; explore = feasible?/why?/which/limit?. Demo: quantifiable acceptance → build; open question → explore.
 - **Mutual generation**: either branch can spawn new work items of either kind — findings → build items; open questions or anomalies → explore items. Every new item re-enters triage and needs its own dispatch brief.
 - **Misjudgment** = deviation labeled `misclassification`: correct through existing channels (judged build but Claims are guesses → abandon any frozen spec if one exists and re-tag as explore; judged explore but investigation converges → new build item); log a decision entry and a Progress node state. No new mechanism.
 - **Outline (living board) materializes on demand** — cross-session continuation, tree too coarse, preregistration needed, or owner asks. See `write-research-outline`.
-- **Dispatch brief**: implementation = [Sn] verbatim + related decision records + boundaries; investigation = hypotheses + evidence standard; review = spec path + diff scope (prompt composition: see `structured-code-review`).
+- **Dispatch brief**: every dispatch = goal/Claims verbatim + skill/mode + boundaries + evidence contract + stopping/escalation + task report. Implementation adds [Sn] and related decisions; investigation adds question/hypotheses and evidence standard; review adds spec path + diff scope (composition: see `structured-code-review`). Never copy the methodology into a prompt or persist it by default.
 - **Knowledge recall**: before composing any brief, search standalone DRs and the decision logs for entries touching the work's surface; state the search result in the brief even at zero hits.
 - **Assembly is the coverage check**: unquotable Claims, unclear boundary, or unresolvable dependencies = the [Sn] is not dispatchable; return to `write-spec`.
 
@@ -61,6 +62,7 @@ Checklist — all five must pass before a topic may reach terminal state (unatte
 
 - Budget check at work-item/batch boundaries; insufficient budget → stop + report (the Progress tree is the recovery point). Never degrade quality to keep running.
 - Update the owning Progress node at every work-item boundary (start and end) before moving on; an unrecorded boundary is a lost recovery point.
+- When a named external condition prevents progress, mark the item `blocked` with its evidence pointer; resume only after that condition clears. An unruled deviation or acceptance objection is blocked, never done.
 - Fix blockers only; record suggestions, do not chase them.
 - A review target rejected 3× in a row → stop + report; a green light resets the count; deviation findings do not count toward the limit.
 - 3 consecutive failures on one objective → dispatch a read-only advisor; record the consultation and disposition (advised X / adopted Y / because Z) as a decision entry — closing-triage input.
@@ -90,8 +92,8 @@ Three carriers (no reviewer role):
 | small prose | main agent self pass | cost consideration |
 
 - Dispatched review = generic subagent + review prompt (composition: see `structured-code-review`).
-- Acceptance gate: main agent + owner rule on the deviation + deferred lists (kept in the PR description) before merge.
-- Verdicts: approve / needs fixes / reject. Evidence is mandatory — prose is not evidence.
+- Acceptance gate: main agent + owner rule on the deviation + deferred lists (kept in the PR description) before merge. A clean no-change item may be accepted unattended only when every Claim and guard is `met`, no repository change is required, and no target or measurement objection exists; record `done + no-change` with baseline evidence. Owner-accepted deviations stay `unmet` in the acceptance record.
+- Verdicts: approve / needs fixes / reject. Claim outcomes are `met / unmet / unevidenced`; invalid, missing, or inconclusive evidence is `unevidenced`. Evidence is mandatory — prose is not evidence.
 
 ## Coding rules
 
@@ -112,7 +114,7 @@ Test behavior (iron laws): tests are deterministic (isolation over serialization
 
 ## GitHub Flow (red lines)
 
-- 1 spec = 1 branch = 1 PR; one [Sn] = one main commit (+ follow-up review commits).
+- 1 spec = 1 branch = 1 PR unless the entire spec is accepted as no-change; one [Sn] = one main commit (+ follow-up review commits).
 - Merge-only: never rebase, never force-push; never use `--no-verify`.
 - Merge in dependency order with merge commits; precondition = review verdict approve + evidence (see `merge-stack`). Branch/commit formats: see `references/workflow/github-flow.md`.
 - Post-merge rollback: the owner rules revert or fix-forward. A revert is an ordinary forward commit — never reset, never force-push — one merge per revert commit, executed direct-to-main; the lesson lives in the revert message and the redo's spec Claims (a knowledge DR only at the owner's word). A revert that hits conflicts stops and reports; the owner may switch to fix-forward.
@@ -138,6 +140,7 @@ Load the skill when a task hits its trigger:
 | `pr-description` | PR narrative (four sections + acceptance minimums) | creating a PR; description drift after review rounds |
 | `merge-stack` | merge ordering and fix propagation | merging PRs / stacked slices |
 | `test-reliability` | test reliability design (topology, atomic resources, isolation) | new/modified concurrency·resource tests; flaky diagnosis |
+| `optimize-performance` | performance measurement, optimization paths, iteration stopping, measurement cards | performance optimization/regression; benchmark or performance-gate design |
 
 ## Model and record-keeping rules
 

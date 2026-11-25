@@ -2,6 +2,38 @@
 
 本文件是仓库的版本变更说明与理由：每一节讲清这一版改了什么、为什么这么改，以及当时为什么排除了其他方案。版本按时间倒序排列，新版本追加在最上面；仓库没有正式版本号，节名取该版的主题，日期用 ISO 格式，文件路径按该节所述版本当时的布局书写，当前布局见最新一节。
 
+## [evidence-optimization-flow] - 2026-11-25
+
+**变了什么**
+
+- 主题记录统一为 `docs/topics/<topic>/`：一个 `decisions.md` 和一个 Progress 树，`research/`、`specs/`、`evidence/` 按需物化；spec 不再携带独立日志。主题以 owner 级收尾目标为界，研究、spec 或两者兼有不改变主题身份。跨主题独立 DR 使用 `docs/decisions/`；本仓库的 `docs/` 过程记录仅本机保存，不提交、不推送。
+- Progress 统一为 `pending / in progress / blocked / done / dead-end / pivot`，`misclassified` 仅作转移标记；主题工作项用 `[W<n]`，spec 切片用 `[<slug>#S<n>]`。Claim 与预注册结果统一为 `met / unmet / unevidenced`，PASS/FAIL 只作测试事实。
+- 预注册拆为 confirmatory / exploratory：前者保留目标判据、归因设计和结果义务，后者以观察目标、测量协议和结果义务取代强制成功阈值；两者开工均强冻结。事后因果解释须经独立后继证据确认，描述性测量和无解释探索均可完成。
+- 验收与优化停止分离：无争议零改动允许无人值守自动完成，完全零改动不产生空 PR；owner 接受偏差后可完成但保留 `unmet`。普通变更复用 PR + Decision Log，完全零改动复用主题日志，不新增 per-spec 验收文件。
+- 新增第 14 个 skill `optimize-performance`：轻量路径复用已校准测量，完整路径处理新基准、多假设、噪声和资源权衡；基线、护栏、负控制、漂移重校准与候选采用分离。测量卡为版本化 Plan + 同文件追加 Runs，共享卡单写者、可原子交接，subagent 通过 task report 交接，原始产物按 Run 隔离。
+- 派发简报统一为目标/Claims、skill 与模式、边界、证据契约、停止/升级、task report 六块；通用结构归 `assets/AGENTS.md`，领域增量归对应 skill，完整 prompt 不默认落盘。研究报告建议重新进入 `build / explore` triage，不再只允许 spec 叶。
+- 安装校验由存在性检查改为仓源内容比较：14 个仓源 skill 与 references 必须一致；target-only 标为 `unknown-origin`，只报告、经 owner 确认后才删除，个人 skill 不受影响。PR Motivation 改从需求基线或主题 Decision Log 获取。
+
+**为什么**
+
+- 原预注册只适合事前有判据的验证实验，发现型研究会被迫编造理想值；直接判 PASS/FAIL 又容易错过后续归因。双模式保留防挪靶能力，同时让先观察、后解释、再验证成为正式路径。
+- 工程目标未达或过易时，原流程把验收、继续优化和终止混在一起。分离验收与停止后，方法失败、原理不可达、目标过易、零改动和带偏差交付各有明确出口。
+- 原 `docs/research`、`docs/specs` 及双 Progress 在混合主题中需要迁移和同步。统一主题目录用一次路径替换删除这些长期义务，而不是继续增加跨目录规则。
+- 性能数字需要独立的测量纪律，但不能让普通任务承担性能流程。新增事件 skill 将基线、噪声、候选迭代和测量卡封装在性能任务内，轻量路径通过引用已有校准控制成本。
+
+**排除的方案**
+
+- 不采用 reference-only 性能指南：它不能可靠承载触发、迭代停止和交付义务。
+- 不采用每 Run 一文档、每 agent 一测量卡、每 spec 一验收文件、全局调度器、自动安装清单或自动删除 target-only：这些都会增加维护义务或误删风险。
+- 不在当前 skill 中保留旧词汇/路径映射和兼容默认值：迁移由采用它的工作项目处理。
+- 暂停取消、生产副作用、跨主题调度、部署、多仓库、主观质量、自动统计阈值、性能 hook 与 benchmark 框架不在本次范围，待真实需求形成独立工作项。
+
+**对使用者的影响**
+
+- 新主题统一从 `docs/topics/<topic>/` 恢复；研究与 spec 可独立合并、独立回滚，但共享同一个主题 Progress。
+- 安装后为 14 个 skill；升级应重新同步并执行内容校验，不能只看目录数量。实机个人 skill 继续保留。
+- 远程仓库只包含最终可用资产与 owner 文档；中间 spec、Decision Log 和主题工作区不推送。
+
 ## [report-lifecycle] - 2026-11-07
 
 **变了什么**

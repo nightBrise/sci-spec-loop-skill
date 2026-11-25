@@ -108,6 +108,13 @@ not restate them. Tests that own concurrency, resources, subprocesses, ports,
 clocks, or asynchronous teardown settle their design with
 `see skills/test-reliability` before green counts.
 
+## Performance measurements
+
+Performance optimization, regression diagnosis, benchmark design, and
+performance gates use `skills/optimize-performance`. Its measurement card,
+baseline, comparability, guard, and stopping rules supplement the functional
+evidence tiers above; L0-L3 green does not by itself prove a performance Claim.
+
 ## Boundaries
 
 - **The test gate precedes the review gate.** Red tests return the work to

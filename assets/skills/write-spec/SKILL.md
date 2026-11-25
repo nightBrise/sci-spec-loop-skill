@@ -34,8 +34,9 @@ wrong thing.
   (`skills/write-research-outline`).
 - The requirements baseline: the owner's goal quoted verbatim, plus the derived
   requirements.
-- Existing records on the topic: `docs/specs/*.md`, their `.decisions.md`,
-  standalone Decision Records.
+- Existing records on the topic: `docs/topics/*/specs/*.md`, the topic's
+  `docs/topics/<topic>/decisions.md`, and standalone Decision Records in
+  `docs/decisions/`.
 
 A missing required input is reported and stops the write; never infer the
 baseline or the requirements from context.
@@ -148,9 +149,10 @@ Calibration pair:
 - Separate merge batches needed to keep `main` deployable signal a split;
   `[Sn]` count never does — cohesion is the criterion.
 
-**Paths.** `docs/specs/<slug>.md`, `docs/specs/<slug>.decisions.md`, and
-`docs/specs/decisions/` for standalone records; a project may register another
-spec directory in its `AGENTS.md`.
+**Paths.** Topic-owned contracts live at
+`docs/topics/<topic>/specs/<slug>.md`; every topic decision and Progress node
+lives at `docs/topics/<topic>/decisions.md`, and standalone records live at
+`docs/decisions/`. A project may register another layout in its `AGENTS.md`.
 
 **Slug.** Kebab-case feature name; a rewritten spec takes a new slug.
 
@@ -228,8 +230,8 @@ spec directory in its `AGENTS.md`.
 
 ### Freeze
 
-- Freeze is one commit: the spec and its `.decisions.md`, direct to `main`
-  (`references/workflow/github-flow.md`).
+- Freeze is one commit: the spec and the owning topic's `decisions.md`, direct
+  to `main` (`references/workflow/github-flow.md`).
 - Never commit the draft before the freeze.
 - Gate: the owner's approval in interactive mode; an `approve` verdict from the
   dispatched review in unattended mode (`skills/structured-code-review`).
@@ -239,7 +241,7 @@ spec directory in its `AGENTS.md`.
   `needs fixes` or `reject`.
 - Re-review after revision is full-text; incremental re-review is code-only.
 - Three consecutive `needs fixes`/`reject` on the draft stop the run.
-- The `.decisions.md` is never frozen; entries keep accumulating (format:
+- The topic `decisions.md` is never frozen; entries keep accumulating (format:
   `skills/manage-decision-records`).
 - After freeze the spec is point-in-time: immutable except through Amendment
   (`skills/record-discipline`, refresh exemption).
@@ -268,7 +270,7 @@ and contradicts no frozen Claim; every `[Sn]` still holds.
 1. **Classify.** A Claim that obliges the work makes it an implementation
    detail: do it and record a decision entry. A Claim it contradicts makes it a
    contract error: stop. Only the third answer is deferred scope.
-2. **Record the entry** in `.decisions.md`
+2. **Record the entry** in the topic `decisions.md`
    (`skills/manage-decision-records`), naming the nearest Claims and why none
    covers the work.
 3. **Ship the spec as-is** — no new `[Sn]`, no edited word, no abandon.
@@ -279,6 +281,41 @@ and contradicts no frozen Claim; every `[Sn]` still holds.
 
 If you cannot name why no Claim covers the work, it is an implementation
 detail, not deferred scope.
+
+### Metric and optimization findings
+
+Use the finding to choose an action, never the raw PASS/FAIL alone. Claim and
+criterion outcomes are `met`, `unmet`, or `unevidenced`; invalid, missing, or
+inconclusive evidence is `unevidenced`. Evaluate every Claim within its declared
+scope and never aggregate or extrapolate past it without a preregistered rule.
+
+| Finding | Action |
+|---|---|
+| Measurement is invalid or a required guard is unevidenced | Do not accept; restore valid evidence before judging the Claim |
+| Current method misses a Claim but the principle remains reachable | Record deviation and continue implementation or spawn an explore item without editing the Claim |
+| Evidence shows the Claim is unreachable under named constraints | Stop optimization and take the constraints and evidence to the owner for ② or ③; record the review condition |
+| A valid minimum Claim is met | Accept the current spec; a higher ambition becomes deferred scope or a new work item |
+| A candidate meets an absolute target but is worse than baseline | Separate Claim acceptance from candidate adoption; `optimize-performance` owns the adoption rule |
+
+### No-change acceptance
+
+Use when the existing repository already satisfies the frozen measurement
+contract. This is an acceptance disposition, not a fifth contract-change channel.
+
+1. Verify that every required Claim and guard is `met` by valid baseline evidence
+   within the declared scope and that no repository change or new verification
+   artifact is required. Any unresolved target or measurement objection makes
+   the item `blocked`, not no-change.
+2. Record the acceptance in the topic `decisions.md`
+   (`skills/manage-decision-records`), with `Delivery: no-change`, the ruling
+   actor, coverage, a review condition, and baseline evidence. In unattended
+   operation, only this clean case may be accepted automatically.
+3. If the whole spec is no-change, close it without a branch or PR. If it is not
+   yet frozen, do not create an implementation spec merely to wrap the evidence.
+4. If only part of the spec is no-change, implement the remaining slices and cite
+   baseline evidence for each no-change Claim in the PR's Testing section.
+5. Mark the accepted item `done`; no-change is not a deviation and does not
+   authorize a higher target within the same spec.
 
 ### Amendment
 
@@ -335,14 +372,16 @@ Use when the foundation is gone: the deliverable definition changed.
    becomes a standalone statement or an epitaph pointer
    (`skills/trim-cot-leakage`, Class 1 fix); no surviving pointer, the Progress
    node included, may target a deleted file.
-6. **Delete the process artifacts** — spec, `.decisions.md`, PLAN, other
-   process files — in one commit with the epitaph and de-links.
+6. **Delete the spec-local process artifacts** — spec, PLAN, and other
+   spec-local process files — in one commit with the epitaph and de-links.
+   Never delete the shared topic `decisions.md`.
 7. **Start a successor through triage**; a rewritten spec takes a new slug.
    Never revive the deleted file.
 
 | Artifact | After abandon | Why |
 |---|---|---|
-| Spec, `.decisions.md`, PLAN, other process/contract files | Delete | No working value; only noise |
+| Spec, spec-local PLAN and process files | Delete | No working value; only noise |
+| Shared topic `decisions.md` | Keep | It also owns other work and the epitaph |
 | The abandon decision and its reason | Keep as the epitaph | Prevents re-proposal |
 | Research reports | Never delete | A deliverable, not a corpse |
 | Superseded decision entries | Keep alive with the supersession marker | The revision chain stays traceable |
@@ -366,9 +405,10 @@ Git history keeps the deleted text; the worktree keeps only current truth.
 **Write and freeze**
 
 1. Confirm the entry: build work item (`AGENTS.md`, Main loop), no frozen spec
-   covers it — glob `docs/specs/*.md`; a design doc is input, `.decisions.md`
-   is a log. Check every planned Claim value's source — measurement, standard,
-   requirement; a predicted value is a hidden preregistration, and the item
+   covers it — glob `docs/topics/*/specs/*.md`; a design doc is input, and the
+   topic `decisions.md` is the log. Check every planned Claim value's source —
+   measurement, standard, requirement; a predicted value is a hidden
+   preregistration, and the item
    goes back to triage as explore. Search the standalone DRs and the decision
    logs for entries touching this deliverable — a rejected record on this
    surface is input — and record the search result, zero hits included.
@@ -376,8 +416,8 @@ Git history keeps the deleted text; the worktree keeps only current truth.
    paths.
 3. Run record-discipline's write-before ticket per planned unit, then draft:
    boundary, `[Sn]`, Claims, `Global Constraints`, `Out of Scope`.
-4. Create `.decisions.md`; record requirements-phase choices with real
-   alternatives (`skills/manage-decision-records`, supersession check).
+4. Create or reuse the topic `decisions.md`; record requirements-phase choices
+   with real alternatives (`skills/manage-decision-records`, supersession check).
 5. Self-check: dispatch test, defect taxonomy, record-discipline's verify-after
    checks; fix in place.
 6. Hand the draft, baseline, and brainstorm entries to review before freeze:

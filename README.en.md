@@ -16,17 +16,19 @@ flowchart LR
 ```
 
 - **Owner (human)**: sets direction and requirements, and rules at the key gates — spec freeze, amendment/abandon, acceptance, topic closing.
-- **Main agent**: talks with the human, understands requirements, decomposes work, dispatches, reviews, and accepts; the **sole writer** among agents of decisions, progress, contracts, and reports (the owner rules on a deliverable report's draft and may edit it directly). Applies small fixes directly; resumes the implementing subagent for large ones.
-- **Subagent**: implements the dispatched task (bulk code or prose) and returns a task report; never writes contract or decision artifacts.
+- **Main agent**: talks with the human, understands requirements, decomposes work, dispatches, reviews, and accepts; the **sole writer** among agents of decisions, progress, contracts, reports, and shared evidence (the owner rules on a deliverable report's draft and may edit it directly). Applies small fixes directly; resumes the implementing subagent for large ones.
+- **Subagent**: implements the dispatched task (bulk code or prose) and returns a task report plus isolated raw artifacts; never writes contract, decision, or shared evidence artifacts.
 
-### Six core ideas
+### Eight core ideas
 
 1. **Single entry + triage test** — no "engineering vs research" split up front. Each work item gets one question: "Can the Claims be written now?" Yes (writable = every value has a source — measurement, standard, requirement; a predicted value is a hidden preregistration) → build, through a spec contract; only experiments can tell → explore, through preregistration.
 2. **Mutual generation** — exploration findings spawn build items; implementation anomalies spawn explore items. "Testing while exploring" needs no track switch, only new work items.
 3. **Four channels for claim changes** — a frozen spec is not dead: deviation (contract unchanged), Amendment (the measure changes), Abandon (foundation gone, cleanly deleted), deferred scope (new scope recorded elsewhere), each with a controlled exit.
 4. **One source, many projections** — the same fact appearing in several artifacts serves several readers and is not the disease; unspecified copying is. Each fact has one authoritative home; every other appearance is a one-line projection, and projections of projections are forbidden.
-5. **Preregistration = attribution anchor** — freeze the target criterion and attribution design before an exploratory experiment; only then do "met" and "missed" carry causal meaning. FAIL analysis is exploration's most valuable output.
+5. **Dual-mode preregistration** — confirmatory work freezes target criterion, attribution design, and result duty; exploratory work freezes observation objective, measurement protocol, and result duty without requiring an ideal or success threshold. Both outcomes require analysis; post-hoc causal explanations need independent successor evidence.
 6. **Progressive disclosure + four enforcement layers** — rules load in three tiers on demand (always-loaded rule file → event-loaded skills → references for depth); enforcement is layered: mechanical interception > process structure (gates/checklists) > rule text > role discipline.
+7. **One record root per topic** — `docs/topics/<topic>/` holds one `decisions.md` and one Progress tree; research, specs, and evidence materialize in subdirectories only when needed, and new artifacts never migrate history. Standalone DRs live in `docs/decisions/`.
+8. **Acceptance is separate from stopping** — Claim outcomes are `met / unmet / unevidenced`; stopping an optimization does not accept it. Clean no-change work may finish automatically, and an owner-accepted deviation may finish while remaining `unmet`.
 
 ### The main loop
 
@@ -42,6 +44,18 @@ flowchart TB
     B --> C["Topic closing gate"]
     E --> C
 ```
+
+### Topic directories and records
+
+```text
+docs/topics/<topic>/
+├── decisions.md      # All decisions, the only Progress tree, no-change acceptance
+├── research/         # Optional: outline, reports, assets
+├── specs/            # Optional: spec contracts only
+└── evidence/         # Optional: findings, measurement cards, raw evidence
+```
+
+A topic is bounded by its owner-level closing objective, not by a research/build shape. Topic work items use `[W<n>]` and spec slices use `[<slug>#S<n>]`; standalone cross-topic DRs use `docs/decisions/`. Progress statuses are `pending / in progress / blocked / done / dead-end / pivot`; `misclassified` is only a transition marker and `no-change` only a delivery marker.
 
 ### Four channels for claim changes
 
@@ -79,7 +93,7 @@ flowchart LR
     Q -->|"no"| S["Stop and report<br/>Progress tree = recovery point"]
 ```
 
-## The skill set (13, in four layers)
+## The skill set (14, in four layers)
 
 ```mermaid
 flowchart TB
@@ -103,6 +117,7 @@ flowchart TB
         PRD["pr-description"]
         MST["merge-stack"]
         TR["test-reliability"]
+        OP["optimize-performance"]
     end
     WS -->|"decision bookkeeping"| MDR
     WRO -->|"board registration"| RD
@@ -146,6 +161,7 @@ flowchart TB
 | `pr-description` | PR narrative (four sections) + acceptance minimums (two lists) | Creating / updating a PR |
 | `merge-stack` | Merge landing: dependency order, fix propagation, merge-only | Merging PRs / stacked slices |
 | `test-reliability` | Test reliability: topology modeling, atomic resources, isolation and teardown | Concurrency/resource-heavy tests; flaky diagnosis |
+| `optimize-performance` | Performance measurement, light/full optimization paths, stopping rules, measurement cards | Performance optimization/regression diagnosis; benchmark or performance-gate design |
 
 ## How the skills collaborate
 
@@ -160,6 +176,8 @@ flowchart LR
 ```
 
 - **Writing chain**: `record-discipline` tickets every unit before writing (belong? where? how big? source?) → the artifact skill's genre writing → RD verification → hand-off. Record reports are final at hand-off; deliverable reports enter the owner's review loop and freeze at `Status: final`. High-frequency outline updates ride the light path (registration completes immediately).
+- **Dispatch chain**: every brief carries verbatim goals/Claims, skill and mode, boundaries, evidence contract, stopping/escalation, and task report. The generic structure lives in `assets/AGENTS.md`, domain increments in their owning skills, and complete prompts are not persisted by default.
+- **Performance chain**: establish the baseline and no-change check first, then choose light for calibrated reuse or full for new benchmarks/multiple hypotheses. Measurement cards use a versioned Plan plus append-only Runs; optimization stopping and Claim acceptance are recorded separately.
 - **Review chain**: `structured-code-review` is the single methodology — Layer 1 runs `prose-quality` + `trim-cot-leakage` first, Layer 2 applies semantic checks per change surface. Carriers as needed: owner direct review of documents, main agent review of subagent code (writer ≠ reviewer), or a dispatched review. Evidence is mandatory: **prose is not evidence**.
 - **Change chain**: a finding touching claims → the four channels → Amendment / Abandon bookkeeping and epitaphs live in `manage-decision-records`; de-linking pointers is `trim-cot-leakage`'s.
 - **Quality-gate chain**: risky tests pass `test-reliability` design criteria → `pre-push-checks` selects evidence before push → `pr-description` records the two lists → `merge-stack` lands with approve + evidence. Engineering red lines: merge-only, never rebase / force-push, never `--no-verify`; a post-merge rollback is an owner-ruled revert commit (history moves forward; the lesson lands in the redo's spec).
@@ -203,7 +221,7 @@ cp -r assets/skills/*     ~/.kimi-code/skills/
 cp -r assets/references/* ~/.kimi-code/references/
 ```
 
-- The sync is a mirror: the repository is authoritative — besides overwriting, a re-sync deletes whatever the repository no longer carries (`diff -rq` shows the residue); files that never came from the repository stay.
+- A re-sync overwrites repository-owned files. Files appearing only in the target are `unknown-origin`: report them and delete only after owner confirmation; personal files are never deleted automatically.
 - A skill's name comes from its `SKILL.md` frontmatter, not its directory.
 - References are the deep layer, resolved by path from rules and skills; they are not injected automatically.
 
@@ -237,11 +255,19 @@ cd <your-product-repo> && git config core.hooksPath .githooks
 
 ```sh
 { cat assets/AGENTS.md; echo; cat assets/adapters/kimi.md; } | diff -q - ~/.kimi-code/AGENTS.md
-find ~/.kimi-code/skills -mindepth 1 -maxdepth 1 -type d | wc -l   # should be 13
+for s in assets/skills/*/; do
+  n=$(basename "$s")
+  diff -q "$s/SKILL.md" ~/.kimi-code/skills/"$n"/SKILL.md || echo "missing/stale: $n"
+done
+for f in style/python.md style/engineering.md style/error-handling.md workflow/github-flow.md workflow/testing.md; do
+  diff -q "assets/references/$f" ~/.kimi-code/references/"$f" || echo "missing/stale: $f"
+done
 ls ~/.kimi-code/hooks/block-dangerous-git.mjs ~/.kimi-code/hooks/push-evidence-reminder.mjs
+diff -rq assets/skills ~/.kimi-code/skills || true
+diff -rq assets/references ~/.kimi-code/references || true
 ```
 
-Verify in a new session that the rules and skills load.
+The source contains 14 skills. Re-sync `missing/stale` entries. Files appearing only in the install directory are `unknown-origin`: report them and delete only after owner confirmation; personal skills do not count toward the total. Verify in a new session that the rules and skills load.
 
 ### Migrating to MiMo Code
 
@@ -367,8 +393,15 @@ mimo run -m <provider>/<model> "Reply with exactly: ok"
 
 ```sh
 { cat assets/AGENTS.md; echo; cat assets/adapters/<harness>.md; } | diff -q - ~/.<harness>/AGENTS.md || echo "stale: re-run step 1"
-find ~/.<harness>/skills -mindepth 1 -maxdepth 1 -type d | wc -l   # expect 13
+for s in assets/skills/*/; do
+  n=$(basename "$s")
+  diff -q "$s/SKILL.md" ~/.<harness>/skills/"$n"/SKILL.md || echo "missing/stale: $n"
+done
+diff -rq assets/skills ~/.<harness>/skills || true
+diff -rq assets/references ~/.<harness>/references || true
 ```
+
+Generic verification requires all 14 repository-owned skills to match their sources. Files found only in the install directory are `unknown-origin` and are never deleted automatically.
 
 ## Repository layout
 
@@ -376,9 +409,10 @@ find ~/.<harness>/skills -mindepth 1 -maxdepth 1 -type d | wc -l   # expect 13
 |---|---|
 | `assets/AGENTS.md` | The rule body (harness-agnostic; half of the composed file) |
 | `assets/adapters/` | One adapter fragment per harness + optional hook scripts |
-| `assets/skills/` | 13 skills, one directory with one `SKILL.md` each |
+| `assets/skills/` | 14 skills, one directory with one `SKILL.md` each |
 | `assets/references/` | `style/` (style, engineering principles, error handling) and `workflow/` (test method, GitHub Flow) |
 | `.githooks/` | R3 pre-commit hook reference implementation (plain git, portable to any harness) |
+| `docs/` | Local process records (specs, decision logs, topic workspaces); never committed or pushed |
 | `README.md` / `README.en.md` | The bilingual front page (this file) |
 | `CHANGELOG.md` | Version changes and rationale (incl. the language policy) |
 

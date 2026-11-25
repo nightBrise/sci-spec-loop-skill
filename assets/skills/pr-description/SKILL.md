@@ -21,7 +21,7 @@ Required inputs:
 
 - The PR's base and head, and the diff between them.
 - The governing spec path and its `[Sn]` Claims.
-- The feature's `.decisions.md` — the deviation and deferred-scope entries.
+- The owning topic's `decisions.md` — the deviation and deferred-scope entries.
 - Evidence actually produced: named tests, command output, `file:line`.
 
 A missing required input is reported and stops the write; never reconstruct an
@@ -33,7 +33,7 @@ layer only.
 Always excluded:
 
 - Version history and review chronology — describe the current head, not how it got there.
-- Design essays beyond what the diff needs; rationale lives in the spec and `.decisions.md`.
+- Design essays beyond what the diff needs; rationale lives in the requirements baseline and the owning topic's `decisions.md`.
 - Pasted logs as body text; keep the pointer and result, and put long output in a collapsed block or a linked artifact.
 - Session narration — no transcripts, timestamps, or tool calls.
 
@@ -83,10 +83,11 @@ never add a fifth heading.
 
 ### Minimum items
 
-- **Spec path** — in `Motivation`: `docs/specs/<slug>.md`, the frozen spec this PR delivers.
-- **Claims evidence pointers** — in `Testing`: every entry names the Claim or `[Sn]` it evidences; a Claim with no entry is a gap to report, not to omit.
-- **Claims-deviation list** — at the end of `Changes`: one line per deviation — the Claim, what shipped instead, and why — transcribed from `.decisions.md`.
-- **Deferred-scope list** — at the end of `Changes`: every adjacent-scope entry the frozen spec did not absorb, transcribed from `.decisions.md`.
+- **Spec path** — in `Motivation`: `docs/topics/<topic>/specs/<slug>.md`, the frozen spec this PR delivers.
+- **Delivery form** — at the end of `Changes`: `Delivery: change`.
+- **Claims evidence pointers** — in `Testing`: every entry names the Claim or qualified slice ID it evidences and states its outcome and coverage; a Claim with no entry is a gap to report, not to omit. Every no-change Claim cites its baseline evidence.
+- **Claims-deviation list** — at the end of `Changes`: one line per deviation — the Claim, what shipped instead, why, and its Decision Log pointer — transcribed from the topic `decisions.md`.
+- **Deferred-scope list** — at the end of `Changes`: every adjacent-scope entry the frozen spec did not absorb, transcribed from the topic `decisions.md`.
 
 The claims-deviation and deferred-scope lists are the acceptance gate's
 reconciliation material: the gate rules on each deviation and reports both
@@ -123,9 +124,9 @@ Main loop).
    longer holds.
 2. Collect evidence pointers from task reports and actual runs; drop any
    pointer you cannot open.
-3. Write `Motivation` from the spec's problem statement; add the spec path.
+3. Write `Motivation` from the requirements baseline or the owning topic's `decisions.md`; add the spec path.
 4. Write `Changes` as behavior guarantees; append the claims-deviation and
-   deferred-scope lists from `.decisions.md`.
+   deferred-scope lists from the owning topic's `decisions.md`.
 5. Write `Testing` as design then entries; select checks with
    `skills/pre-push-checks`.
 6. Write `AI Usage` for the work that ends up in this PR.

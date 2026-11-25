@@ -104,13 +104,13 @@ Different surfaces allow different leakage classes. This table overrides the bla
 | README/docs | No | No | Current-state only |
 | Spec Claims (`[Sn]`) | No | No | Frozen contract |
 | Legacy Spec Decisions (frozen specs only) | No | User dialogue as WHY | Historical snapshot; specs written under write-spec carry no `## Decisions` section |
-| Decision Log (`.decisions.md`) | No | Phase field + user dialogue | Sanctioned evidence surface |
-| Standalone DR (`docs/specs/decisions/`) | No | Merged-PR/issue citations + user dialogue | `## Problem`/`## Alternatives Considered` state the pre-decision state; `## Decision`/`## Consequences` are present tense (per prose-quality) |
+| Decision Log (`docs/topics/<topic>/decisions.md`) | No | Phase field + user dialogue | Sanctioned evidence surface |
+| Standalone DR (`docs/decisions/`) | No | Merged-PR/issue citations + user dialogue | `## Problem`/`## Alternatives Considered` state the pre-decision state; `## Decision`/`## Consequences` are present tense (per prose-quality) |
 | Plan Steps | No | No | For workflows that produce plan documents |
 | Delivery summary "What Was Built" | No | No | For workflows that produce delivery summaries; final state, self-contained |
 | Delivery summary "Design Decisions" | "we chose X because Y" | No | For workflows that produce delivery summaries; decision framing allowed |
-| Research outline leaf | No | Leaf status tags (`dead-end`, `pivot`) + evidence refs | Leaf conclusions and one-line reasons are sanctioned |
-| Research report (stage, overall, deep-dive) | No | Leaf status tags (`dead-end`, `pivot`) + evidence refs | A self-contained deliverable that must stand alone for a reader outside the session; leaf conclusions and their one-line reasons are sanctioned. write-research-report owns the body language (Report language), the lifecycle and editability, and the figures with their captions (Figures), so the English technical tokens and section anchors inside a report are sanctioned per Class 8 |
+| Research outline leaf | No | Progress status and transition tokens + evidence refs | Leaf conclusions and one-line reasons are sanctioned |
+| Research report (stage, overall, deep-dive) | No | Progress status and transition tokens + evidence refs | A self-contained deliverable that must stand alone for a reader outside the session; leaf conclusions and their one-line reasons are sanctioned. write-research-report owns the body language (Report language), the lifecycle and editability, and the figures with their captions (Figures), so the English technical tokens and section anchors inside a report are sanctioned per Class 8 |
 | Process journal | Yes (≤5 items) | `[dead end]`/`[pivot]`/`[lesson]` tags | Sanctioned narrative surface |
 | Prompts/UI strings | No | No | Wording is behavior |
 
@@ -183,7 +183,7 @@ Judged and kept as false positives in past purges; expect them again:
 - **`§N` with a committed owner** — external standards (RFC 9110 §10.1.5) and committed docs that own their §-numbering stay citable by section.
 - **"Today" in generated timestamps and CLI output samples** — recorded output keeps its voice.
 - **本版本 in zh prose** — a legitimate rendering of "this release" in versioned-artifact contexts; the banned indexical is 本版 as a bare stamp mirroring "this cut".
-- **English technical tokens on a surface whose language is mandated zh** — `dead-end`, `[S3]`, `docs/research/<topic>.md`, and a `<report>.md:41` reference inside a Chinese report body are identifiers under Class 8's technical-token rule, not authoring-language slips.
+- **English technical tokens on a surface whose language is mandated zh** — `dead-end`, `[S3]`, `docs/topics/<topic>/research/outline.md`, and a `<report>.md:41` reference inside a Chinese report body are identifiers under Class 8's technical-token rule, not authoring-language slips.
 - **`[Sn]`/`Dn` anchors in active spec/plan/Decision Log** — these are the spec-loop anchoring system, resolvable at HEAD, not leakage.
 
 ## Workflow
