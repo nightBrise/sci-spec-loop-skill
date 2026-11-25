@@ -29,11 +29,11 @@ A report passes only when every passage earns its place; one that does not is cu
 
 | Report | Scope | File | Default lifecycle |
 |---|---|---|---|
-| stage | one topic, all leaves, since the previous record stage report | `docs/research/<topic>-report-<NNN>.md`, `NNN` counting up from `001` per topic | record |
-| overall | one topic, the topic's closing report | `docs/research/<topic>-final-report.md` | deliverable |
-| deep-dive | one leaf whose conclusion needs more than its one-line record | `docs/research/<topic>-<leaf-slug>.md` (path owned by write-research-outline) | record |
+| stage | one topic, all leaves, since the previous record stage report | `docs/topics/<topic>/research/report-<NNN>.md`, `NNN` counting up from `001` per topic | record |
+| overall | one topic, the topic's closing report | `docs/topics/<topic>/research/final-report.md` | deliverable |
+| deep-dive | one leaf whose conclusion needs more than its one-line record | `docs/topics/<topic>/research/<leaf-slug>.md` (path owned by write-research-outline) | record |
 
-All reports live beside the outline in `docs/research/`. Ordinal numbering keeps stage record reports ordered without depending on dates: one day of unattended work can produce several checkpoints, and each record report covers the span since its predecessor rather than a fixed interval. A leaf slug must not begin with the reserved prefix `report-` or equal `final-report`, which would collide with the stage and deliverable report names.
+All reports live beside the outline in `docs/topics/<topic>/research/`. Ordinal numbering keeps stage record reports ordered without depending on dates: one day of unattended work can produce several checkpoints, and each record report covers the span since its predecessor rather than a fixed interval. A leaf slug must not begin with the reserved prefix `report-` or equal `final-report`, which would collide with the stage and deliverable report names.
 
 ## Report lifecycle
 
@@ -57,14 +57,14 @@ A deliverable report never serves as a stage checkpoint. A stage-span deliverabl
 
 Stage reports are checkpoint-driven, not calendar-driven: the workflow runs both interactively and unattended, so no fixed interval fits every topic. Write a stage record report when any of these holds:
 
-- A batch of leaves reached a terminal status (`resolved` / `dead-end` / `pivot`) since the previous record stage report.
+- A batch of leaves reached a terminal status (`done` / `dead-end` / `pivot`) since the previous record stage report.
 - The owner asks for a readout.
 - The owner set a cadence for the topic; honor it at the nearest checkpoint.
 - An unattended run ended — the stage report is mandatory then, because it is what the owner reads afterward.
 
 An owner request fixes the form and lifecycle: a readout defaults to the record lifecycle; a formal report uses the deliverable lifecycle.
 
-Write the overall report at topic closure: every leaf is `resolved`, `dead-end`, or `pivot` with the pivot's successor leaf itself terminal, and no leaf remains `open` or `in-progress`. It is the topic's default deliverable report: it may be drafted earlier at the owner's request or when the remaining work is acceptance and closure; a draft states its verdict as provisional, and is finalized at closure.
+Write the overall report at topic closure: every leaf is `done`, `dead-end`, or `pivot` with the pivot's successor leaf itself terminal, and no leaf remains `pending`, `in progress`, or `blocked`. It is the topic's default deliverable report: it may be drafted earlier at the owner's request or when the remaining work is acceptance and closure; a draft states its verdict as provisional, and is finalized at closure.
 
 Decide the deep-dive per leaf. The one-line leaf conclusion suffices when the outcome and its evidence pointer fit a single proposition. A deep-dive earns its file when any of these holds:
 
@@ -84,22 +84,22 @@ Stage report skeleton:
 
 Date: YYYY-MM-DD
 Period: since record stage report <NNN-1> (or since the outline was created)
-Outline: docs/research/<topic>.md
+Outline: docs/topics/<topic>/research/outline.md
 
 ## Research question
 The topic's question, restated so the report stands alone.
 ## What changed
 Which leaves moved and which experiments ran since the previous report.
 ## Leaf transitions
-Every leaf terminal in the period — resolved, dead-end, pivot — each with its evidence reference.
+Every leaf terminal in the period — done, dead-end, pivot — each with its evidence reference.
 ## Findings
 The aggregated findings across leaves, each with its confidence and supporting evidence; the figures for findings in this section appear here, under the trigger and summary-floor rules in the Figures section.
 ## Direction options
 What the findings mean for direction, as options with tradeoffs; the report does not pick for the owner.
 ## Risks and unknowns
 Open questions, threats to validity, unresolved dependencies.
-## Suggested next leaves
-The proposed next batch of leaves, each typed spec or investigation.
+## Suggested next work items
+Candidate questions or deliverables, each with its supporting finding and known dependencies. The report does not assign `build` or `explore`; the main agent re-runs triage on registration.
 ```
 
 Overall report skeleton:
@@ -109,7 +109,7 @@ Overall report skeleton:
 
 Date: YYYY-MM-DD
 Status: draft | in review | final
-Outline: docs/research/<topic>.md
+Outline: docs/topics/<topic>/research/outline.md
 
 ## Research question
 The question the topic set out to answer.
@@ -132,7 +132,7 @@ The overall skeleton is the deliverable form; a record overall report omits the 
 The body prose of all three reports is written in Chinese. This section is the language home for research reports; the forms kept in their original shape below stay that way by rule, not by slip.
 
 - **Skeleton headings and metadata field labels stay English** — `## Research question`, `## Leaf transitions`, and every other heading in the Report structure skeletons, together with the `Date:` / `Period:` / `Status:` / `Outline:` field labels in their headers. They are stable cross-report structural anchors: the trigger rules in this skill and references in other skills name report sections by these headings, and the field labels keep the three report forms aligned with one another.
-- **Technical tokens stay untranslated.** The general token categories are owned by trim-cot-leakage's Class 8; the report-surface increment over them is the set of leaf status values (`pending` / `in progress` / `done` / `dead-end` / `pivot` / `misclassified`) and the report lifecycle values (`draft` / `in review` / `final`) — the leaf status vocabulary owned by the Progress tree in `skills/manage-decision-records`, and the lifecycle vocabulary owned here. The report-surface list extends the general list, and where the two conflict the report-surface list governs. Translating any of these tokens breaks the anchor that keeps a report traceable to its leaves, specs, and code.
+- **Technical tokens stay untranslated.** The general token categories are owned by trim-cot-leakage's Class 8; the report-surface increment over them is the set of leaf status values (`pending` / `in progress` / `blocked` / `done` / `dead-end` / `pivot`), the transition marker `misclassified`, Claim outcomes (`met` / `unmet` / `unevidenced`), the delivery marker `no-change`, and the report lifecycle values (`draft` / `in review` / `final`) — the leaf status and transition vocabulary owned by the Progress tree in `skills/manage-decision-records`, and the lifecycle vocabulary owned here. The report-surface list extends the general list, and where the two conflict the report-surface list governs. Translating any of these tokens breaks the anchor that keeps a report traceable to its leaves, specs, and code.
 - **Text rendered inside a figure follows that figure's own generation constraints**, because the plotting toolchain's font support and localization cost sit outside this workflow's control. The interpretability burden falls on the caption: a caption is report body prose, is written in Chinese, and must let the reader understand what the figure presents without parsing the English inside it.
 - **A fenced code block in a report is a verbatim quotation of delivered code, not prose written for the report, so the report language rules do not reach inside it.** The language of the comments inside such a block is governed by the style document for that code's language, indexed in `AGENTS.md`.
 
@@ -142,13 +142,13 @@ A figure is evidence and is held to the same standard as text.
 
 - **Trigger by evidence type, not by report type or figure count.** Any finding whose evidence is data, measurement, experiment results, or prototype behavior is presented by at least one figure; a finding resting only on literature is exempt. Triggering per finding keeps every figure evidential and leaves no quota to fill with decorative charts.
 - **Summary floor.** A stage or overall report that contains any data-backed finding includes at least one figure summarizing the key findings of the period (stage) or the topic (overall).
-- **Location.** Figure files live in `docs/research/assets/<topic>/`, a per-topic subdirectory that keeps `docs/research/` readable as figures accumulate.
+- **Location.** Figure files live in `docs/topics/<topic>/research/assets/`, a per-topic subdirectory that keeps `docs/topics/<topic>/research/` readable as figures accumulate.
 - **Naming.** `<report-id>-<figure-slug>.<ext>`, where `<report-id>` matches the owning report: `report-<NNN>` for a record stage report, `report-<slug>` for a stage-span deliverable, `final-report` for the overall report, the leaf slug for a deep-dive report.
 - **Reference.** Embed a figure with Markdown image syntax and a path relative to the report file.
 - **Caption.** Every figure carries a caption stating at least four things: what the figure shows; its axes and units, where applicable; which finding it supports; and the data source or generation method — script, command, or data-file path — as the reproducibility anchor.
 - **Traceability.** Every figure traces to a leaf's evidence reference; a figure that cannot be traced is decoration — delete it.
 - **Freeze and correction routing.** A figure freezes with its report: a record report's figures freeze at handoff; a deliverable report's figures freeze at `Status: final`. During a deliverable report's review loop, a figure may be regenerated or replaced as part of the report revision; after freeze, never overwrite a figure file and never edit one in place. A corrected figure ships as a new file in the next report covering the same topic or leaf, and the report that carries it names the report and the figure it corrects. While the topic runs, that carrier is the next stage record report. After the topic has closed, the two stage-report triggers that can still fire carry it: a supplementary stage report written at the owner's request, or the stage report produced at the end of a later unattended run. A corrected deep-dive figure routes the same way, to the next report covering that leaf. Presentation-only errors — a wrong axis label, a series mislabeled in the legend — change no finding, so this routing is the whole remedy. An error that changes a finding is substantive: update the living outline first, at the leaf's status or conclusion, and the corrected figure ships with the next report that leaf produces; the outline is a living board that keeps taking updates, and a report does not.
-- **Negative results.** A figure for a `dead-end` leaf meets the same caption and traceability bar as one for a `resolved` leaf, per Negative results carry equal weight.
+- **Negative results.** A figure for a `dead-end` leaf meets the same caption and traceability bar as one for a `done` leaf, per Negative results carry equal weight.
 - **Inspection.** Inspect the rendered figure before inserting it into the report; where the harness cannot read a rendered image, verify instead the output of the command that generated the figure plus the axes, units, and data ranges the figure declares, and state in the caption which verification was performed. An uninspected figure is not verified evidence. Re-inspect a figure after any replacement.
 
 ## Reader and altitude
@@ -162,20 +162,20 @@ A figure is evidence and is held to the same standard as text.
 
 ## Evidence
 
-- Reports inherit the investigation evidence standard from write-research-outline (Review and evidence): experiment data, measurement, literature, or prototype behavior; the bar is "conclusion is supported and the process is reproducible". Prose is not evidence.
-- Every finding traces to a leaf's evidence reference or its deep-dive report, and states a confidence grounded in that evidence.
+- Reports inherit the investigation evidence standard from write-research-outline (Evidence standard): experiment data, measurement, literature, or prototype behavior; the bar is "conclusion is supported and the process is reproducible". Prose is not evidence.
+- Every finding traces to a leaf's evidence reference or its deep-dive report, states a confidence grounded in that evidence, and identifies whether it is an observed fact, a candidate explanation, or a confirmed attribution. A candidate explanation never inherits confirmatory status from the report's prose.
 - Figures are part of the evidence chain: the figure rules in the Figures section — traceability to a leaf's evidence reference plus the caption's reproducibility anchor — are part of this evidence standard.
 
 ## Negative results carry equal weight
 
-- A dead-end leaf is reported with the same rigor as a resolved one: the dead-end record is what keeps future work from re-walking the same failed path.
+- A dead-end leaf is reported with the same rigor as a done one: the dead-end record is what keeps future work from re-walking the same failed path.
 - Hard requirement: a stage or overall report that omits any leaf that reached a terminal status in its covered span — dead-ends included — is incomplete. An overall report without the topic's dead-ends hides the most expensive knowledge the topic produced.
 
 ## Reports are records, not decisions and not specs
 
 - A report is a research record, outside manage-decision-records' governance. It carries no decision state machine; `Status:` on a deliverable report is a production lifecycle, not a governance state.
-- A knowledge-class conclusion discovered while writing is promoted by the main agent to a standalone `rejected` Decision Record per write-research-outline's handoff rules; the report records the finding, and the promotion has its own governance.
-- A recommendation becomes real work only when it lands as a spec leaf in the outline and freezes via write-spec. A report never authorizes implementation directly.
+- A knowledge-class conclusion discovered while writing is promoted by the main agent to a standalone `rejected` Decision Record through `manage-decision-records`' closing batch; the report records the finding, and the promotion has its own governance.
+- A recommendation re-enters triage as a candidate work item. The main agent registers it in Progress and, when an outline exists, through light leaf registration without editing the finalized report. A report never authorizes implementation directly.
 
 ## Writer
 
@@ -197,7 +197,7 @@ The main agent is the sole writer of all three report forms among agents, consis
 This skill is the research layer's reporting layer; write-research-outline owns the board the reports read from.
 
 - **write-research-outline:** the outline is the living board and a projection of the Progress tree's leaf status; reports consume leaf status without restating the outline. Record reports are write-once after handoff; deliverable reports are revised to `Status: final`. The outline skill owns the deep-dive file's path; this skill owns its triggers, structure, and content bar.
-- **write-spec:** a report's recommendation becomes work only as a spec leaf in the outline frozen via write-spec.
-- **manage-decision-records:** reports are research records outside its governance; knowledge-class conclusions found while reporting are promoted to standalone Decision Records by the main agent per write-research-outline's handoff rules.
+- **write-spec:** a report recommendation that triages as `build` becomes a spec contract through write-spec; a recommendation that triages as `explore` follows write-research-outline's preregistration instead.
+- **manage-decision-records:** reports are research records outside its governance; knowledge-class conclusions found while reporting are promoted to standalone Decision Records by the main agent through its closing batch.
 - **prose-quality / trim-cot-leakage:** report prose obeys the complete-proposition rule and is a leakage audit surface; reports carry no session context. A deliverable report before `Status: final` is an editable surface; a record report and a finalized deliverable report are scan-only. The Report language section is the project rule that trim-cot-leakage's Class 8 override for mandated writing languages defers to, and its token rule — the report-surface increments over the Class 8 categories — defines which English tokens in Chinese report prose are mandated rather than slips.
 - **main agent:** the sole writer of every report; produces a stage report at the end of each unattended run and finalizes deliverable reports with the owner.

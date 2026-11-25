@@ -68,7 +68,7 @@ a decision; one that answers only one is a half-record.
 
 | Kind | What it is | Disposition |
 |---|---|---|
-| Decision Log entry | a feature-bound decision in `<slug>.decisions.md`, appended once | stays for the item's life; never deleted entry by entry |
+| Decision Log entry | a topic-bound decision in `docs/topics/<topic>/decisions.md`, appended once | stays for the item's life; never deleted entry by entry |
 | Standalone Decision Record | a durable cross-feature decision with three states | lifecycle below; superseded by an overlay |
 | Epitaph | the record of an abandon: reason, review condition, historical pointer | triaged at closing; knowledge → rejected DR, situational → condition check |
 | Progress node | one work item's state line in the Progress tree | one line, updated in place |
@@ -112,7 +112,7 @@ Other skills cite this section; none restates it. A Decision Log entry:
 **Chosen:** <what binds>
 **Rationale:** <why, one or two sentences>
 **Rejected:** <alternative> — <reason>
-**Spec section:** [S<n>]                         <!-- omit when none -->
+**Spec section:** <slug>#S<n>                   <!-- omit when none -->
 **History:** <abandoned slug and path>           <!-- epitaphs only -->
 **Review condition:** <the state that would overturn this>
 **Status:** superseded by [D<m> in <location>]   <!-- appended only on supersession -->
@@ -128,7 +128,14 @@ Other skills cite this section; none restates it. A Decision Log entry:
 - A triage correction is a normal entry tagged `misclassification: <item> from
   <X> to <Y>`, with its evidence and the node-state update.
 - A decision that constrains several features or outlives its feature becomes a
-  standalone record, not a log entry.
+  standalone record in `docs/decisions/`, not a log entry.
+
+A no-change acceptance is a review entry in the topic log. In addition to the
+standard fields it carries `Delivery: no-change`, a Claim outcome matrix or its
+evidence pointer, `Ruling: automatic | owner`, a coverage pointer, and a review
+condition. Automatic acceptance is available only when every required Claim and
+guard is `met` by valid baseline evidence, no repository change is required, and
+no target or measurement objection exists.
 
 A standalone Decision Record:
 
@@ -167,14 +174,14 @@ Specs: <implementing spec links>  or  `Specs: none — <why>`
 
 | Artifact after death | Disposition | Why |
 |---|---|---|
-| abandoned spec, its `.decisions.md`, plans and other process/contract artifacts | delete in the same commit as the epitaph | zero work value, pure interference |
+| abandoned spec and its spec-local plans or process artifacts | delete in the same commit as the epitaph; never delete the shared topic `decisions.md` | zero work value, pure interference |
 | the epitaph: decision, reason, review condition, historical pointer | keep in the live decision file or CHANGELOG | prevents re-proposal |
 | research report | keep | a deliverable is not a corpse |
 | superseded entry | keep, annotated | the revision chain stays traceable |
 | rejected standalone record | keep | the home of promoted knowledge |
 
-- Delete an abandoned item's process file whole; never delete an individual
-  entry from a live log.
+- Delete an abandoned item's spec-local process files whole; never delete the
+  shared topic log or an individual entry from a live log.
 - The epitaph lands in the same commit as the deletion; git history keeps the
   past, the worktree keeps current truth (`write-spec` owns the procedure).
 - Age, length, and dislike are never deletion criteria.
@@ -233,9 +240,10 @@ repeated here.
 
 ### Progress tree (the sole format)
 
-The tree lives under `## Progress` in the decision file that owns the work items
-— `<slug>.decisions.md` alongside a spec; the topic's decision file otherwise.
-It is the only progress truth; every status statement elsewhere is a projection.
+Each topic has one tree under `## Progress` in
+`docs/topics/<topic>/decisions.md`, covering topic work items and every spec
+slice. There is no spec-local progress tree or decision log. The topic tree is
+the only progress truth; every status statement elsewhere is a projection.
 
 ```markdown
 - [<ID>] <type>: <title> · <status> (<evidence pointer>)
@@ -244,16 +252,25 @@ It is the only progress truth; every status statement elsewhere is a projection.
 
 - One line per node, nothing else; prose and conclusions belong at their homes
   (`record-discipline` sets the line budget).
-- `ID` is the work item's identifier, assigned once and never reused (`[W<n>]`
-  in a topic; `[S<n>]` for a spec slice).
+- `ID` is `[W<n>]` for a topic work item and `[<slug>#S<n>]` for a spec slice;
+  every reference resolves to exactly one node in the topic.
 - `type` is the registered triage result, `build` or `explore`; there is no
   other type vocabulary.
-- `status` reuses the existing state words: `pending`, `in progress`, `done`,
-  `dead-end`, `pivot`, `misclassified`.
-- `dead-end` stops the inquiry, `pivot` continues it in a child leaf, and `done`
-  meets the item's criterion; these are the only meanings the words carry.
-- A corrected triage keeps its history in place: `misclassified → done |
-  dead-end | absorbed`, the replacement drawn from the same words.
+- `status` is exactly one of `pending`, `in progress`, `blocked`, `done`,
+  `dead-end`, or `pivot`.
+- `blocked` is nonterminal and carries a pointer to the named condition that
+  prevents progress; it returns to `pending` or `in progress` when that
+  condition clears.
+- A build item is `done` only after its delivery disposition is accepted and no
+  successor is required. An explore item is `done` only after its result duty
+  is complete and no successor is required. An owner-accepted deviation remains
+  `unmet` in the acceptance record.
+- `dead-end` stops the current direction with its required analysis complete;
+  `pivot` continues in a registered successor, and the topic stays open until
+  that successor is terminal.
+- `misclassified` is a transition marker, never a current status. A corrected
+  triage records `misclassified → <current status>`; successor absorption is
+  `pivot`, not a separate status.
 - Indentation is derivation: a spawned child node is indented under its
   parent; a flat list is wrong when the work produced children.
 - State words are grep-able — that is the batch-reconciliation entry point — and

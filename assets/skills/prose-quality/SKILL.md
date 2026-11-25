@@ -36,14 +36,14 @@ Accept `mode: automatic | interactive`; default to `automatic`.
 - External dependencies and third-party vendored code (`<external-dependency-dir>`, e.g. `node_modules/`, `.venv/`) — do not follow symlinks into them
 - Generated files (`__pycache__/`, `.mypy_cache/`, build artifacts)
 - Test fixtures and recorded snapshots
-- Frozen specs (`docs/specs/<slug>.md`) — scanned and reported on only; never edit them. Corrections go to the feature's Decision Log or a new spec (per write-spec)
+- Frozen specs (`docs/topics/<topic>/specs/<slug>.md`) — scanned and reported on only; never edit them. Corrections go to the owning topic's Decision Log or a new spec (per write-spec)
 - Finalized research reports — record reports (final at handoff), and deliverable reports at `Status: final` (per write-research-report) — point-in-time records: scanned and reported on only; never edit one after it is finalized. Later findings and corrections go into a later report covering the same topic or leaf (routing per write-research-report)
 
 Treat generated catalogs, snapshots, and fixtures as derivative. Edit the owning source or scenario first, then regenerate the artifact.
 
 ### Exemptions (from one rule each, never from coverage)
 
-- Decision Log (`.decisions.md`) — exempt from the no-session-context rule: entries may reference session context and record decision-process fields (Phase, user dialogue, rejected alternatives). Change narration stays banned. The Decision-artifact coverage entry and the corpus audit still apply.
+- Decision Log (`docs/topics/<topic>/decisions.md`) — exempt from the no-session-context rule: entries may reference session context and record decision-process fields (Phase, user dialogue, rejected alternatives). Change narration stays banned. The Decision-artifact coverage entry and the corpus audit still apply.
 - Process journals — exempt from the no-narration rule: may narrate process, up to the item limit in trim-cot-leakage's surface tolerance table.
 - Deliverable research reports before `Status: final` — exempt from the always-excluded edit ban: they are in the owner review loop and are revised in place until `Status: final` (per write-research-report). Coverage still applies.
 

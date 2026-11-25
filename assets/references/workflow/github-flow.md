@@ -6,9 +6,11 @@ workflow skills; pointers are at the end.
 
 ## Branch topology
 
-- One spec = one branch = one PR. The spec branch `spec/<slug>` is cut from
-  `main`, and only the spec branch merges into `main` — through the spec's
-  single PR. `main` is deployable at every commit.
+- One spec = one branch = one PR unless the entire spec is accepted as
+  no-change. The spec branch `spec/<slug>` is cut from `main`, and only the
+  spec branch merges into `main` — through the spec's single PR. `main` is
+  deployable at every commit. A fully no-change spec closes through its
+  acceptance record without a branch or PR.
 - Each `[Sn]` works on a slice branch named `spec/<slug>-s<n>` (`[S2]` →
   `spec/<slug>-s2`) and lands on the spec branch by a merge commit.
 - A slice with no unmet `Dependencies` branches from `main`. A slice whose
@@ -44,24 +46,26 @@ workflow skills; pointers are at the end.
 
 ## Direct-to-main list
 
-Three kinds of commits go straight to `main`, with no branch and no PR:
+Four kinds of commits go straight to `main`, with no branch and no PR:
 
-- The freeze commit that adds `docs/specs/<slug>.md` and its
-  `<slug>.decisions.md` (write-spec's save-and-confirm commit).
-- Progress updates to the `.decisions.md` `## Progress` board.
+- The freeze commit that adds `docs/topics/<topic>/specs/<slug>.md` and the
+  owning topic's `decisions.md` (write-spec's save-and-confirm commit).
+- Progress updates to the topic `decisions.md` `## Progress` board.
+- A no-change acceptance recorded in the topic `decisions.md`.
 - Standalone Decision Record transitions (`proposed` → `accepted`/
-  `rejected`) in `docs/specs/decisions/`; the main agent commits these
-  directly on `main`, and the next review or audit re-checks each transition.
+  `rejected`) in `docs/decisions/`; the main agent commits these directly on
+  `main`, and the next review or audit re-checks each transition.
 
-After the freeze, the Decision Log and the Progress board are written only
-direct-to-main, never on the spec branch, so every PR diff carries
+After the freeze, the topic Decision Log and the Progress board are written
+only direct-to-main, never on the spec branch, so every PR diff carries
 implementation code alone and merges stay clean.
 
 ## Pull requests
 
 - The spec's PR is `spec/<slug>` → `main`; it merges with a merge commit.
 - The description and its minimum items are owned by `pr-description`.
-- The frozen-spec gate: the PR diff must not touch `docs/specs/<slug>.md`.
+- The frozen-spec gate: the PR diff must not touch
+  `docs/topics/<topic>/specs/<slug>.md`.
   Merge preconditions and landing: see `merge-stack`.
 - A spec that builds on an unmerged spec bases its PR on the earlier branch.
   The base is updated only by merging `main` into it; rebase plus force-push

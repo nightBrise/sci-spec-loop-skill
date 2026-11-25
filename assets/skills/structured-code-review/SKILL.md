@@ -15,7 +15,7 @@ Governing rule: no evidence, no approve.
 
 **Carriers.** The carrier assignment is `AGENTS.md`'s review mechanism; this skill is the standard for code and task-output reviews, whoever carries them.
 
-- **Owner direct review** — spec drafts before freeze, outline skeletons, reports. The owner applies the owning skill's checklist (`write-spec` "Verify the spec"; `write-research-outline` skeleton review) or, for a report, reads it as its intended reader. The code taxonomy below does not apply to an artifact that makes no behavioral claim.
+- **Owner direct review** — spec drafts before freeze, outline skeletons, reports. The owner applies the owning skill's checklist (`write-spec` "The one test" and defect taxonomy; `write-research-outline` skeleton review) or, for a report, reads it as its intended reader. The code taxonomy below does not apply to an artifact that makes no behavioral claim.
 - **Main agent review, or dispatched review, of subagent-written code** — the writer never reviews its own output. The main agent applies both layers itself, or hands a generic read-only subagent the composed review prompt below; whole-branch scope defaults to dispatch.
 - **Main-agent self pass** — small prose and small fixes; blocking requirement 1 plus a trim pass is the whole review.
 
@@ -29,9 +29,9 @@ Governing rule: no evidence, no approve.
 - Defensive patterns: the project's defensive-patterns documentation, if present.
 - Prose standard and leakage detection: `skills/prose-quality`, `skills/trim-cot-leakage`.
 - Testing conventions: the project's testing documentation and CI configuration; layers and the gate boundary in `references/workflow/testing.md`.
-- Decision Logs: the feature's `.decisions.md`.
-- Standalone Decision Records: `docs/specs/decisions/` — proposals and decisions in their three states.
-- The frozen spec (`docs/specs/<slug>.md`) and the Decision Log and records it references, when the change belongs to a spec loop.
+- Decision Log: the owning topic's `decisions.md`.
+- Standalone Decision Records: `docs/decisions/` — proposals and decisions in their three states.
+- The frozen spec (`docs/topics/<topic>/specs/<slug>.md`) and the owning topic's `decisions.md` plus the records it references, when the change belongs to a spec loop.
 - For subagent output: the task report, carrying the deviations, deferred scope, and evidence pointers the review reconciles against.
 - For a re-review: the prior findings and their dispositions.
 
@@ -86,12 +86,12 @@ Verify the author ran the checks the changed surface requires; `skills/pre-push-
 
 When a frozen spec governs the change:
 
-- Read the spec, its `.decisions.md`, and every standalone Decision Record the spec or log references.
+- Read the spec, the owning topic's `decisions.md`, and every standalone Decision Record the spec or log references.
 - For every `[Sn]` the diff touches, enumerate the Claims; each Claim is implemented with evidence pointing at the code, or reported unmet with the recorded deviation as its explanation.
 - `## Global Constraints` and `## Out of Scope` are not violated.
 - Behavior that no Claim covers is a finding — deferred scope or an uncovered design choice. Report it; the main agent records the entry or routes a contract change.
 - A Claim left unmet by a deviation recorded in the task report is a finding for the acceptance gate, not a blocking defect, and it never counts toward the rejection cap.
-- The diff does not edit the frozen spec (`docs/specs/<slug>.md`).
+- The diff does not edit the frozen spec (`docs/topics/<topic>/specs/<slug>.md`).
 
 ## Layer 2: Semantic checks
 
@@ -154,7 +154,7 @@ Assertions fail on the intended regression and verify external state — logs, e
 
 ### Decision Record matches shipped reality
 
-When a change implements a proposed standalone Decision Record, the pre-merge review verifies that the diff satisfies the record's `## Acceptance criteria` and reports the migration as pending. Main-agent governance commits to a feature's `.decisions.md` or to `docs/specs/decisions/` are not implementer diffs and are not in scope of this gate. The main agent executes the migration to `accepted` (transition rules per `skills/manage-decision-records`; present-tense text per `skills/prose-quality`'s Decision-artifact coverage entry) on main after the change merges; a later review or audit verifies the migration landed against shipped code. Conversely, flag design choices visible in the diff that no Decision Record or Decision Log entry covers — report them; the main agent appends the entry.
+When a change implements a proposed standalone Decision Record, the pre-merge review verifies that the diff satisfies the record's `## Acceptance criteria` and reports the migration as pending. Main-agent governance commits to the owning topic's `decisions.md` or to `docs/decisions/` are not implementer diffs and are not in scope of this gate. The main agent executes the migration to `accepted` (transition rules per `skills/manage-decision-records`; present-tense text per `skills/prose-quality`'s Decision-artifact coverage entry) on main after the change merges; a later review or audit verifies the migration landed against shipped code. Conversely, flag design choices visible in the diff that no Decision Record or Decision Log entry covers — report them; the main agent appends the entry.
 
 ### Snapshot and visible-output changes
 
@@ -214,7 +214,7 @@ A dispatched review is a generic read-only subagent carrying a composed prompt. 
 
 1. **Read-only constraints.** State the available tools and permissions: file reads and the git whitelist above; never write a file, including through shell redirection; never run a mutating git command. Require the final message to be the complete, self-contained review report.
 2. **Methodology.** Instruct the subagent to load `structured-code-review` and apply its two layers, evidence admissibility, and report format. Do not restate the methodology in the prompt — a second copy drifts from this skill.
-3. **Review object.** Give the frozen spec path, its `.decisions.md`, and every referenced standalone Decision Record; the diff range (slice `base..head`, the accumulated range since the last batch review, or the whole branch against its base for a whole-spec review); and what lies outside the review scope. For task output, attach the task report so a recorded deviation is distinguished from an unexplained unmet Claim.
+3. **Review object.** Give the frozen spec path, the owning topic's `decisions.md`, and every referenced standalone Decision Record; the diff range (slice `base..head`, the accumulated range since the last batch review, or the whole branch against its base for a whole-spec review); and what lies outside the review scope. For task output, attach the task report so a recorded deviation is distinguished from an unexplained unmet Claim.
 4. **Verdict contract.** Require the three-state verdict, the evidence rule (no evidence → never `approve`), the findings format, the review object named for the rejection cap, and the report content. Never accept a verdict that lacks evidence; send it back for the missing proof.
 
 - Dispatch to a model satisfying the review role's relative constraint (`AGENTS.md`, model rules); the mapping lives in the harness adapter. Never name a model in the prompt.
@@ -258,7 +258,7 @@ Rules:
 3. Read the diff and enough surrounding code to state the design; the diff alone does not show intent.
 4. Run Layer 1; a single failure blocks. When a spec is in scope, enumerate the Claims of every touched `[Sn]`.
 5. Run the Layer 2 checks the change makes relevant.
-6. Admit evidence; mark each promise evidenced, unmet, or unevidenced.
+6. Admit evidence; mark each promise `met`, `unmet`, or `unevidenced` within its declared scope. Invalid, missing, or inconclusive evidence is `unevidenced`, and a required guard left `unevidenced` prevents acceptance.
 7. Write the findings and the verdict: verdict, blockers with location/impact/evidence, suggestions, unevidenced Claims, the coverage boundary, and for a batch, the owning slice per finding.
 8. For a dispatched review, compose the prompt from the four blocks and verify the returned report is self-contained and evidence-backed.
 

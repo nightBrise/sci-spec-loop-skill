@@ -17,7 +17,7 @@ Governing rule: remove the obligation, not the symptom. A candidate earns its pl
 
 - The scope: a repository, a module set, or the topic's own asset tree (the closing routine).
 - The consumer corpus: production code, tests, documentation, configuration, manifests, generated outputs.
-- The recorded rationale a candidate must beat: `.decisions.md`, `docs/specs/decisions/`, and architecture documents.
+- The recorded rationale a candidate must beat: the owning topic's `decisions.md`, `docs/decisions/`, and architecture documents.
 
 **Mode.**
 
@@ -120,13 +120,13 @@ For asynchronous machinery, map each promise, flag, cancellation path, disposer,
 
 ## Workflow
 
-1. Establish the scope and read the standing rules: `AGENTS.md`, architecture documents, `.decisions.md`, and `docs/specs/decisions/`. Note protected seams and dual implementations; treat them as intentional until evidence beats the record.
+1. Establish the scope and read the standing rules: `AGENTS.md`, architecture documents, the owning topic's `decisions.md`, and `docs/decisions/`. Note protected seams and dual implementations; treat them as intentional until evidence beats the record.
 2. Survey the scope. For a broad request, split independent domains across subagents, each with a bounded domain and a requirement of consumer evidence; otherwise sweep core logic and data flow, UI or API, configuration and tooling, tests and documentation, and external integrations yourself. Start from the largest production deltas; do not stop at the first good candidate or at obvious unused symbols.
 3. Put every candidate through the six questions; drop the ones that expose no obligation to delete.
 4. Prove reachability with the consumer-evidence rules. A production caller turns a deletion into a behavior decision.
 5. Classify delete / narrow / keep; for keep, write the reason at the level of the change.
 6. Apply the anti-over-fixing guard and, for a dependency swap, the net-reduction proof.
-7. Record. A durable cross-feature proposal goes to `docs/specs/decisions/` as a standalone `proposed` record in `manage-decision-records`' format — `## Problem`, `## Proposal`, `## Alternatives Considered`, `## Acceptance criteria`, `## Risks` — with the audit-specific contents below. A decided, feature-bound item goes to the feature's `.decisions.md` in that skill's entry format; a tiny local cleanup becomes an inline TODO.
+7. Record. A durable cross-feature proposal goes to `docs/decisions/` as a standalone `proposed` record in `manage-decision-records`' format — `## Problem`, `## Proposal`, `## Alternatives Considered`, `## Acceptance criteria`, `## Risks` — with the audit-specific contents below. A decided, topic-bound item goes to the owning topic's `decisions.md` in that skill's entry format; a tiny local cleanup becomes an inline TODO.
    - `## Problem` names the current surface, cites the files, and separates production consumers from tests and docs.
    - `## Proposal` states exactly what is removed, narrowed, or rehomed, including tests, docs, configuration, and generated files.
    - `## Alternatives Considered` and `## Risks` make the strongest counterargument legible: why not keep it, and what the change gives up.
